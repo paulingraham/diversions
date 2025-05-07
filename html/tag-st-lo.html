@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width">
+
+<link rel="shortcut icon" href="imgs/favicon.ico" />
+
+<title>8 Diversions Posts Tagged 'St Lo'</title>
+
+<style>
+
+/* CSS defaults for PubSys */
+
+.next_prev_links {margin:5em 2em 2em 2em; font-size:.9em; text-align:center; font-style:italic;}
+.next_prev_links img {margin-left:-1%;}
+.next_prev_links .arrow {font-size:.8em; color:#CCC; vertical-align:.1em;font-style:normal;padding: 0 .6em;}
+.prev_link {float:left; width:40%; text-align: right; margin-top:.4em;line-height:1.2}
+.next_link {float:right; width:40%; text-align:left; margin-top:.4em; line-height:1.2}
+
+div.ytemb {
+margin: 3em auto 3em auto;
+text-align:center;
+max-width: 100%;
+}
+
+iframe.ytemb {
+width:500px;
+height:315px;
+max-width: 100%;
+}
+
+.preamble {color: gray; font-size: .9em}
+
+body { /* defaults for the main text */
+margin:10px;
+font-family:HelveticaNeue-Light,Arial,Helvetica,sans;
+line-height:1.5;
+font-size:16pt;
+}
+
+.sidebar {
+width:90%;
+margin: 1.5em auto;
+font-size: .7em;
+line-height: 1.4;
+color:#666;
+}
+
+.micropost article {font-size:18pt}
+
+time {
+font-size:.8em;
+color:gray;
+}
+
+nav {
+position:absolute;
+top:10px;
+font-size:.7em;
+color:#666;
+}
+
+nav a {
+font-family:HelveticaNeue-CondensedBold,Tahoma,Tahoma,Arial Black;
+}
+
+.footer_nav {
+position: relative;
+text-align: center;
+}
+
+header { /* article header, including title, subtitle and metadata */
+line-height:1.2;
+}
+
+h1, h2, h3 {
+text-rendering:optimizeLegibility;
+font-family:HelveticaNeue-CondensedBold,Tahoma,Tahoma,Arial Black;
+line-height:1;
+}
+
+
+
+article {
+margin-top:4em;
+}
+
+article header h1 {
+margin:0;
+font-size:2em;
+}
+article.micropost header h1 {font-size:1.2em} /* micropost title sizes are much smaller! */
+
+#subtitle {
+color:#999;
+font-size:.8em;
+}
+.micropost #subtitle {display:none}
+
+h2, h3 {
+margin-top:2em;
+font-size:1.2em;
+}
+
+article header .metadata {
+color:#666;
+font-weight:lighter;
+font-size:.9em;
+margin-top:1em;
+margin-bottom:3em;
+}
+
+.micropost .metadata {font-size:.6em}
+
+address {
+display:inline;
+font-style:normal;
+}
+
+
+#byline-bottom {
+margin-top:5em;
+text-align:center;
+}
+
+footer.bio {
+margin: 8em 6% 3em 6%;
+text-align: center;
+font-weight:lighter;
+font-size:.8em;
+line-height:1.5;
+color:#666;
+}
+
+.micropost footer.bio { /* it’s kind of weird, but in a micropost my bio needs to be much more separated from the content, because it’s actually BIGGER than a lot of microposts … if it’s not quite well separated, and in smaller type, it looks too much like the content itself */
+margin-top: 10em;
+font-size:.8em;
+}
+
+
+footer.bio img {
+float:none;
+display:block;
+margin: 0 auto 1em auto;
+}
+
+
+a {text-decoration:none}
+a:link {color:#0080FF}
+a:hover {color:#FF6666; text-decoration:underline}
+a:active {color:red; text-decoration:underline}
+a:visited {color:#4A73A5}
+.post_index a:visited {color:#999}
+
+.featured_link {
+font-size: .8em;
+line-height:1.2;
+font-family:
+	Avenir Next Condensed,
+	HelveticaNeue-CondensedBold,
+	Arial Narrow,
+	Avenir Next,
+	HelveticaNeue,		
+	Tahoma,
+	Verdana,
+	DejaVu Sans,
+	Arial Black,
+	sans-serif;	
+}
+
+.color_dark_gray {color:#666}
+.color_light_gray {color:#AAA}
+.color_med_gray {color:#888}
+
+
+
+
+ul, ol, blockquote {line-height:1.4;font-size:.9em}
+
+ul {padding-left:1em}
+
+li {margin-bottom: 1em}
+
+code {
+font-family:Monaco,Consolas,Droid Sans Mono,Liberation Mono,mono;
+font-size:.8em;
+color:green;
+}
+
+.separator {color:gray;text-align:center;margin:2em 4% 3em 0;}
+
+.separator.bullet:after {content:"•"}
+
+.separator.stars {font-size: 1.2em}
+
+span.img_container {display:inline-block}
+
+.img_container {text-align:center; line-height:1}
+
+img.ds {box-shadow: 3px 3px 8px 0px #555}
+
+.img_container.centre {margin: 2em auto}
+
+.img_container.right {
+float: right;
+margin: 1em 0 2em 2em;
+}
+
+.img_container.left {
+float: left;
+margin: 1em 2em 2em 0;
+}
+
+img, .img_container {
+max-width:100% !important;
+height:auto;
+}
+
+span.img_container, span.caption {display:inline-block}
+
+.img_container .caption {
+margin: .8em 1% 0 1%;
+font-size:.7em;
+color:#888;
+font-weight:100;
+}
+
+.img_container.centre .caption {
+margin-top: 1em 6% 0 6%;
+}
+
+.post_index {margin:2em 0; padding:0;}
+.post_index li {
+list-style-type:none;
+margin:1em 0;
+padding-left:10px;
+line-height:1.3
+}
+
+.post_index li.img {
+list-style-image:url('imgs/!-icon-eye.gif');
+}
+
+.post_index li.s {
+list-style-image:url('imgs/!-icon-post-size-s.gif');
+}
+
+.post_index li.m {
+list-style-image:url('imgs/!-icon-post-size-m.gif');
+}
+
+.post_index li.l {
+list-style-image:url('imgs/!-icon-post-size-l.gif');
+}
+
+.post_index li.xl {
+list-style-image:url('imgs/!-icon-post-size-xl.gif');
+}
+
+
+.post_index {
+font-size:.9em;
+}
+
+.post_index td, .post_index th {
+padding:8px;
+line-height:1.1;
+}
+
+.post_index th {
+cursor: pointer; 
+}
+
+.post_index td.tdsize {
+width:50px;
+background-repeat:no-repeat;
+background-origin:content-box;
+background-position: center;
+}
+
+.post_index td.img {
+background-image:url('imgs/!-icon-eye.gif');
+}
+
+.post_index td.s {
+background-image:url('imgs/!-icon-post-size-s.gif');
+}
+
+.post_index td.m {
+background-image:url('imgs/!-icon-post-size-m.gif');
+}
+
+.post_index td.l {
+background-image:url('imgs/!-icon-post-size-l.gif');
+}
+
+.post_index td.xl {
+background-image:url('imgs/!-icon-post-size-xl.gif');
+}
+
+.post_index td.tddate {
+white-space:nowrap;
+font-size:.7em;
+color:#BBB;
+}
+
+.char_arrow, .char_sort_arrow { /* for sort arrows based on ▲ (9650) & ▼ (9660) … 
+The glyph is available in every single web safe font (probably damn near every font period), but be aware that Arial Unicode MS is unusually SMALL, and there are only a few that have a NARROW shape. This font-stack simply chooses a few of the narrower, smaller for consistency:  */
+font-family: Courier New, Impact, Times New Roman, Lucida Sans Unicode, DejaVu Sans}
+
+.char_arrow2 { /* for sort arrows based on ↑ */
+font-family: Impact, Times New Roman, Arial}
+
+.char_sort_arrow {
+	color: #A9CAF0;
+	vertical-align:-.6em;
+	line-height:0;
+	}
+
+.thtitle {
+text-align:left;
+}
+
+.thtitle .char_sort_arrow { 
+	margin-left:.3em;
+	}
+
+.char_sort_arrow.off {
+	color: #f5f5f5;
+	}
+
+ul.tag_list {
+display:inline;
+margin:0; padding:0;
+}
+
+ul.tag_list li {
+list-style-type:none;
+margin: .2em 6px 0 0;
+padding: 2px 4px;
+border: 1px solid #CCC;
+border-radius:3px;
+display:inline-block;
+text-transform:uppercase;
+font-size: .7em;
+letter-spacing: 0px;
+color: #AAA;
+font-weight:bold;
+}
+
+.metadata a:link {color:#4A73A5}
+
+/* `QUOTATIONS (QT) 
+
+blockquote (ordinary passage quoting, indented paragraph)
+qt (featured quote)
+qt.short (featured short quote, decorative styling, large print) */
+
+blockquote {
+margin:1.2em 1em; 
+font-size:.95em;
+color:#555;
+}
+
+blockquote.featured { /* for longer featured quotes */
+text-rendering: optimizeLegibility;
+margin:2em 10% 2em 10%;
+font-size:1.2em;
+color: #777;
+}
+
+blockquote.short {
+/* Completely different, decorative styling for shorter featured quotes */
+text-rendering: optimizeLegibility;
+margin:2.5em 15% 2.5em 10%;
+font-style:italic;
+font-size:1.4em;
+color: #555;
+}
+
+
+blockquote .attr {
+font-size: .6em;
+color: #999;
+margin: -.5em 10% 0 30%;
+text-indent: -.2em;
+}
+
+blockquote .chartild {
+display:none;
+font-weight:bold;
+color: #CCC;
+font-size:1.2em;
+margin-right:.2em;
+}
+
+
+/* <##> ======= ↓ `big window styles ↓ ======= */
+
+@media screen and (min-width: 550px) {
+
+
+.sidebar {
+width:35%;
+margin: 1em 0 1em 2em;
+float: right;
+font-size: .8em;
+line-height: 1.4;
+color:#666;
+}
+
+
+ul.tag_list li {
+opacity: 0.7;
+font-size: .7em;
+border-radius:4px;
+letter-spacing: 1px;
+}
+
+.img_container.centre {
+margin: 3.5em auto;
+text-align:center;
+}
+
+
+img, .img_container {
+max-width:100% !important;
+height:auto;
+}
+
+.img_container .caption {
+margin: 1.5em 10% 0 10%;
+font-size:.8em;
+line-height:1.3;
+}
+
+
+body {
+margin: 2em auto;
+width: 70%;
+line-height:1.7em;
+font-size:18pt;
+}
+
+.micropost article {font-size:20pt}
+
+
+article header h1 {font-size:2.4em}
+.micropost header h1 {font-size:1.6em} /* micropost title sizes are much smaller! */
+
+h2, h3 {
+margin-top:3em;
+font-size:1.6em;
+}
+
+ul, ol {padding-left:2em}
+
+blockquote {margin:2em 2.5em}
+
+article header .metadata {font-size:.8em}
+
+footer.bio {
+margin: 5em 6% 4em 8%;
+padding-left:100px;
+text-align:left;
+font-weight:lighter;
+font-size:.8em;
+line-height:1.5;
+color:#666;
+}
+
+.micropost footer.bio { /* it’s kind of weird, but in a micropost my bio needs to be much more separated from the content, because it’s actually BIGGER than a lot of microposts … if it’s not quite well separated, and in smaller type, it looks too much like the content itself */
+margin-top: 10em;
+font-size:.7em;
+}
+
+
+footer.bio img {
+float:left;
+margin: .4em 0 0 -100px;
+}
+
+/* `QUOTATIONS (QT) */
+
+.qt {
+/* Completely different, decorative styling for short quotes */
+/* set in prenton */
+margin:3em 10% 2em 8%;
+line-height:1.3;
+font-size:1.2em;
+text-indent: -.2em;
+}
+
+.qt .char_open_qt {
+font-size:1.2em;
+margin-right:.1em;
+}
+
+blockquote .attr {
+font-size:.7em;
+margin:0 10% 0 20%;
+text-indent: -.2em;
+}
+
+blockquote .chartild {
+font-weight:bold;
+color: #CCC;
+font-size:1.2em;
+margin-right:.2em;
+}
+
+blockquote.short {
+/* Completely different, decorative styling for shorter featured quotes */
+text-rendering: optimizeLegibility;
+margin:3em 20% 3em 15%;
+font-style:italic;
+font-size:1.5em;
+color: #555;
+}
+
+
+} /* end of larger window CSS */
+
+.red {color:red}
+.blue {color:blue}
+.green {color:green}
+.orange {color:orange}
+.purple {color:purple}
+.brown {color:brown}
+.gray{color:gray}
+body {font-family:"Trebuchet MS",Helvetica,sans}
+h1 {color: #0080FF}
+.sidebar {
+border:1px solid #999;
+padding:8px;
+}
+.separator {content:"";}
+/* 3px 3px 5px 0px #555
+horizontal shadow, vertical shadow, blur, spread, colour
+img.ds{box-shadow:5px 5px 8px 3px #555} */
+
+.separator {color:gray;text-align:center;margin:2em 4% 3em 0;}
+
+.separator.stars {font-size: 1.2em}
+
+.thsize, .tdsize {display:none}
+
+</style>
+
+<script type='text/javascript' src='https://code.jquery.com/jquery-3.4.1.min.js' ></script>
+
+<script type="text/javascript">
+
+(function(c){c.fn.stupidsort=function(a){var b=c(this),g=0,f=c.fn.stupidtable.dir,e=b.closest("table"),k=b.data("sort")||null;if(null!==k){b.parents("tr").find("th").slice(0,c(this).index()).each(function(){var b=c(this).attr("colspan")||1;g+=parseInt(b,10)});var d;1==arguments.length?d=a:(d=a||b.data("sort-default")||f.ASC,b.data("sort-dir")&&(d=b.data("sort-dir")===f.ASC?f.DESC:f.ASC));e.trigger("beforetablesort",{column:g,direction:d});e.css("display");setTimeout(function(){var a=[],l=e.data("sortFns")[k],h=e.children("tbody").children("tr");h.each(function(b,e){var d=c(e).children().eq(g),f=d.data("sort-value"),d="undefined"!==typeof f?f:d.text();a.push([d,e])});a.sort(function(a,b){return l(a[0],b[0])});d!=f.ASC&&a.reverse();h=c.map(a,function(a){return a[1]});e.children("tbody").append(h);e.find("th").data("sort-dir",null).removeClass("sorting-desc sorting-asc");b.data("sort-dir",d).addClass("sorting-"+d);e.trigger("aftertablesort",{column:g,direction:d});e.css("display")},10)}};c.fn.stupidtable=function(a){return this.each(function(){var b=c(this);a=a||{};a=c.extend({},c.fn.stupidtable.default_sort_fns,a);b.data("sortFns",a);b.on("click.stupidtable","thead th",function(){c(this).stupidsort()})})};c.fn.stupidtable.dir={ASC:"asc",DESC:"desc"};c.fn.stupidtable.default_sort_fns={"int":function(a,b){return parseInt(a,10)-parseInt(b,10)},"float":function(a,b){return parseFloat(a)-parseFloat(b)},string:function(a,b){return a.localeCompare(b)},"string-ins":function(a,b){a=a.toLocaleLowerCase();b=b.toLocaleLowerCase();return a.localeCompare(b)}}})(jQuery);
+/* Stupid jQuery Table Sort
+http://joequery.github.io/Stupid-Table-Plugin/
+requires stupidtable.min.js and html5shiv.js
+
+Bare bones setup guide:
+
+	* load jquery, stupidtable.min.js (and html5shiv.js for production)
+	* load css-matrix.css for styling of sort arrows and much more
+	* <table id="matrix">, must have <thead>
+	* <th data-sort="int|float|string"> the columns to sort cell contents
+	* <td data-sort-value="?"> to sort with invisible data instead of cell contents
+	* first sorted column is default; add this to the TH to get an arrow on it on first run
+			<span class="char_sort_arrow">▼</span><!-- default sort -->
+
+Template for bare bones setup:
+
+	<table id="matrix">
+	<thead><tr>
+	<th data-sort="int">integer column<span class="char_sort_arrow">▼</span><!-- default sort --></th>
+	<th data-sort="string" >string column</th>
+	etc...
+	</tr></thead>
+
+	<tr>
+	<td>365</td>
+	<td data-sort-value="data actually used for sort">user-facing data</td>
+	</tr>
+
+Th-th-that's all, folks!
+
+*/
+
+$(function(){
+		
+	$("#matrix").stupidtable(); // apply stupidtable intelligence to tables of id=matrix (large data tables)
+
+	console.log('Matrix table initialized for sorting');
+
+/* $("#matrix").on("beforetablesort", function (event, data) {
+// Apply a "disabled" look to the table while sorting.
+// Using addClass for "testing" as it takes slightly longer to render.
+// $("#msg").text("Sorting...");
+// $("#matrix").addClass("disabled"); // sort may be too fast for this to be needed, but it's nice if the sort is slow enough
+}); */
+
+	$("#matrix").bind('aftertablesort', function (event, data) {
+		// data.column - the index of the column sorted after a click
+		// data.direction - the sorting direction (either asc or desc)
+		// $("#msg").html("&nbsp;");
+		// $("#matrix").removeClass("disabled");
+		var th = $(this).find("th");
+		th.find(".char_sort_arrow").remove();
+		var arrow = data.direction === "asc" ? "&#9650;" : "&#9660;"; // 9650=up-triangle, 9660=down-triangle
+		th.eq(data.column).append('<span class="char_sort_arrow">' + arrow +'</span>');
+		// the sort_arrow class needs to be styled with a special font_stack to ensure rendering on most devices
+		document.getElementById("sort_help").style.display = 'none'; // if there’s id=sort_help, make it go away after the first sort
+		});
+
+	});
+
+
+</script>
+
+</head><body><!-- <##> -->
+
+<nav><strong><a href="index.html">Diversions</a></strong> <img src="imgs/diversions-logo-30px.jpg" height="15" width="15" style="vertical-align:-2px"> Fitness, family, fiction</nav>
+
+<article><!--  article start -->
+
+<header>
+
+<h1 style="line-height:1.2">8 Diversion Posts Tagged <span style='color:#004080;text-transform:uppercase;
+font-size:.8em;
+padding: 0 4px;
+border: 2px solid #BBB;
+border-radius:8px;
+white-space:nowrap;
+'>St Lo</span></h1>
+
+</header>
+
+<table id='matrix' class='post_index'>
+<thead><tr>
+	<th class='thsize' data-sort="int"></th>
+	<th data-sort="int"><span class="char_sort_arrow">▼</span></th>
+	<th class='thtitle' data-sort="string" ></th>
+</tr></thead><tbody>
+<tr class='World War II,Normandy,Cherbourg,St Lo,Mortain,Falaise Pocket,Aachen,Hurtgen Forest,size L'>
+	<td class='tdsize l' data-sort-value="960" title="word count: 960"></td>
+	<td class='tddate' data-sort-value="1617001209" nowrap>Mar&nbsp;29,&nbsp;21</td>
+	<td class='tdtitle' data-sort-value='uncle-bill'><a href='uncle-bill.html'>Uncle Bill and World War II</a></td>
+</tr>
+<tr class='World War II,Normandy,Cherbourg,St Lo,Mortain,Falaise Pocket,Aachen,Hurtgen Forest,size L'>
+	<td class='tdsize l' data-sort-value="822" title="word count: 822"></td>
+	<td class='tddate' data-sort-value="1617001208" nowrap>Mar&nbsp;29,&nbsp;21</td>
+	<td class='tdtitle' data-sort-value='hoax'><a href='hoax.html'>Uncle Bill and World War II - The Hoax</a></td>
+</tr>
+<tr class='World War II,Normandy,Cherbourg,St Lo,size L'>
+	<td class='tdsize l' data-sort-value="828" title="word count: 828"></td>
+	<td class='tddate' data-sort-value="1617001207" nowrap>Mar&nbsp;29,&nbsp;21</td>
+	<td class='tdtitle' data-sort-value='bill-at-st-lo'><a href='bill-at-st-lo.html'>Uncle Bill and World War II - Battle of the Hedgerows and the Battle of St. Lo</a></td>
+</tr>
+<tr class='World War II,Normandy,Cherbourg,St Lo,Mortain,Falaise Pocket,Aachen,Hurtgen Forest,size L'>
+	<td class='tdsize l' data-sort-value="795" title="word count: 795"></td>
+	<td class='tddate' data-sort-value="1617001205" nowrap>Mar&nbsp;29,&nbsp;21</td>
+	<td class='tdtitle' data-sort-value='bill-at-hurtgen'><a href='bill-at-hurtgen.html'>Uncle Bill and World War II - The Battle of the Hurtgen Forest</a></td>
+</tr>
+<tr class='World War II,Normandy,Cherbourg,St Lo,Mortain,Falaise Pocket,size L'>
+	<td class='tdsize l' data-sort-value="735" title="word count: 735"></td>
+	<td class='tddate' data-sort-value="1617001204" nowrap>Mar&nbsp;29,&nbsp;21</td>
+	<td class='tdtitle' data-sort-value='bill-at-falaise-pocket'><a href='bill-at-falaise-pocket.html'>Uncle Bill and World War II - Battle of the Falaise Pocket</a></td>
+</tr>
+<tr class='World War II,Normandy,Cherbourg,St Lo,Mortain,Falaise Pocket,Aachen,Hurtgen Forest,size XL'>
+	<td class='tdsize xl' data-sort-value="2189" title="word count: 2189"></td>
+	<td class='tddate' data-sort-value="1617001202" nowrap>Mar&nbsp;29,&nbsp;21</td>
+	<td class='tdtitle' data-sort-value='bill-at-battle-of-the-bulge'><a href='bill-at-battle-of-the-bulge.html'>Uncle Bill and World War II - The Battle of the Bulge</a></td>
+</tr>
+<tr class='World War II,Normandy,Cherbourg,St Lo,Mortain,Falaise Pocket,Aachen,size L'>
+	<td class='tdsize l' data-sort-value="546" title="word count: 546"></td>
+	<td class='tddate' data-sort-value="1617001201" nowrap>Mar&nbsp;29,&nbsp;21</td>
+	<td class='tdtitle' data-sort-value='bill-at-aachen'><a href='bill-at-aachen.html'>Uncle Bill and World War II - The Fall of Aachen</a></td>
+</tr>
+<tr class='World War II,Normandy,Cherbourg,St Lo,Mortain,Falaise Pocket,Aachen,Hurtgen Forest,size XL'>
+	<td class='tdsize xl' data-sort-value="4784" title="word count: 4784"></td>
+	<td class='tddate' data-sort-value="1617001200" nowrap>Mar&nbsp;29,&nbsp;21</td>
+	<td class='tdtitle' data-sort-value='bill-as-radar'><a href='bill-as-radar.html'>Uncle Bill and World War II - Another "Radar" from MASH</a></td>
+</tr>
+</tbody></table>
+
+</article>
+
+<footer class="bio"><img src="imgs/susan-75x87-web.jpg" width="75" height="87">I taught in the public schools for 32 years. After retirement, I trained to become a fitness instructor for older adults. I enjoy working on family history, writing novels, and researching the latest fitness news for my class participants.</footer>
+
+<nav class="footer_nav">
+<a href="http://www.susaningraham.net"><span class='color_light_gray'>www&#8202;.&#8202;</span>Susan&thinsp;Ingraham<span class='color_light_gray'>&#8202;.&#8202;net</span></a>
+</nav>
+
+
+</body></html>
