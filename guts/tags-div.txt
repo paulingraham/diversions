@@ -1,0 +1,582 @@
+TAGS
+
+This section, before the row of **** below, is a scratch space. You can keep any notes you want here.
+
+Here is tag template.  You can copy and paste it and fill in the blanks.  Every item is optional.
+
+true tag name
+	notes = 
+	description = 
+	short = 
+	long = 
+	abbr = 
+	synonyms = 
+	parents = 
+	
+quackery [auto tag count] 			< the main or “true” form of the tag, with correct case & punctuation
+	notes: My favourite tag. 		< private notes about the tag, eg clarifying what kind of content
+	description:							< public description of the tag, eg appears in tooltips on mouseover
+	short: quackery						< a shorter form of the tag
+	long: qkry								< a longer form of the tag
+	abbr: quack 							< abbreviation of the 
+	synonyms:	snake oil				< usage of these terms will always be replaced by the main tag
+	parents: skepticism, healthcare		< all 'quackery' items are also tagged with 'skepticism' and 'healthcare'
+
+Tags preceded by a DOT are “admin” tags for your eyes only. They will never appear on the website. Example, you can tag your posts with a tag about its editorial status:
+
+	.needs editing
+
+***************************************
+
+Aachen [6]
+
+abdominals []
+	long = abdominal muscles
+	abbr = abs
+
+abductors []
+
+activity []
+	synonyms = activities, choosing an activity, staying active
+
+adapting exercise []
+
+adductors []
+	synonyms = adductor brevis, adductor longus, adductor magnus
+
+aerobic []
+	synonyms = anaerobic
+
+aging []
+
+air pollution []
+
+air quality []
+
+Allen [2]
+
+allergies []
+
+Allison [2]
+
+American Civil War [2]
+
+American Revolution []
+
+ankle []
+
+arm bones []
+
+arthritis []
+
+asthma []
+
+autobiography []
+
+av [4]
+
+back []
+
+backbone []
+
+balance []
+
+ball []
+
+ball-and-socket joint []
+
+barometric pressure []
+
+basketball [2]
+
+BCRPA []
+
+Beaver [1]
+
+best of [2]
+
+biceps []
+
+body systems []
+
+body temperature []
+
+bones []
+
+Boone [2]
+
+boot camp []
+
+brain []
+
+Brand [5]
+
+breathing []
+
+burn []
+
+calf []
+
+calf muscles []
+
+Canada's Food Guide []
+
+cancer []
+
+canoe []
+
+cardio []
+
+cardiovascular []
+
+Cherbourg [9]
+
+cholesterol []
+
+chronic pain []
+
+cold []
+
+computers []
+
+COPD []
+
+Corbin [1]
+
+core []
+
+DeBolt [1]
+
+deltoids []
+
+dementia []
+
+depression []
+
+diabetes []
+
+diet []
+	synonyms = dieting, diets, food
+
+digestive system []
+
+Eddy [4]
+
+elbow []
+
+elementary school []
+
+emergencies []
+
+emphysema []
+	synonyms = COPD
+
+endocrine system []
+
+erector spinae []
+
+exercise []
+
+exercise research []
+
+exocrine system []
+
+eye health []
+
+eyes []
+
+Fairbury []
+
+Falaise Pocket [7]
+
+fall prevention []
+	synonyms = falling, falls
+
+family secrets []
+
+fascia []
+
+fascial system []
+
+feet []
+
+femur []
+
+fibula []
+
+fiction []
+
+Fierro []
+	parents = New Mexico
+
+fitness class []
+	synonyms = fitness
+
+fitness equipment []
+
+fitness instructors []
+
+fitness principles []
+
+fitness research []
+
+fitness terms []
+
+forearm []
+
+free weights []
+
+French and Indian War []
+	synonyms = French and Indian
+
+gastrocnemius []
+
+genetics []
+
+glutes []
+
+Grand Canyon []
+
+Grizzly Den []
+
+group fitness []
+
+hamstrings []
+
+hand []
+
+Hansen [4]
+
+Harness [2]
+
+Hastings [2]
+	parents = Nebraska
+
+Hastings College [2]
+
+Hastings High School [2]
+
+Hatch [2]
+
+head []
+
+health []
+
+healthy []
+
+heart disease []
+
+Heartwell Nebraska []
+	short = Heartwell
+
+heat injuries []
+	synonyms = heat cramps, heat exhaustion, heatstroke
+
+Herrick [5]
+
+Higby [4]
+
+high blood pressure []
+
+hike []
+
+hip []
+	synonyms = hip flexors, hip joint
+
+holiday []
+
+home safety []
+
+hormones []
+
+Hornback [1]
+
+humerus []
+
+Hurtgen Forest [5]
+
+hypertension []
+
+iliotibial band []
+
+Illinois []
+
+immune system []
+
+impingement syndrome []
+
+individuality []
+
+Ingraham [4]
+
+inheritance []
+
+injuries []
+	synonyms = exercise injuries
+
+insomnia []
+
+instructors []
+
+Jasper []
+
+Jensen [3]
+
+joints []
+	short = joint
+	long = joint classification
+	synonyms = ball-and-socket joint, cartilagenous joint
+
+judo []
+
+Kansas City []
+
+knee []
+	long = knee injury
+	synonyms = knee joint, knee replacement
+
+lab school []
+
+Lake []
+
+latissimus dorsi []
+	short = lats
+
+Lee [4]
+
+leg []
+
+Lewis County []
+
+lifestyle []
+
+Light Fit []
+
+longevity []
+
+lower leg []
+
+lunar landing []
+
+Mahoney [3]
+
+marriage []
+
+McDonald [3]
+
+medications []
+
+memory []
+
+metabolism []
+
+Mexican War []
+
+Minden []
+
+Minnestoa []
+
+mood []
+
+Mortain [7]
+
+Mosher [3]
+
+motherhood []
+
+motivation []
+	long = motivation to exercise
+
+movement []
+
+muscles []
+
+muscular system []
+
+museum []
+
+music []
+
+musings []
+
+mystery []
+
+Nebraska [2]
+
+nervous system []
+
+New Mexico []
+
+Nissen [3]
+
+Normandy [10]
+
+novel []
+
+nutrition []
+
+obliques []
+
+older adults []
+
+old wives tales []
+
+opposing muscles []
+
+osteoarthritis []
+	synonyms = arthritis
+
+osteopenia []
+
+osteoporosis []
+
+over-training []
+
+Overturf [5]
+	synonyms = Oberdorf
+
+pain []
+
+pandemic []
+
+pecs []
+
+pectoralis major []
+
+perceived exertion scale []
+
+perfume []
+
+Porter [2]
+
+Power [2]
+
+Prince George []
+
+quadriceps []
+	short = quads
+
+Quebec []
+
+quotations []
+
+radius []
+
+research []
+
+respiratory system []
+
+review []
+
+rheumatoid arthritis []
+
+rhomboids []
+
+ribs []
+	synonyms = floating rib, rib injuries
+
+safety []
+
+Salem Witch Trials []
+
+scientific studies []
+
+Sheldon [1]
+
+shins []
+
+shoulder []
+
+Silver City []
+
+singing []
+
+size L [12]
+
+size M []
+
+size S [4]
+
+size XL [18]
+
+skeleton []
+
+sleep []
+
+small town []
+
+Solart [4]
+
+spine []
+
+sports []
+
+Steel [2]
+
+St Lo [8]
+
+strength training []
+
+stroke []
+
+studies []
+
+Sugarbowl []
+
+sweating []
+
+teaching []
+
+technology []
+
+Tegarden [1]
+
+temperature []
+
+thoughts []
+
+tibia []
+
+torn meniscus []
+
+trapezius []
+
+trends []
+
+triceps []
+
+Trumbo [2]
+
+Turpin [2]
+
+ulna []
+
+Valentine []
+	parents = Nebraska
+
+Vancouver []
+	parents = British Columbia, Canada
+
+video []
+
+Vietnam War []
+
+virus []
+
+walking []
+
+warm-up []
+
+War of 1812 []
+
+weight loss []
+
+Wheeler [2]
+
+women health []
+
+World War II [10]
+
+wrist []
+
+yoga []

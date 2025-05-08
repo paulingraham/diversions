@@ -1,0 +1,11 @@
+Image Option Synonyms
+
+This file is a user-editable collection of synonyms for common options for including images in PubSys.  All lines that don’t begin with a • or * are ignored, so you can add notes anywhere you like.
+
+* shadow, ds, dropshadow, dshadow
+
+* centre, center, cen, ctr, c
+
+* right, ri, r, rside
+
+* left, le, l, lside

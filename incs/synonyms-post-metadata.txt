@@ -1,0 +1,32 @@
+Post Option Synonyms
+
+This file is a user-editable collection of synonyms for common PubSys post options.  See the PubSys manual for what these options mean, or add notes here, if you like. All lines that don’t begin with a • or * are ignored, so you can add notes anywhere you like.
+
+* link, linkpost, link post, url, lnk, href
+
+I'm an example note!  This has no effect on the synonyms whatsoever.
+
+* hidelink, hide link, hide url, hideurl, linkbuthide
+
+* tags, tagged, keywords, kwords
+
+* subtitle, subt, sub, sub-title, sub-t  subhead, subtitled, st
+
+* description, desc, summary, summ, abstract, abs, precis
+
+* priority, importance, rank
+
+* lock, locked, draft, ignore
+
+* preview, prev, prevew
+
+* null, blank, 0, empty, zip, x, —
+
+* slug, shorttitle, short-title, shortitle, filename, fname, fn
+
+
+
+
+The following post options are for PainScience.com only at this time:
+
+* canonical, canon, main-url

@@ -1,0 +1,27 @@
+/* CSS for tools: styles for dev-side web apps
+
+I have many PHP utility scripts.  Although diverse, a great many benefit from styling (without the concerns of cross-browser compatibility and responsiveness).  In particular, I routinely want to render dense/rich tabular data (the “matrix” class). For notes on matrix table styling, see css-matrix.css.
+
+*/
+
+html { 
+border-top:8px solid #79b; /* a clear visual cue that we're running a tool, and the stylesheet is loaded */
+font-family: Myriad Pro;
+}
+
+body {
+margin:2%;
+}
+
+h1 {font-size:1.4em}
+
+h2 {font-size:1.2em;margin-top:2em;}
+
+.step { /* journalling step marker */
+color:#AAA;
+margin:0 -.3em 0 0;
+font-size:.6em;
+vertical-align:.2em;
+}
+
+.warning {color: orange;}

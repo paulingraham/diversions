@@ -1,0 +1,248 @@
+/* CSS for matrix tables: user-facing styles for data rich tables (id=matrix) and their sort/filter controls
+
+See also:
+	css-tools.css					dev tool web apps in general
+	css-matrix-*.css				any matrix table with special needs
+		e.g. 	css-matrix-tools.css			matrix tables in dev apps
+
+*/
+
+.char_arrow, .char_sort_arrow { /* for sort arrows based on ▲ (9650) & ▼ (9660) … 
+The glyph is available in every single web safe font (probably damn near every font period), but be aware that Arial Unicode MS is unusually SMALL, and there are only a few that have a NARROW shape. This font-stack simply chooses a few of the narrower, smaller for consistency:  */
+font-family: Courier New, Impact, Times New Roman, Lucida Sans Unicode, DejaVu Sans}
+
+.char_arrow2 { /* for sort arrows based on ↑ */
+font-family: Impact, Times New Roman, Arial}
+
+.char_sort_arrow { 
+	position:absolute;
+	color: #A9CAF0;
+	margin-left:.2em;
+	vertical-align:.1em;
+	line-height:0;
+	font-size:.95em;
+	right: 3px;
+	top:0;
+	text-shadow: 1px 1px 1px white, -1px 1px 1px white;
+	}
+
+.badge.verylight {
+letter-spacing:normal;
+color:white;
+background-color:#e5e5e5;
+font-size:.85em;
+font-weight:normal;
+padding: 1px 2px 2px 2px;
+}
+
+.blog_label {
+float:right;
+color:#CDCDCD;
+font-size:.7em;
+margin-right:1em;
+}
+
+th.item_highlight {
+font-size:.7em;
+}
+
+td.item_highlight {
+color:orange;
+font-size:.7em;
+opacity:0.6;
+text-align:center;
+}
+
+.controls_box_toggle img {z-index:0;margin: 0 0 -6px -8px;}
+.inline_gear {width:18px;height:18px}
+@media screen and (max-width: 400px) {.controls_box_toggle img {margin: 0 0 -3px -3px;}
+.inline_gear {width:12px;height:12px}}
+
+#controls_box a.main_help_popup {float:right;
+margin:-4px 0px 0 3px;font-size:1.5em}
+
+#filter_controls_status {
+width:auto;
+text-align:center;
+border-bottom:2px dotted #BBB;
+font-size:.9em;
+margin-bottom: 15px;
+padding: 10px 5px 5px 5px;
+}
+
+.counter {
+
+vertical-align:-1px;color:#C66;font-weight:600; letter-spacing:-1px;
+
+}
+
+#totalCount {color:gray}
+
+																#masthead {margin-bottom: 130px}
+@media screen and (max-width: 800px) {	#masthead {}}
+@media screen and (max-width: 400px) {	#masthead {}}
+
+#document {margin-left:auto} 
+																#document {width: 90%}
+@media screen and (max-width: 800px) {	#document {width: 96%}}
+@media screen and (max-width: 400px) {	#document {width: 100%}}
+
+#title, #subtitle {display:inline; line-height:1.2}
+
+#subtitle {margin-left:.8em}
+
+#subtitle+p {font-size:.9em; margin-top:1.5em; line-height:1.3}
+
+#controls_box {
+position:relative;
+border:1px solid #DDD;
+background-image: url('/imgs/icon-bg-gear-xs.png');
+background-position: bottom -18px right -30px;
+background-repeat: no-repeat;
+background-color:white;
+-webkit-border-radius:6px 6px 0 0;
+-moz-border-radius:6px 6px;
+-khtml-border-radius:6px 6px;
+box-shadow: inset 0 0 6px #BBB;
+display:none;
+}
+
+#help_tips {
+float:right;
+text-align:right;
+width: 33%;
+margin:0 1em 0 1.5em;
+color:#C66;
+font-size:.85em;
+font-weight:normal;
+line-height:1.2;
+text-shadow: 1px 1px 2px white;
+}
+
+#matrix {
+width:100%;
+position:relative;
+z-index:100;
+font-size:.9em;
+margin: 0 0 3em 0;
+border-collapse:collapse;
+-webkit-border-horizontal-spacing: 2px;
+-webkit-border-vertical-spacing: 2px;
+}
+
+#matrix.disabled {
+  opacity: 0.5;
+}
+
+#matrix tr {border-bottom: 2px solid #f2f2f2;}
+
+#matrix th, #matrix td {padding: 12px 6px 4px 6px; line-height:1.2; vertical-align:middle}
+
+#matrix th {
+cursor: pointer; /* matrix tables have clickable column heads for sorting */
+position:relative;
+color:#888;
+background-color:#DDD;
+text-align:left;
+font-weight:500;
+border-left: 1px solid #BBB;
+}
+
+#header>:first-child {border-left: 1px solid #DDD;}
+
+#matrix tr#header {border-bottom: 1px solid #BBB;}
+
+.matrix_help { /* a help message that can display in the widest TD, and which will disappear after the first sort click */
+	font-size:.8em;
+	margin: 0 .5em 0 1.5em;
+	color:#C66;
+	width:100%;
+	text-align:right;
+	}
+
+#matrix .important {font-weight:bold}
+
+#matrix .light {color:#999}
+
+#matrix .small {font-size:.8em;}
+
+
+.filter_controls_intro {
+	font-size:.9em;color:#999;
+	margin: 0 0 0.5em .6em;
+	font-style: italic;
+	}
+
+.filter_controls {
+	list-style-type:none;
+	margin:1em 0 1em 1em;
+	font-size: .8em;
+	-webkit-padding-start:0;
+	}
+
+.filter_controls li {
+	margin: .5em 0 0 0;
+	line-height:1.4;
+	padding:0 0 0 0;
+	padding-left:0;
+	}
+
+.control-head {font-weight:bold;color:#999}
+
+.filter_controls input {margin: 0 0 0 .8em; vertical-align:2px}
+
+.filter_controls label {font-weight:normal; margin: 0 0 0 5px;}
+
+.filter_controls input[type=checkbox] { display: none}
+.filter_controls input[type=checkbox] + label {color: gray; cursor: pointer}
+.filter_controls input[type=checkbox][checked] + label {color: #69C; cursor: pointer}
+
+.filter_controls input[type=checkbox] + label:before {content:'✓'; visibility:hidden;
+font-family: Avenir Next, Lucida Grande, Arial Unicode Ms, DejaVu Sans, Wingdings, Zapf Dingbats, Dingbats, Code2000, PragmataPro, Symbola, Quivira, EversonMono, san-serif;}
+.filter_controls input[type=checkbox][checked] + label:before {content:'✓'; visibility:visible;
+font-family: Avenir Next, Lucida Grande, Arial Unicode Ms, DejaVu Sans, Wingdings, Zapf Dingbats, Dingbats, Code2000, PragmataPro, Symbola, Quivira, EversonMono, san-serif;}
+
+
+@media screen and (max-width: 800px) {
+	
+	#controls_box {}
+	
+	/* hide data there’s no room for in MEDIUM windows; these classes match the hide/show filter classes, and are manually applied to the corresponding table cells; thus both the filter control and the table data are hidden */
+	.tags, .freshness {display:none}
+
+	#help_tips {line-height:1.1;font-size:.8em}	
+	
+	ul.MSG-ContentFilter-controls li {margin: .8em 0;line-height:1.4}
+	li input {margin: 0 0 0 .8em;vertical-align:1px}
+	li label {margin: 0 0 0 4px}
+
+
+	
+	
+	
+	}
+
+@media screen and (max-width: 400px) {
+	/* hide data there’s no room for in SMALL windows; these classes match the hide/show filter classes, and are manually applied to the corresponding table cells; thus both the filter control and the table data are hidden */
+	.matrix_help, .tags, .words, .freshness  {display:none}
+
+	#controls_box {box-shadow:none}
+
+	.filter_controls_intro	{margin: 0 		0 	-.5em 	.3em; color:#BBB}
+	.filter_controls			{margin: 0 		0 	1em 		.3em}
+	.filter_controls li 		{margin: .3em 	0 	0 			0}
+	
+	#help_tips {line-height:1.1;font-size:.75em}	
+
+	#matrix {width:100%; font-size:1em;} /* different than most situations, the table data is so dense and small to begin with that we need to bump it up a bit for tiny screens, or it’s just almost invisible. */
+	#matrix tr {border-bottom: 1px solid #f2f2f2;}
+	#matrix th, #matrix td {padding: 3px 1px 1px 1px; line-height:1.1;}
+	#matrix tr th:first-child {padding-left:2px}
+	#matrix tr td:last-child {padding-right:0}
+	#matrix td.item_size {font-size:1em;letter-spacing:0;}
+	#matrix th.item_highlight {min-width:2em}
+	ul.MSG-ContentFilter-controls li {margin: 1.5em 0;line-height:1.6}
+	li input {margin: 0 0 0 .6em;vertical-align:-1px}
+	li label {margin: 0 0 0 3px;}
+	}
+	

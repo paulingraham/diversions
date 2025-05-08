@@ -1,0 +1,24 @@
+/* CSS for matrix tables:  especially data-rich tables tuned for Safari
+For main notes on matrix tables, see css-matrix.css. */
+
+#matrix {
+width:95%;
+font-family: Proxima Nova Extra Condensed, Avenir Next Condensed, Arial Narrow, sans-serif;
+font-weight:100;
+margin-top: 2em; /* until matrix tools also have a control box right on top of them, give them some top margin */
+}
+
+
+/* from make-site.css */
+
+/* truncation markers are a subtle visual indicator that a table item is truncated (probably too subtle for user-facing) */
+.truncation_symbol:after {
+content:"•";
+font-size:.8em;
+color:#FEA1A3;
+vertical-align:.1em;
+margin-left:.3em;
+font-weight:bold;
+}
+
+#matrix td a {text-decoration:none}

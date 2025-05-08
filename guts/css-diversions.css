@@ -1,0 +1,23 @@
+.red {color:red}
+.blue {color:blue}
+.green {color:green}
+.orange {color:orange}
+.purple {color:purple}
+.brown {color:brown}
+.gray{color:gray}
+body {font-family:"Trebuchet MS",Helvetica,sans}
+h1 {color: #0080FF}
+.sidebar {
+border:1px solid #999;
+padding:8px;
+}
+.separator {content:"";}
+/* 3px 3px 5px 0px #555
+horizontal shadow, vertical shadow, blur, spread, colour
+img.ds{box-shadow:5px 5px 8px 3px #555} */
+
+.separator {color:gray;text-align:center;margin:2em 4% 3em 0;}
+
+.separator.stars {font-size: 1.2em}
+
+.thsize, .tdsize {display:none}

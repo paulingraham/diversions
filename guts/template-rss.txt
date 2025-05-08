@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/css" href="http://{$domain}/feed-${sitename_lc}.css" ?>
+<rss version="2.0"
+	xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+<link>http://{$domain}</link>
+<atom:link href="http://{$domain}/feed-${sitename_lc}.xml" rel="self" type="application/rss+xml" />
+<title>${sitename}</title><description>${tagline}</description>
+<copyright>Copyright ${year} by ${author}</copyright><managingEditor>${email} (${author})</managingEditor>
+<language>en-us</language>
+<lastBuildDate>${last_build_date}</lastBuildDate>
+
+${rss_posts}
+
+</channel></rss>

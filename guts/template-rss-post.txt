@@ -1,0 +1,16 @@
+
+
+
+<item><!-- ========================== -->
+	<title>${title}</title>
+	<pubDate>${date}</pubDate>$url_rss
+	<guid>http://${domain}/$title_smpl.html</guid>
+	<description><![CDATA[
+
+${content}
+${url_pretty}
+
+<br><p><a href="http://${domain}/site/${title_smpl}.html">[View this post on ${domain_display}]</a></p>
+
+]]></description></item>
+
