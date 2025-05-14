@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<link rel="shortcut icon" href="favicon.ico" />
+
+<meta name="google-site-verification" content="M2UfodIw3zVg6ePkirt3dWchRGK1pEAsZc4GVmacHhE" />
+
+<title>Diversions—Not Found</title>
+
+
+<style>
+/* CSS defaults for PubSys */
+
+.next_prev_links {margin:5em 2em 2em 2em; font-size:.9em; text-align:center; font-style:italic;}
+.next_prev_links img {margin-left:-1%;}
+.next_prev_links .arrow {font-size:.8em; color:#CCC; vertical-align:.1em;font-style:normal;padding: 0 .6em;}
+.prev_link {float:left; width:40%; text-align: right; margin-top:.4em;line-height:1.2}
+.next_link {float:right; width:40%; text-align:left; margin-top:.4em; line-height:1.2}
+
+div.ytemb {
+margin: 3em auto 3em auto;
+text-align:center;
+max-width: 100%;
+}
+
+iframe.ytemb {
+width:500px;
+height:315px;
+max-width: 100%;
+}
+
+.preamble {color: gray; font-size: .9em}
+
+body { /* defaults for the main text */
+margin:10px;
+font-family:HelveticaNeue-Light,Arial,Helvetica,sans;
+line-height:1.5;
+font-size:16pt;
+}
+
+.sidebar {
+width:90%;
+margin: 1.5em auto;
+font-size: .7em;
+line-height: 1.4;
+color:#666;
+}
+
+.micropost article {font-size:18pt}
+
+time {
+font-size:.8em;
+color:gray;
+}
+
+nav {
+position:absolute;
+top:10px;
+font-size:.7em;
+color:#666;
+}
+
+nav a {
+font-family:HelveticaNeue-CondensedBold,Tahoma,Tahoma,Arial Black;
+}
+
+.footer_nav {
+position: relative;
+text-align: center;
+}
+
+header { /* article header, including title, subtitle and metadata */
+line-height:1.2;
+}
+
+h1, h2, h3 {
+text-rendering:optimizeLegibility;
+font-family:HelveticaNeue-CondensedBold,Tahoma,Tahoma,Arial Black;
+line-height:1;
+}
+
+
+
+article {
+margin-top:4em;
+}
+
+article header h1 {
+margin:0;
+font-size:2em;
+}
+article.micropost header h1 {font-size:1.2em} /* micropost title sizes are much smaller! */
+
+#subtitle {
+color:#999;
+font-size:.8em;
+}
+.micropost #subtitle {display:none}
+
+h2, h3 {
+margin-top:2em;
+font-size:1.2em;
+}
+
+article header .metadata {
+color:#666;
+font-weight:lighter;
+font-size:.9em;
+margin-top:1em;
+margin-bottom:3em;
+}
+
+.micropost .metadata {font-size:.6em}
+
+address {
+display:inline;
+font-style:normal;
+}
+
+
+#byline-bottom {
+margin-top:5em;
+text-align:center;
+}
+
+footer.bio {
+margin: 8em 6% 3em 6%;
+text-align: center;
+font-weight:lighter;
+font-size:.8em;
+line-height:1.5;
+color:#666;
+}
+
+.micropost footer.bio { /* it’s kind of weird, but in a micropost my bio needs to be much more separated from the content, because it’s actually BIGGER than a lot of microposts … if it’s not quite well separated, and in smaller type, it looks too much like the content itself */
+margin-top: 10em;
+font-size:.8em;
+}
+
+
+footer.bio img {
+float:none;
+display:block;
+margin: 0 auto 1em auto;
+}
+
+
+a {text-decoration:none}
+a:link {color:#0080FF}
+a:hover {color:#FF6666; text-decoration:underline}
+a:active {color:red; text-decoration:underline}
+a:visited {color:#4A73A5}
+.post_index a:visited {color:#999}
+
+.featured_link {
+font-size: .8em;
+line-height:1.2;
+font-family:
+	Avenir Next Condensed,
+	HelveticaNeue-CondensedBold,
+	Arial Narrow,
+	Avenir Next,
+	HelveticaNeue,		
+	Tahoma,
+	Verdana,
+	DejaVu Sans,
+	Arial Black,
+	sans-serif;	
+}
+
+.color_dark_gray {color:#666}
+.color_light_gray {color:#AAA}
+.color_med_gray {color:#888}
+
+
+
+
+ul, ol, blockquote {line-height:1.4;font-size:.9em}
+
+ul {padding-left:1em}
+
+li {margin-bottom: 1em}
+
+code {
+font-family:Monaco,Consolas,Droid Sans Mono,Liberation Mono,mono;
+font-size:.8em;
+color:green;
+}
+
+.separator {color:gray;text-align:center;margin:2em 4% 3em 0;}
+
+.separator.bullet:after {content:"•"}
+
+.separator.stars {font-size: 1.2em}
+
+span.img_container {display:inline-block}
+
+.img_container {text-align:center; line-height:1}
+
+img.ds {box-shadow: 3px 3px 8px 0px #555}
+
+.img_container.centre {margin: 2em auto}
+
+.img_container.right {
+float: right;
+margin: 1em 0 2em 2em;
+}
+
+.img_container.left {
+float: left;
+margin: 1em 2em 2em 0;
+}
+
+img, .img_container {
+max-width:100% !important;
+height:auto;
+}
+
+span.img_container, span.caption {display:inline-block}
+
+.img_container .caption {
+margin: .8em 1% 0 1%;
+font-size:.7em;
+color:#888;
+font-weight:100;
+}
+
+.img_container.centre .caption {
+margin-top: 1em 6% 0 6%;
+}
+
+.post_index {margin:2em 0; padding:0;}
+.post_index li {
+list-style-type:none;
+margin:1em 0;
+padding-left:10px;
+line-height:1.3
+}
+
+.post_index li.img {
+list-style-image:url('imgs/!-icon-eye.gif');
+}
+
+.post_index li.s {
+list-style-image:url('imgs/!-icon-post-size-s.gif');
+}
+
+.post_index li.m {
+list-style-image:url('imgs/!-icon-post-size-m.gif');
+}
+
+.post_index li.l {
+list-style-image:url('imgs/!-icon-post-size-l.gif');
+}
+
+.post_index li.xl {
+list-style-image:url('imgs/!-icon-post-size-xl.gif');
+}
+
+
+.post_index {
+font-size:.9em;
+}
+
+.post_index td, .post_index th {
+padding:8px;
+line-height:1.1;
+}
+
+.post_index th {
+cursor: pointer; 
+}
+
+.post_index td.tdsize {
+width:50px;
+background-repeat:no-repeat;
+background-origin:content-box;
+background-position: center;
+}
+
+.post_index td.img {
+background-image:url('imgs/!-icon-eye.gif');
+}
+
+.post_index td.s {
+background-image:url('imgs/!-icon-post-size-s.gif');
+}
+
+.post_index td.m {
+background-image:url('imgs/!-icon-post-size-m.gif');
+}
+
+.post_index td.l {
+background-image:url('imgs/!-icon-post-size-l.gif');
+}
+
+.post_index td.xl {
+background-image:url('imgs/!-icon-post-size-xl.gif');
+}
+
+.post_index td.tddate {
+white-space:nowrap;
+font-size:.7em;
+color:#BBB;
+}
+
+.char_arrow, .char_sort_arrow { /* for sort arrows based on ▲ (9650) & ▼ (9660) … 
+The glyph is available in every single web safe font (probably damn near every font period), but be aware that Arial Unicode MS is unusually SMALL, and there are only a few that have a NARROW shape. This font-stack simply chooses a few of the narrower, smaller for consistency:  */
+font-family: Courier New, Impact, Times New Roman, Lucida Sans Unicode, DejaVu Sans}
+
+.char_arrow2 { /* for sort arrows based on ↑ */
+font-family: Impact, Times New Roman, Arial}
+
+.char_sort_arrow {
+	color: #A9CAF0;
+	vertical-align:-.6em;
+	line-height:0;
+	}
+
+.thtitle {
+text-align:left;
+}
+
+.thtitle .char_sort_arrow { 
+	margin-left:.3em;
+	}
+
+.char_sort_arrow.off {
+	color: #f5f5f5;
+	}
+
+ul.tag_list {
+display:inline;
+margin:0; padding:0;
+}
+
+ul.tag_list li {
+list-style-type:none;
+margin: .2em 6px 0 0;
+padding: 2px 4px;
+border: 1px solid #CCC;
+border-radius:3px;
+display:inline-block;
+text-transform:uppercase;
+font-size: .7em;
+letter-spacing: 0px;
+color: #AAA;
+font-weight:bold;
+}
+
+.metadata a:link {color:#4A73A5}
+
+/* `QUOTATIONS (QT) 
+
+blockquote (ordinary passage quoting, indented paragraph)
+qt (featured quote)
+qt.short (featured short quote, decorative styling, large print) */
+
+blockquote {
+margin:1.2em 1em; 
+font-size:.95em;
+color:#555;
+}
+
+blockquote.featured { /* for longer featured quotes */
+text-rendering: optimizeLegibility;
+margin:2em 10% 2em 10%;
+font-size:1.2em;
+color: #777;
+}
+
+blockquote.short {
+/* Completely different, decorative styling for shorter featured quotes */
+text-rendering: optimizeLegibility;
+margin:2.5em 15% 2.5em 10%;
+font-style:italic;
+font-size:1.4em;
+color: #555;
+}
+
+
+blockquote .attr {
+font-size: .6em;
+color: #999;
+margin: -.5em 10% 0 30%;
+text-indent: -.2em;
+}
+
+blockquote .chartild {
+display:none;
+font-weight:bold;
+color: #CCC;
+font-size:1.2em;
+margin-right:.2em;
+}
+
+
+/* <##> ======= ↓ `big window styles ↓ ======= */
+
+@media screen and (min-width: 550px) {
+
+
+.sidebar {
+width:35%;
+margin: 1em 0 1em 2em;
+float: right;
+font-size: .8em;
+line-height: 1.4;
+color:#666;
+}
+
+
+ul.tag_list li {
+opacity: 0.7;
+font-size: .7em;
+border-radius:4px;
+letter-spacing: 1px;
+}
+
+.img_container.centre {
+margin: 3.5em auto;
+text-align:center;
+}
+
+
+img, .img_container {
+max-width:100% !important;
+height:auto;
+}
+
+.img_container .caption {
+margin: 1.5em 10% 0 10%;
+font-size:.8em;
+line-height:1.3;
+}
+
+
+body {
+margin: 2em auto;
+width: 70%;
+line-height:1.7em;
+font-size:18pt;
+}
+
+.micropost article {font-size:20pt}
+
+
+article header h1 {font-size:2.4em}
+.micropost header h1 {font-size:1.6em} /* micropost title sizes are much smaller! */
+
+h2, h3 {
+margin-top:3em;
+font-size:1.6em;
+}
+
+ul, ol {padding-left:2em}
+
+blockquote {margin:2em 2.5em}
+
+article header .metadata {font-size:.8em}
+
+footer.bio {
+margin: 5em 6% 4em 8%;
+padding-left:100px;
+text-align:left;
+font-weight:lighter;
+font-size:.8em;
+line-height:1.5;
+color:#666;
+}
+
+.micropost footer.bio { /* it’s kind of weird, but in a micropost my bio needs to be much more separated from the content, because it’s actually BIGGER than a lot of microposts … if it’s not quite well separated, and in smaller type, it looks too much like the content itself */
+margin-top: 10em;
+font-size:.7em;
+}
+
+
+footer.bio img {
+float:left;
+margin: .4em 0 0 -100px;
+}
+
+/* `QUOTATIONS (QT) */
+
+.qt {
+/* Completely different, decorative styling for short quotes */
+/* set in prenton */
+margin:3em 10% 2em 8%;
+line-height:1.3;
+font-size:1.2em;
+text-indent: -.2em;
+}
+
+.qt .char_open_qt {
+font-size:1.2em;
+margin-right:.1em;
+}
+
+blockquote .attr {
+font-size:.7em;
+margin:0 10% 0 20%;
+text-indent: -.2em;
+}
+
+blockquote .chartild {
+font-weight:bold;
+color: #CCC;
+font-size:1.2em;
+margin-right:.2em;
+}
+
+blockquote.short {
+/* Completely different, decorative styling for shorter featured quotes */
+text-rendering: optimizeLegibility;
+margin:3em 20% 3em 15%;
+font-style:italic;
+font-size:1.5em;
+color: #555;
+}
+
+
+} /* end of larger window CSS */
+.red {color:red}
+.blue {color:blue}
+.green {color:green}
+.orange {color:orange}
+.purple {color:purple}
+.brown {color:brown}
+.gray{color:gray}
+body {font-family:"Trebuchet MS",Helvetica,sans}
+h1 {color: #0080FF}
+.sidebar {
+border:1px solid #999;
+padding:8px;
+}
+.separator {content:"";}
+/* 3px 3px 5px 0px #555
+horizontal shadow, vertical shadow, blur, spread, colour
+img.ds{box-shadow:5px 5px 8px 3px #555} */
+
+.separator {color:gray;text-align:center;margin:2em 4% 3em 0;}
+
+.separator.stars {font-size: 1.2em}
+
+.thsize, .tdsize {display:none}
+</style>
+
+</head>
+<body><!-- <##> -->
+
+
+
+
+<h1><img src="imgs/diversions-logo-50px.jpg" height="50" width="50" style="vertical-align:-10px"> <strong><a href="index.html">Diversions.net</a></strong> Page Not Found</h1>
+  
+<article><!--  article start -->
+
+<body>
+
+
+<p>Search just this site…</p>
+
+<style>
+
+#searchform input[type='text'] {
+font-size:1.1em;
+width:80%;
+max-width: 200px;
+padding: .2em;
+border: 1px solid #CCC;
+border-radius:4px;
+color:#27d;
+}
+
+#searchform input[type='text']::placeholder {color:#DDD}
+
+#searchform button {
+font-size:1.1em;
+padding: .2em;
+width:auto;
+	font-weight: bold; /* AvenirNextCondensed-Bold will mostly be unaffected by the “bold” declaration, except that child <em> will inherit it bold too; if “normal” is declared here, that’s fine in general, but for <em> you get a true normal font-weight because reasons. So declaring bold is an otherwise harmless fix for that Avenir edge case. Arial Narrow behaves more predictably: normal is always normal, bold is always bold. */
+}
+
+</style>
+
+
+<form method="get" id="searchform" action="https://duckduckgo.com/" class=" font_narrow">
+
+<input type="hidden" name="sites" value="https://diversions.net"/>
+
+<input class="search" type="text" name="q" maxlength="300" class="font_narrow" placeholder="Search Diversions"/>
+
+<input type="hidden" value="1" name="kh"><?php // https on ?>
+<input type="hidden" value="1" name="kn"><?php // new window on ?>
+<input type="hidden" value="1" name="kac"><?php // auto-suggest  on ?>
+<input type="hidden" value="1" name="kc"><?php // auto-load images on ?>
+<input type="hidden" value="b" name="kj"><?php // removes advertisements ?>
+<input type="hidden" value="-1" name="k1"><?php // removes advertisements ?>
+<button type="submit">GO</button></form>
+
+</header>
+
+<p>Or browser around. Here’s an overview of the content…</p>
+
+<hr>
+
+<p>Diversions once explored ideas in the world of fitness for the older adult as well as the dynamics of family history, both real and fictional.  It was an eclectic mix of writing in two different, but sometimes related, categories. Many articles have been removed for various reasons which will not be discussed here. Suffice it to say that this page now only announces my fitness classes and has articles about my family and my husband’s family:</p>
+
+<ul>
+<li>fitness for older adults, which I teach in downtown Vancouver, Canada</li>
+<li>the history of my family and my husband's family, particularly the Overturf, Hansen, Ingraham, and Herrick families</li>
+
+<p>Plus more diversions. In some ways these topics couldn’t be more different, and yet they have also inspired and informed each other. See below for more information.</p>
+
+<img src="imgs/susan-131x146-web.jpg" width="131" height="146" style="float:left;margin-right:2em;">
+<div class="metadata">
+<img src="imgs/signature.jpg" width="152"  width="167" height="53"><br><address class="author">Susan Ingraham<br><script type="text/javascript">
+//<![CDATA[
+<!--
+var x="function f(x){var i,o=\"\",l=x.length;for(i=0;i<l;i+=2) {if(i+1<l)o+=" +
+"x.charAt(i+1);try{o+=x.charAt(i);}catch(e){}}return o;}f(\"ufcnitnof x({)av" +
+" r,i=o\\\"\\\"o,=l.xelgnhtl,o=;lhwli(e.xhcraoCedtAl(1/)3=!33{)rt{y+xx=l;=+;" +
+"lc}tahce({)}}of(r=i-l;1>i0=i;--{)+ox=c.ahAr(t)i};erutnro s.buts(r,0lo;)f}\\" +
+"\"(0),1\\\"\\\\dn{hnsa.)qj&!%+&z 6a03\\\\\\\\/,\\\\\\\\\\\\\\\\20\\\\0^\\\\" +
+"V]WzDYFCRYPZHBD@26\\\\0D\\\\E^FA7K00\\\\\\\\6x03\\\\\\\\DDwR|>9 w2rt|bdfe<j" +
+"~xcdo\\\\n(\\\"}fo;n uret}r);+)y+^(i)t(eAodrCha.c(xdeCoarChomfrg.intr=So+7;" +
+"12%=;y=2y*))+y10>((iif){++;i<l;i=0(ior;fthnglex.l=\\\\,\\\\\\\"=\\\",o iar{" +
+"vy)x,f(n ioctun\\\"f)\")"                                                    ;
+while(x=eval(x));
+//-->
+//]]>
+</script>
+</address></div>
+
+<h2>Highlights</h2>
+
+<ul>
+<li>FITNESS</li>
+
+<p>After retirement from 32 years of public school teaching, at the age of 57, I started exercising for my own well being and found that I wanted to impart my knowledge to others. It took a year to earn my qualifications: several courses and a pretty tough exam from the British Columbia Parks and Recreation Association. Plus, I’m expected to update my qualifications every year, including CPR and First Aid. I have also had special training in teaching Older Adults and Adapted Fit. Today, at 77, I continue to teach four classes a week.</p>
+
+<p><span class='red'>Light Fit</span> encourages people of any age (though the emphasis is on the older adult) to get active:warmup, strength training, cardiovascular exercise, balance training, stretch and flexibility. If you have been away from exercise, had a recent injury, or you are just starting to exercise, you should find this class a good one to start with, but many participants are "regulars" who enjoy the general mood and tone of the class. It meets from 10:45 a.m. to 11:45 a.m. on Tuesdays and Thursdays at the West End Community Centre, 870 Denman Street, in Vancouver, BC. </p>
+
+</p><span class='red'>Adapted Fit</span> is a fitness class for older adults (usually 55 and older) who may have strength or mobility issues. Participants do many exercises in a chair and they stand up for some activities while using the chair for support. It meets on Mondays and Fridays from 11:00 a.m. to noon.</p>
+
+<li>MY FAMILY HISTORY: I have done research on my own family which includes: 
+<a href="family-history-home-page.html">Overturfs, Hansens, Mahoneys, and McDonalds."</a></li>
+
+<li>MORE FAMILY HISTORY: I have also done research on my husband's family history which includes: <a href="ingraham-family-home-page.html">Ingrahams, Herricks, Moshers, and Brands.</a></li>
+
+<h2>Another Site of Interest</h2>
+
+<li>My husband, Bob Ingraham, offers you a very different web site. He says: “<a href="http://www.ephemeraltreasures.net">Ephemeral Treasures </a> is a mostly philatelic web site which reflects my interests in the early commercial aviation and the Second World War, and showcases items from my collections — old envelopes (aka covers), stamps, and postcards. But it also highlights some of the adventures I’ve had in my life, including surviving a plane crash in New Mexico’s Black Range and being badly wounded in Vietnam when I was a Marine Corps hospital corpsman.”</li>
+</ul>
+</ul>
+
+
+
+
+</article>
+
+<nav class="footer_nav">
+<a href="http://www.susaningraham.net"><span class='color_light_gray'>www&#8202;.&#8202;</span>Susan&thinsp;Ingraham<span class='color_light_gray'>&#8202;.&#8202;net</span></a>
+</nav>
+
+<!-- <h2>All Pages</h2> -->
+
+
+.</body></html>
