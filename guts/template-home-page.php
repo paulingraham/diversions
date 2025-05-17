@@ -10,11 +10,11 @@
 
 <title>Diversions</title>
 
-<link href="http://www.susaningraham.net/feed-diversions.xml" rel="alternate" type="application/rss+xml" title="Diversions RSS Feed" />
+<link href="https://susaningraham.net/feed-diversions.xml" rel="alternate" type="application/rss+xml" title="Diversions RSS Feed" />
 
 <meta name='title' 						content='Diversions'>
-<meta name='og:url' 						content='http://www.susaningraham.net/index.html'>
-<meta name='twitter:url' 				content='http://www.susaningraham.net/index.html'>
+<meta name='og:url' 						content='https://susaningraham.net/index.html'>
+<meta name='twitter:url' 				content='https://susaningraham.net/index.html'>
 
 <meta property='og:type' 				content='website'>
 
@@ -22,7 +22,7 @@
 
 <meta property='og:description' 	content='Diversions explores ideas in the world of fitness for the older adult and the dynamics of family history, both real and fictional.'>
 
-<meta property='og:image' 			content='http://www.susaningraham.net/imgs/diversions-logo-250px.jpg'>
+<meta property='og:image' 			content='https://susaningraham.net/imgs/diversions-logo-250px.jpg'>
 
 <meta property='og:site_name' 		content='Diversions'>
 
@@ -98,7 +98,7 @@ while(x=eval(x));
 </article>
 
 <nav class="footer_nav">
-<a href="http://www.susaningraham.net"><span class='color_light_gray'>www&#8202;.&#8202;</span>Susan&thinsp;Ingraham<span class='color_light_gray'>&#8202;.&#8202;net</span></a>
+<a href="https://susaningraham.net">Susan&thinsp;Ingraham<span class='color_light_gray'>&#8202;.&#8202;net</span></a>
 </nav>
 
 <!-- <h2>All Pages</h2> -->

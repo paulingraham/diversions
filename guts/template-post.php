@@ -65,7 +65,7 @@
 <footer class="bio"><img data-src="imgs/susan-75x87-web.jpg" class="lazyimg" width="75" height="87" class='lazyimg'>I taught in the public schools for 32 years. After retirement, I trained to become a fitness instructor for older adults. I enjoy working on family history, writing novels, and researching the latest fitness news for my class participants.</footer>
 
 <nav class="footer_nav">
-<a href="http://www.susaningraham.net"><span class='color_light_gray'>www&#8202;.&#8202;</span>Susan&thinsp;Ingraham<span class='color_light_gray'>&#8202;.&#8202;net</span></a>
+<a href="https://susaningraham.net">Susan&thinsp;Ingraham<span class='color_light_gray'>&#8202;.&#8202;net</span></a>
 </nav>
 
 <script type='text/javascript' src='https://code.jquery.com/jquery-3.4.1.min.js' ></script>
