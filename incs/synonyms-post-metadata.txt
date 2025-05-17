@@ -12,7 +12,9 @@ I'm an example note!  This has no effect on the synonyms whatsoever.
 
 * subtitle, subt, sub, sub-title, sub-t  subhead, subtitled, st
 
-* description, desc, summary, summ, abstract, abs, precis
+* description, desc, summary, summ, abstract
+
+* description_audio, desc2, summary2, summ2, abstract2, desc_long, summary_log
 
 * priority, importance, rank
 

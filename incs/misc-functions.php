@@ -32,7 +32,8 @@ function isAssoc($array) { return (bool)count(array_filter(array_keys($array), '
 /** returns @boolean: checks for a string in another string */
 function inStr($needle, $haystack) {
 	/* this is a more useable boolean-only function to replace the awkard strpos(haystack,needle)!==false */
-	if (strpos($haystack, $needle) !== false) return true; else return false;}
+	if ($haystack !== null and mb_strpos($haystack, $needle) !== false) return true; else return false; #PHP8_prep_null_params
+	}
 
 function inRange($num, $min, $max) {
 	if ($num >= $min and $num <= $max) return true; else return false; }
@@ -98,7 +99,7 @@ function dayOfWeekPrecise() {
 	}
 
 /** returns @string: replaces common Unicode punctuation replaced with ASCII */
-function asciify ($string) {
+function asciifyPunctuation ($string) {
 	$find = explode("\t","’|‘|“|”|—|–|…");
 	$replace = explode("|", "|'|'|\"|\"|--|-|…");
 	return str_replace($find,$replace,$string); }
@@ -136,15 +137,17 @@ function extract1stUrl($content) {
 	}
 	
 /** returns @file: saves a string to a file */
-function saveAs($str, $fn, $mode = "w") {
+function saveAs($str, $fn, $mode='w') {
 // sleep(1);
+	if ($str == NULL) $str = '';
 	$fp = @fopen($fn, $mode);
 	if (!$fp) {
 		echo "<br><strong>warning</strong>: could not write file '$fn'<br>";	
 		return;
 		}
 	// default w mode: open for writing only; truncate file to zero; create if needed
-	fwrite($fp, $str); fclose($fp);
+	fwrite($fp, $str);
+	fclose($fp);
 	}
 
 /** returns @file: checks string against file, saves only if different */
@@ -183,7 +186,7 @@ function prettifyURL($url) {
 	$url_path = rtrim($url_path,"/");
 	$url_path = str_replace("/", "<span style='margin:0 .2em'>/</span>", $url_path);
 	$url_path = str_replace("XXX", "/", $url_path);
-	$url_str = "<span class=\"pretty_url\">${domain_sub}.<strong>$domain_main.$domain_tld</strong>$url_path</span>";
+	$url_str = "<span class=\"pretty_url\">{$domain_sub}.<strong>$domain_main.$domain_tld</strong>$url_path</span>";
 	return $url_str;
 }
 
@@ -224,7 +227,8 @@ function parseURL($url) {
 
 /** returns @number, word count: rounds down word count in a way that's right for word counts, or other specified multiple */
 function roundDown($theNumber, $nearest = false) {
-    if ($nearest > 0) { // if a “nearest” multiple to round down to (i.e. the nearest multiple of 25) is specified, round down to that
+	if ($theNumber == '') $theNumber = 0;
+   if ($nearest > 0) { // if a “nearest” multiple to round down to (i.e. the nearest multiple of 25) is specified, round down to that
 	return floor($theNumber/$nearest)*$nearest;
     } else { /* round down according to an algorithm suitable for rounding down word counts */
 		switch ($theNumber) {
@@ -255,14 +259,17 @@ function roundDown($theNumber, $nearest = false) {
 		case ($theNumber >= 10):
 			$theNumber = floor($theNumber/5)*5;
 			break; 
+		case ($theNumber >= 1):
+			$theNumber = intval($theNumber);
+			break; 
 		}
     }
     return $theNumber;
 }
 
 /** returns @array: gets an array of trimmed words from given string delimited by spaces (default) or other delimiter, an upgrade of explode() */
-function arraynge ($str,$delim=" ") { // it’s simple and doesn’t do much more than php’s explode, but it’s handy that it trims, filters, and defaults to spaces
-		if (trim($str) == "") return array(); // if there's no data to arraynge, return an empty array
+function arraynge ($str, $delim=" ") { // it’s simple and doesn’t do much more than php’s explode, but it’s handy that it trims, filters, and defaults to spaces
+		if (!isset($str) or trim($str) == "") return array(); // if there's no data to arraynge, return an empty array
 		$array = explode($delim, $str);
 		$array = array_map("trim", $array);
 		return array_filter($array);
@@ -275,19 +282,62 @@ function wordifyNumbers($number) {
 	return $number; // ... or return the original number
 	}
 
+function wordifyNumbersOrdinals($number) {
+    $number = ceil($number);
+
+    $units = [
+        "", "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth"
+    ];
+    $teens = [
+        "tenth", "eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth", 
+        "sixteenth", "seventeenth", "eighteenth", "nineteenth"
+    ];
+    $tens = [
+        "", "", "twentieth", "thirtieth", "fortieth", "fiftieth", 
+        "sixtieth", "seventieth", "eightieth", "ninetieth"
+    ];
+    $tensPrefix = [
+        "", "", "twenty", "thirty", "forty", "fifty", 
+        "sixty", "seventy", "eighty", "ninety"
+    ];
+
+    if ($number <= 0 || $number > 100) {
+        return "out of range";
+    }
+
+    if ($number == 100) {
+        return "one hundredth";
+    } elseif ($number <= 9) {
+        return $units[$number];
+    } elseif ($number <= 19) {
+        return $teens[$number - 10];
+    } else {
+        $tensPart = floor($number / 10);
+        $unitsPart = $number % 10;
+
+        if ($unitsPart == 0) {
+            return $tens[$tensPart];
+        } else {
+            return $tensPrefix[$tensPart] . "-" . $units[$unitsPart];
+        }
+    }
+}
+
+
 /** returns @timestamp: gets a timestamp from structured date like 2013-03-09 (default); does not parse hours, mins, secs */
-function parseDate($date, $format = "%Y-%m-%d") {
+function parseDate($date, $format = "Y-m-d") { #936491636 no longer need % prefixes in default format, e.g. "%Y-%m-%d"
 /* What a fine use of a function this is, because it requires two tricky steps to get a timestamp out of a random date every damned time, so it’s a terrific wheel not to have to reinvent. Why there isn’t a PHP function that already does this is beyond me. How it works ...
 
-Tricky step 1: the php function STRPTIME (string parsed to time) compares a string with a date format and (if it can) returns a strange array of values.  Matching a format to the input date can be hellacious. We default to my own very commonly used date format (2013-06-18), but the function will take arbitrary formats. It would be awfully nice if the strptime docs included information about formats, but it doesn’t: you have to go to the strftime docs for that:
-	http://ca2.php.net/manual/en/function.strftime.php
+Tricky step 1: the php function STRPTIME (string parsed to time) compares a string with a date format and (if it can) returns a strange array of values.  Matching a format to the input date can be hellacious. We default to my own very commonly used date format (2013-06-18), but the function will take arbitrary formats.
 
-Tricky step 2: the php function mktime (make time) builds a Unix timestamp from the values in the weird array that we got from strptime. Hours, minutes, and seconds are hard-coded to 0. 
+Tricky step 2: the php function mktime (make time) builds a Unix timestamp from the values in the weird array that we got from strptime. Hours, minutes, and seconds are hard-coded to 0.  This is now easier and clearer than it used to be with strptime, fortunately. 
 
  */
 
 	// tricky step 1
-	$tmp = strptime ($date, $format);
+	
+	$tmp = date_parse_from_format ($format, $date); #date_parse_from_format__replaces__striptime, change 936491636 on 2024-06-24. This is the main place the change affects, with a handful of other files affected.  Differences are: the new function flips the parameter order, doesn't need % to mark format shorthands, and has less cryptic output that doesn't need to be modified, see details below in the $tmp array passed to mktime.
+
 	if ($tmp === false) {
 		error("Sorry, but “{$date}” cannot be parsed from the format “{$format}”.");
 		return false;
@@ -295,9 +345,9 @@ Tricky step 2: the php function mktime (make time) builds a Unix timestamp from 
 		
 	// tricky step 2
 		$timestamp = mktime( 0,0,0,
-			 $tmp['tm_mon']+1, 
-			 $tmp['tm_mday'], 
-			 $tmp['tm_year']+1900 );
+			 $tmp['month'],  #936491636 clearer name, no longer need to add 1
+			 $tmp['day'], #936491636 clearer name
+			 $tmp['year'] ); #936491636 clearer name, no longer need to add 1900
 	return $timestamp;
 }
 
@@ -318,7 +368,7 @@ function printUpd ($date) {
 	$updatedStamp = parseDate($updated);
 	if ($paid or MODE_DEV) // for non-G-indexable document states
 		return date('M j, Y', parseDate($date)); 
-	// for for all indexable content, it is necessary to NOT spell out full dates, because Google is bizarrely unable to resist using them as doc modified dates, and this had been true for years the last time I tested it ~2017 *eyeroll*
+	// for all indexable content, it is necessary to NOT spell out full dates, because Google is bizarrely unable to resist using them as doc modified dates, and this had been true for years the last time I tested it ~2017 *eyeroll*
 	if ($date == $updated and daysSinceTstamp($updatedStamp) < 400)
 		return date('M j, Y',parseDate($date)); // handle the most recent update differently: print the full date (but only if it's in the same year)
 	if (inStr(YEAR,$date)) // if the current year is in the $date...
@@ -347,8 +397,8 @@ function preventOrphans($str) {
 /** returns @print, var contents: reports boolean-ness of var regardless of value (is_bool with output) */
 function printBool($boolean) {
 	if ($boolean === null) { echo "NULL"; return;}
-	if (!is_bool($boolean)) { echo "NOT BOOLEAN: "; var_dump ($boolean); return;}
-	else if ($boolean == true) echo "TRUE"; else echo "false";
+//	if (!is_bool($boolean)) { echo "NOT BOOLEAN: "; var_dump ($boolean); return;}
+	else if ($boolean == true) echo "TRUE"; else echo "FALSE";
 	}
 
 /** return @print, var values including explicitly identified nulls and empty strings **/
@@ -363,10 +413,68 @@ function printVar($var) {
 function printArr($var, $size = "0.9em") {
 	global $_istool;
 	if (MODE_LIVE and !MODE_BUILD and !$_istool) return; // suppress output in production, except for tool scripts (in tools dir)
-		echo "<pre class='boogers' style='font-size:{$size}'>"; // add a size manually; otherwise the size comes from the 'boogers' class
-	print_r($var);
+	$bt = debug_backtrace();
+	$caller = array_shift($bt);
+	$file = basename($caller['file']);
+//	print_r($caller);
+	echo "<pre class='color_soft_red' style='font-size:{$size}'>"; // add a size manually; otherwise the size comes from the 'boogers' class
+		echo "<p><strong>printArr() called by {$file}[{$caller['line']}], " . count($var) . " items</strong></p>";
+		print_r($var);
 	echo  '</pre>';
 	}
+
+function print_array_prettier($array, $depth = 0, $header = true) {
+	global $_istool;
+	if (MODE_LIVE and !MODE_BUILD and !$_istool) return; // suppress output in production, except for tool scripts (in tools dir)
+	$bt = debug_backtrace();
+	$caller = array_shift($bt);
+	$file = basename($caller['file']);
+	
+	if ($header) { // the header can be suppressed by a parameter for scenarios when it should be EVEN PRETTIER
+		echo '<div style="font-family: Avenir Next; font-size:15pt; margin:2em 0">';
+		echo "<p><strong>print_array_prettier() called by {$file}[{$caller['line']}], " . count($array) . " items</strong></p>";
+		}
+
+	if ($depth > 5) {echo "too deep!"; return;}
+	foreach ($array as $field=>$value) {
+		$colour = '#' . ($depth*2) . ($depth*2) . ($depth*2); 
+		if ($depth == 0) $marginTop = '2em';
+		if ($depth == 1) $marginTop = '.4em';
+		if ($depth == 2) $marginTop = '.2em';
+		if ($depth == 3) $marginTop = '.1em';
+		if ($depth == 4) $marginTop = '0';
+		$field = str_replace('_', '<span style="color:#DDD">_</span>', $field);
+		echo "<div style='margin-left:" . ($depth*.7) . "em; margin-top:{$marginTop}; font-size: " . (1-$depth/20) . "em; color:{$colour}'>";
+		$narrow = null;
+		if (strlen($field) > 20) $narrow = ' class="font_narrow"';
+		echo "<span{$narrow}>";
+		if ($depth < 3) echo "<strong>{$field}</strong></span> <span style='color:#BBB'>→</span> ";
+		else
+		echo "{$field}</span> <span style='color:#BBB'>→</span> ";
+		if (is_array($value)) {
+//			echo 'array (' . count($value) . '):';
+			print_array_prettier($value, $depth+1, false); // false to suppress the header on nested calls
+			}
+		else {
+			$narrow = '';
+			if (is_string($value) and strlen($value) > 30) $narrow = ' class="font_narrow"';
+			echo "<span class='{$narrow}'>";
+			if ($value === null) echo "<small style='color:#999'>NULL</small>";
+			if ($value === true) echo "<small style='color:#81AD81'>TRUE</small>";
+			if ($value === false) echo "<small style='color:#c66'>FALSE</small>";
+			if (is_string($value)) echo $value;
+			if (is_integer($value)) echo "<code>$value</code>";
+			if (is_string($value) and $value == '') echo "<small style='color:#999'>EMPTY</small>";
+//			if (is_bool($value)) printBool($value); 
+			// echo "<br>";var_dump($field, $value); echo "<br>";
+			echo "</span>";
+			}
+		
+		echo "</div>";
+	}
+		if ($header) echo "</div>";	
+}
+
 
 /** returns @print, Json contents: basically just slightly fine-tuned output of json_encode() */
 function printJson ($var) {
@@ -396,8 +504,39 @@ function printArrOl($arr, $size = "0.9em") {
 	echo  '</ol>';
 	}
 
-/** returns @echo, array: prints simple associative array as a table */
-function printArrTable($arr) { /* basic database structure: records consisting of fields and data, ie
+/** returns @echo|string, array: coverts array of keys and values to a table view to print or return; "1" is a reference to the depth; see also the printArrTable2 */
+function printArrTable1($arr, $return=false, $title=null, $size="large", $headKey=false, $headVal=false) { /*
+	This function is mostly a dev-tool, not for producing user-facing tables of data… though it could do that, if the data was clean enough.  I’ve provided several some cosmetic configuration parameters for that reason: optional title (caption), size class, headers…
+		return = to return the string data instead of echo
+		title = adds title in <caption> element
+		size = small|medium|large class for <table>
+		headKey/headVal = <th> contents for key and value columns
+	Example data: $testArr = array("field1" => "data1", "field2" => "data2", "field3" => "data3"); */
+	if (!is_array($arr)) { echo "That’s no array! That’s …<br> ";  var_dump($arr); return;}
+	$table .= "<table class='$size' style='font-family:\"Avenir Next Condensed\"; margin:2em 0;border-spacing:10px 0'>"; 
+	if ($title) $table .= "<caption>$title</caption>";
+	// $table .= '<caption>Simple associative array with count ' . count($arr) . ' fields';
+	if ($headKey and $headVal) $table .= "<tr><th>$headKey</th><th>$headVal</th></tr>";
+	foreach ($arr as $field => $value) {
+		$value = htmlentities($value, ENT_QUOTES, "UTF-8");
+		if (strlen($value) > 5000) $value = substr($value,0,500) . " <strong> … [truncated to 500 chars]</strong>";
+		if (!isset($value)) $value = "<span style='color:#AAA'>unset</span>"; 
+		if ($value === '') $value = "<span style='color:#AAA'>empty</span>";
+		if (is_null($value)) $value = "<span style='color:#AAA'>null</span>";
+		//var_dump($field, $value); echo "<br><br>";
+		if (is_bool($value)) {
+			if ($value === true) $value = "true";
+			else $value = "false";
+			}
+		$table .= "<td style='vertical-align:top;color:#888'><strong>$field</strong></td><td><span class='copythis2' onClick='copy(this)'>$value</span></td></tr>"; // to style the copyable text, add the "copyable" class
+		}
+	$table .= "</table>";
+	if ($return) return $table;
+		echo $table;
+	}
+
+/** returns @echo, array: prints array of arrays as a table (e.g. multiple records), "2" is a reference to depth, see also printArrTable1 */
+function printArrTable2($arr, $return=false) { /* basic database structure: an array of records, each one container an array of fields and data, like so:
 				array(
 				"record1" => array (
 					"field1" => "data",
@@ -409,33 +548,39 @@ function printArrTable($arr) { /* basic database structure: records consisting o
 					"field3" => "data")); */
 
 if (!is_array($arr)) { echo "That’s no array! That’s …<br> ";  var_dump($arr); return;}
-	echo '<table style="font-family:\'Avenir Next Condensed\'; font-size:0.8em;margin:2em 0;border-spacing:10px 0">';
+	$table .= '<table class="large" style="font-family:\'Avenir Next Condensed\'; margin:2em 0;border-spacing:10px 0">';
 //	echo "<caption>" . count($arr) . " posts:</caption>";
+
 	foreach ($arr as $key => $value) {
 	unset($fieldNo);
 	$fieldCount = count($value);
 		foreach ($value as $field => $subvalue) {
+		if (is_array($subvalue)) $subvalue = implode(' • ', $subvalue); // many field values are simple array themselves, and many of them can be trivially and meaningfully imploded into a string (rather than getting into the complexity of another layer of hierarchy
 		$subvalue = htmlentities($subvalue, ENT_QUOTES, "UTF-8");
 		if ($field == "content" and strlen($subvalue) > 1000) $subvalue = substr($subvalue,0,1000) . " <strong> … [truncated]</strong>";
 		if ($field == "html") continue; // special case for my cms
 		if (++$fieldNo == 1)
-			echo "<tr><td colspan=3 style='border-bottom:1px solid #AAA;'>&nbsp;</td></tr><tr><td rowspan=$fieldCount style='vertical-align:top;color:#AAA'>$key</td>";
+			$table .= "<tr><td colspan=3 style='border-bottom:1px solid #AAA;'>&nbsp;</td></tr><tr><td rowspan=$fieldCount style='vertical-align:top;color:#AAA'>$key</td>";
 		else
-			echo "<tr>";
-		echo "<td style='vertical-align:top;font-weight:strong;color:#888'>$field</td><td>$subvalue</td></tr>";
+			$table .= "<tr>";
+		$table .= "<td style='vertical-align:top;font-weight:strong;color:#888'>$field</td><td>$subvalue</td></tr>";
 		}
 	}
-	echo "</table>";
+	
+	$table .= "</table>";
+	if ($return) return $table;
+	else echo $table;
 	}
 
 /** returns @string, content: evaluates PHP with the eval function and returns the output */
-function renderPhpStr ($string) { 
+function renderPhpStr ($string) {
 	/* Note: renderPhpStr(file_get_contents(file)) === renderPhpFile(file,true) */
-	if (strpos($string, "<?php") === false) return $string; // is there PHP in the string?
+	if (!inStr("<?php", $string)) return $string; // is there PHP in the string?
 	ob_start();
 	eval("?>$string"); // On the use of eval in the PainSci CMS: craftdocs://open?blockId=D8BB4DEF-66B7-4395-9020-1CACBE6BBFC4&spaceId=bc7d854c-3e5b-a34e-4850-a6d2f31a1a59
 	$string = ob_get_contents();
 	ob_end_clean();
+//	if (inStr("XXX", $string)) exit("<pre>`". htmlentities($string) . "`</pre>");
 	return $string;
 }
 
@@ -574,6 +719,8 @@ function truncateToWord ($str, $max) {
 
 /** returns @string, content: capitalizes short runs of EM or STRONG text */
 function emUpperizer ($str, $max=40) {
+	$str = str_replace("&nbsp;", " ", $str); // strip non-breaking space entitites
+	$str = str_replace("<em>et al</em>", "et al", $str); // strip <em> from et al., because 
 	$str = preg_replace_callback("@(<em>|<strong>)(.{2,$max})(</em>|</strong>)@ui", 
 		function ($matches) {return mb_strtoupper($matches[2]); }, $str); 
 	$str = preg_replace_callback("@[\*_]{1,2}(.{2,20})[\*_]{1,2}@ui", 
@@ -584,6 +731,7 @@ function emUpperizer ($str, $max=40) {
 /** returns @echo, log: echoes a step in a script and adds it to a log */
 function journal($msg, $depth, $echo = false) {
 //	if (!MODE_DEV) return; // journalling is for dev only
+	$x = 0; $msg_class = '';
 	global $jrnl, $a, $b, $c;
 	$msg = str_replace("posts/","",$msg);
 	if (strpos($msg, "warning") === 0) { $warning = true; $msg_class = "warning"; }
@@ -598,7 +746,7 @@ function journal($msg, $depth, $echo = false) {
 		++$a; $no = $a; $b = 0; $c = 0;
 		$jrnl[$a]['msg'] = $msg;
 		$jrnl[$a]['time'] = $time;
-		if ($a > 1) $jrnl[$a]['elapsed'] = $time - $jrnl[$a][$b-1]['time'];
+		if ($a > 1 and $b > 0) $jrnl[$a]['elapsed'] = $time - $jrnl[$a][$b-1]['time'];
 		}
 	if ($depth == 2) {
 		++$b; $no = "$a.$b"; $c = 0;
@@ -628,7 +776,7 @@ function journal($msg, $depth, $echo = false) {
 /** returns @string: simplifies a string for easier matching */
 function simplify($str, $stripDiacriticals = false) {
 	$find =	 explode(" ","- * _ — – . , … & ! ’ ‘ “ ” \" ' : ; ? / · % ( ) ="); $find[] = " "; // add space
-	$str = str_replace($find, null, $str); // strip spaces and punctuation
+	$str = str_replace($find, '', $str); // strip spaces and punctuation
 	$str = strtolower($str); // lowerize
 	if ($stripDiacriticals) $str = stripDiacriticals($str); // optional diacritical stripping
 	return $str;
@@ -712,7 +860,7 @@ $yt_html= <<<HTML
 				></iframe>
 			</div>
 			
-			<p class="css_caption font_accent"><a href="//www.youtube.com/watch?v=$yt_id" title="$yt_title">$yt_title <img class="lazyimg" data-src="/imgs/icon-youtube-i-m.png" width="44" height="18" style="vertical-align:-4px;border:0" alt="" border="0" loading="lazy">$yt_duration</a></p>
+			<p class="css_caption font_accent"><a href="//www.youtube.com/watch?v=$yt_id" title="$yt_title">$yt_title&ensp;<img class="lazyimg" data-src="/imgs/icon-youtube--land4-180x40-4k.png" width="72" height="16" style="border:0;vertical-align:-1px" alt="" border="0" loading="lazy">$yt_duration</a></p>
 		</div>
 
 HTML;
@@ -758,11 +906,6 @@ function hashDir($directory)
     return md5(implode('', $files));
 }
 
-/** returns @string: removes common words from a string */
-function stripCommonWords($input){
- 	$commonwords = str_replace(" ", "|", $GLOBALS['commonwords']); // convert SSV to |SV for this purpose
-	return preg_replace("/\b(" . $commonwords . ")\b/u",NULL,$input);
-	}
 
 /** returns @object, record: gets a record from $sources via citekey, with some input sanitization */
 function getRecord($citekey) {
@@ -793,11 +936,10 @@ function recordObjToArr($record_obj) {
 	$record_arr = get_object_vars($record_obj);
 	foreach ($record_arr as $key=>$value) {
 		$record_raw_tmp[$key] = $value;
-		$key_clean = str_replace("-", null, $key);
+		$key_clean = str_replace("-", '', $key);
 		$record_arr[$key_clean] = $record_obj->get($key);
 		}
 	$record_arr = addCommonPseudofields($record_arr, $record_obj);
-	$record_arr = array_change_key_case($record_arr, CASE_LOWER);
 	ksort($record_arr);
 	$record_arr['raw'] = $record_raw_tmp; 
 	return $record_arr;
@@ -805,7 +947,7 @@ function recordObjToArr($record_obj) {
 
 /** returns @array, record data: adds an array of common pseudofields to an array of field data for a record */
 function addCommonPseudofields($record_arr, $record_obj) {
-	$select_pseudofields = explode(" ", "surnameetal surnameoffirst fullnameoffirst biburl basetitle titlesmartperiod pmedurl longtags shorttags nocitesto maxsummary keywords allenhancedtags_short noindex titlecustom wcannote wcabstract title_smart titletocolon best_ext_url countcites dateadded datemodded related biburlfilename");
+	$select_pseudofields = explode(" ", "surnameetal surnameoffirst fullnameoffirst biburl basetitle titlesmartperiod pmedurl longtags shorttags citedbynum maxsummary keywords allenhancedtags_short noindex titlecustom wcannote wcabstract titletocolon best_ext_url countcitedbys dateadded datemodded related biburlfilename");
 	foreach ($select_pseudofields as $fieldname)  $record_arr[strtolower($fieldname)] = $record_obj->get($fieldname);
 	return $record_arr;
 	}
@@ -900,7 +1042,7 @@ function ogimg ($img_filename) {
 	$image_mime = image_type_to_mime_type(exif_imagetype($pageimg_file));
 
 	$ogoutput = <<<OGPAGEIMG
-<meta property='og:image' 				content='https://www.painscience.com/imgs/${img_filename}'>
+<meta property='og:image' 				content='https://www.painscience.com/imgs/{$img_filename}'>
 	<meta property='og:image:type' 	content='{$image_mime}'>
 	<meta property='og:image:width' 	content='{$w}'>
 	<meta property='og:image:height' 	content='{$h}'>
@@ -1009,6 +1151,7 @@ function printTestimonials ($citekey, $num = 30, $max_length = 300) {
 	$searchResults = $sources->findRecordsThatContain('type', 'testimonial'); // look for records containing that filename
 	if (!$citekey) $citekey = 'all';
 	$searchResults = $sources->findRecordsThatContainItems('re', $citekey); // Get a test list of the testimonials that contain the citekey for the current landing page
+	$x = 0;
 	if ($searchResults) {
 		foreach ($sources->results() as $entry) {
 			if (wordCounter($entry->get("abstract")) > $max_length) continue;
@@ -1058,9 +1201,9 @@ function obfuscateEmail($email, $numchars = 3) {
 		if ($char == '@') {$result .= $char; $domain = true; continue;}
 		if ($domain)  {$result .= $char; continue;}
 		if ($x < $numchars) {$result .= $char; continue;}
-		if ($x % 2 === 0) {$result .= $char; continue;} // echo every other character
+		if ($x % 3 === 0) {$result .= $char; continue;} // echo every other character
 		if ($x == count($emailArr)) {$result .= $char; continue;}
-		$result .= "<span style='color:#BBB'>•</span>";
+		$result .= "•";
 		}
 	return $result;
 	}
@@ -1117,7 +1260,7 @@ function linky($citekey, $anchor) { // echo text with a link to a citekey only i
 		}
 	}
 
-$commonwords = "a able about above abroad according accordingly across actually adj after afterwards again against ago ahead ain t all allow allows almost alone along alongside already also although always am amid amidst among amongst an and another any anybody anyhow anyone anything anyway anyways anywhere apart appear appreciate appropriate are arent around as a s aside ask asking associated at available away awfully b back backward backwards be became because become becomes becoming been before beforehand begin behind being believe below beside besides best better between beyond both brief but by c came can cannot cant can’t can't caption cause causes certain certainly changes clearly c’mon c'mon c'mon co co. com come comes concerning consequently consider considering contain containing contains corresponding could couldn’t couldn't couldn't course c’s c's c's currently d dare daren’t daren't daren't definitely described despite did didn’t didn't didn't different directly do does doesn’t doesn't doesn't doing done don’t don't don't down downwards during e each edu eg eight eighty either else elsewhere end ending enough entirely especially et etc even ever evermore every everybody everyone everything everywhere ex exactly example except f fairly far farther few fewer fifth first five followed following follows for forever former formerly forth forward found four from further furthermore g get gets getting given gives go goes going gone got gotten greetings h had hadn’t hadn't half happens hardly has hasn’t hasn't have haven’t haven't having he he’d he'd he’ll he'll hello help hence her here hereafter hereby herein here’s here's hereupon hers herself he’s he's hi him himself his hither hopefully how howbeit however hundred i i’d i'd ie if ignored i’ll i'll i’m i'm immediate in inasmuch inc inc. indeed indicate indicated indicates inner inside insofar instead into inward is isn’t isn't it it’d it'd it’ll it'll its it’s it's itself i’ve i've j just k keep keeps kept know known knows l last lately later latter latterly least less lest let let’s let's like liked likely likewise little look looking looks low lower ltd m made mainly make makes many may maybe mayn’t mayn't me mean meantime meanwhile merely might mightn’t mightn't mine minus miss more moreover most mostly mr mrs much must mustn’t mustn't my myself n name namely nd near nearly necessary need needn’t needn't needs neither never neverless nevertheless new next nine ninety no nobody non none nonetheless noone no-one nor normally not nothing notwithstanding novel now nowhere o obviously of off often oh ok okay old on once one ones one’s one's only onto opposite or other others otherwise ought oughtn’t oughtn't our ours ourselves out outside over overall own p particular particularly past per perhaps placed please plus possible presumably probably provided provides q que quite qv r rather rd re really reasonably recent recently regarding regardless regards relatively respectively right round s said same saw say saying says second secondly see seeing seem seemed seeming seems seen self selves sensible sent serious seriously seven several shall shan’t shan't she she’d she'd she’ll she'll she’s she's should shouldn’t shouldn't since six so some somebody someday somehow someone something sometime sometimes somewhat somewhere soon sorry specified specify specifying still sub such sup sure t take taken taking tell tends th than thank thanks thanx that that’ll that'll thats that’s that's that’ve that've the their theirs them themselves then thence there thereafter thereby there’d there'd therefore therein there’ll there'll there’re there're theres there’s there's thereupon there’ve there've these they they’d they'd they’ll they'll they’re they're they’ve they've thing things think third thirty this thorough thoroughly those though three through throughout thru thus till to together too took toward towards tried tries truly try trying t’s t's twice two u un under underneath undoing unfortunately unless unlike unlikely until unto up upon upwards us use used useful uses using usually v value various versus very via viz vs w want wants was wasn’t wasn't way we we’d we'd welcome well we’ll we'll went were we’re we're weren’t weren't we’ve we've what whatever what’ll what'll what’s what's what’ve what've when whence whenever where whereafter whereas whereby wherein where’s where's whereupon wherever whether which whichever while whilst whither who who’d who'd whoever whole who’ll who'll whom whomever who’s who's whose why will willing wish with within without wonder won’t won't would wouldn’t wouldn't x y yes yet you you’d you'd you’ll you'll your you’re you're yours yourself yourselves you’ve you've z zero";
+
 
 $smallwords = "a abaft abeam aboard about above absent across afore after against along alongside amid amidst among amongst an and anent apropos around as aside astride at athwart atop barring before behind below beneath beside besides between beyond but by chez circa concerning despite down during else except excluding failing following for from given if in including inside into is like mid midst minus modulo near next nor notwithstanding of off on onto opposite or out outside over pace past per plus pro qua regarding round sans since than the then through throughout times to toward towards under underneath unlike until unto up upon versus via vice vis-a-vis when with within without worth"; // mostly prepositions, a few others
 
@@ -1135,18 +1278,20 @@ function isBot($user_agent) {
 function makeTOCpreview($content, $default_heading = true) { 
 	global $structured;
 	$toc = '';
-	$startPos = strpos($content, 'makeTOC');
-	$endPos = strrpos($content, "'member', 'end'");
-	$membersOnlyContent = substr($content, $startPos, $endPos-$startPos);
-	if ($structured) 
-			preg_match_all('|"head" =>\s*"(.+?)",|', $membersOnlyContent, $matches);
- else
+	// warning: multiple member areas (e.g. if there's also an audio embed) have the potential to make it very difficult to accurately detect the start and end position of the main member area
+	$startPos = mb_strpos($content, 'makeTOC');
+	$endPos = mb_strpos($content, '#memberContent-end'); 
+	// var_dump($startPos, $endPos);
+	$membersOnlyContent = mb_substr($content, $startPos, $endPos-$startPos);
+	//	var_dump(htmlspecialchars($membersOnlyContent));
+	if ($structured)
+		preg_match_all('|"head" =>\s*"(.+?)",|', $membersOnlyContent, $matches);
+	 else
 		preg_match_all('|<h[234].*?>(.+?)</h\d>|', $membersOnlyContent, $matches);
-
 	foreach ($matches[1] as $heading) $toc .= "<li>$heading</li>";
 	$toc = "<ul id='tighter'>$toc</ul>";
-if ($default_heading == true) echo "<h3>PREVIEW: Headings in the members-only area…</h3>\n\n";
-echo $toc;
+	if ($default_heading == true) echo "<h3>PREVIEW: Headings in the members-only area…</h3>\n\n";
+	echo $toc;
 }
 
 function makeTOC($content) { 
@@ -1223,3 +1368,182 @@ if ($pos !== false) {
 else return $haystack;
 }
 
+/* Returns @string: Generates a "daypass", a concatenation of an enciphered filename and timestamp that temporarily grants access to member content on one page. See generate-daypass.php. */
+function generateDaypass ($filename) {
+	$encipheredFilename = encipherFilename($filename);
+	$encipheredTimestamp = encipherTimestamp(time()); // encode the current timestamp
+	//echo "Finally, concatentate $encipheredFilename & $encipheredTimestamp to get the pass key:<br><strong>{$encipheredFilename}{$encipheredTimestamp}</strong><br>";
+	return $encipheredFilename . $encipheredTimestamp; // return the pass
+	}
+
+/* Returns @string: Generates a trivially obfuscated string from a fragment of a filename */
+function encipherFilename($filename) {
+	$testing = false;
+	if ($testing) echo "Generating a day-pass for: $filename<br>";
+
+	$pathinfo =  pathinfo($filename);
+	$filename = $pathinfo['filename'];
+	if ($testing) echo "Remove the extension: $filename<br>";
+
+	$filename = str_replace("-", null, $filename); // hyphens are the only "special" characters found in my filenames
+	if ($testing) echo "Remove hyphens: $filename<br>";
+
+	$filename = substr ($filename, 2, 8);
+	if ($testing) echo "Extract 8 chars from position 3-10: $filename<br>";
+
+	$x = 0;
+	$filename = str_split($filename);
+
+	foreach ($filename as $char) {
+	$mb_ord = mb_ord($char)-32; // get the codepoint for the capital letter
+	$encipheredFilename .= $mb_ord;
+	$encipheredFilenameReadable .= " $mb_ord";
+	}
+
+	if ($testing) echo "Convert each character to codepoint-32: $encipheredFilenameReadable<br>";
+
+	return $encipheredFilename;
+	}
+
+/* Returns @string: Generates a trivially obfuscated timestamp for a given timestamp, defaulting to now. */
+function encipherTimestamp($timestamp = null) {
+	$testing = false;
+	if (!$timestamp)  $timestamp = time();
+
+
+	if ($testing) echo "Current timestamp: $timestamp<br>";
+
+	$timestamp = substr_replace($timestamp, "00000", 5, 6);
+	if ($testing) echo "Reduce the precision of the timestamp: $timestamp (replace last five digits with zeroes)<br>";
+
+	if ($testing) echo "Which converts to: " . dateTime24($timestamp) . " (should be roughly 1 day ago)<br>";
+
+	$timestamp = $timestamp/100000;
+	if ($testing) echo "Divide by 100,000 to truncate: $timestamp<br>";
+
+	$timestamp = strrev($timestamp);
+	if ($testing) echo "Aaand reverse that string: $timestamp<br>";
+
+	return $timestamp;
+	}
+
+/* Returns @string: tidies whitespace in complex multiline strings by collapsing runs of horizontal and vertical whitespaces */
+function tidyWhitespace ($string) {
+	$string = preg_replace("| {3,10}|", " ", $string); // reduce runs of spaces to 1
+	$string = preg_replace("|\n\s+\n|", "\n\n", $string); // removed lines that containing only spaces, tabs, etc
+	$string = str_replace("\n", "\n\n", $string); // standardize vertical spacing for nice diffing, make sure every break has at least 2 linefeeds
+	$string = preg_replace("|\n{3,10}|", "\n\n", $string); // reduce runs of linefeeds to 2
+	return $string;
+	}
+	
+/* return an array of all the @mine type citations in a given @mine type page */
+function getInternalCites ($citekey) {
+//	var_dump ($citekey);
+	$citekeys_arr = array();
+	global $sources;
+	$citesnum_mypages = 0;
+	$record = $sources->safeGet($citekey); // get the record for the given citekey
+	$citesnum = $record->get("citesnum"); // get the total count all kinds of cites
+	if ($citesnum == "") return false; // abort, because there are no citations of any kind
+	$allcites = $record->get("cites"); // get the list of harvested citekeys, e.g. "epsom, lbp, ways_to_hurt"
+	$allcites_arr = arraynge($allcites, ", "); // make an array from the list
+	foreach ($allcites_arr as $ck) {  // go through the list
+		$record = $sources->safeGet($ck); // get the record for e.g. §gru or §epsom
+		// printArr($allcites_arr); echo "$citekey cites $ck which is type==" . $record->get('type'); exit;
+		if ($record->get('type') == 'mine') { // if it’s an @mine record…
+			$citekeys_arr[] = $ck; // save it
+			$citesnum_mypages++; // count it
+			}
+		}
+	if ($citesnum_mypages == 0) return false;
+	return $citekeys_arr;
+	}
+
+function echoDev ($string) {
+	if (MODE_DEV) echo "<code class='color_soft_red'>$string</code>";
+	else return false;
+	}
+	
+function embed_audio ($filename, $paywalled = false, $figcaption = "Audio version of this section:") {
+// 2023-12-22 — Just got a start on using this function, but it’s still too simple to use for all my audio embedding needs.  Audio embeds can be featured (audio for a whole post/article) vs. minor (just a sub-section), and they can be independently paywalled or not.  This function so far only puts out an unpaywalled minor audio embed, and I need to figure out a solution for the others before I can start using it more widely.
+$url = "/media/$filename";
+if (!file_exists($_SERVER['DOCUMENT_ROOT'] . $url)) error("Audio file does not exist: '$filename'");
+//$url = "https://www.painscience.com" . $url;
+
+$embed = <<<embed
+	<figcaption class="font_accent color_gray_blue"><em>$figcaption</em></figcaption>
+	<audio controls  src="$url"><a href="$url">[DOWNLOAD]</a></audio>
+	embed;
+
+if ($paywalled) {
+	printPaywallMarkup ('nonmember', 'start'); #paywall #cta_join-start <#====#>
+	echo <<<audio_teaser
+	<aside class="meta meta-small audio_embed no-print font_accent" style="position:relative;padding-bottom:1em">
+		<p><em>This content has an audio version for PainSci members. To unlock, <a href='/membership.php'>join now</a> or login. <span class='pupb' onClick='toglDispId("login")' style='position:absolute;bottom:-.6em; left: 50%;  transform: translateX(-50%);'>LOGIN</span></p></aside>
+	</aside>
+	audio_teaser;	
+	printPaywallMarkup ('nonmember', 'end'); #paywall #cta_join-end <#====#>
+	printPaywallMarkup ('member', 'start'); #paywall #memberContent-start
+	echo <<<audio_embed
+		<aside class="meta meta-small audio_embed no-print">
+		$embed
+		</aside>
+	audio_embed;	
+	printPaywallMarkup ('member', 'end'); #paywall #memberContent-end
+	}
+else { // just the embed without teaser and paywall conditions
+	echo <<<audio_embed
+	<aside class="meta meta-small audio_embed no-print">
+		$embed
+	</aside>
+	audio_embed;
+	}
+}
+
+/**
+ * https://stackoverflow.com/a/7135484/470749
+ * @param string $path
+ * @return int
+ */
+function getDurationOfAudioInSecs($path) {
+    $time = getDurationOfAudio($path);
+    list($hms, $milli) = explode('.', $time);
+    list($hours, $minutes, $seconds) = explode(':', $hms);
+    $totalSeconds = ($hours * 3600) + ($minutes * 60) + $seconds;
+    return $totalSeconds;
+}
+
+/**
+ * 
+ * @param string $path
+ * @return string
+ */
+function getDurationOfAudio($path) {
+    $cmd = "ffmpeg -i " . escapeshellarg($path) . " 2>&1 | grep 'Duration' | cut -d ' ' -f 4 | sed s/,//";
+    return exec($cmd);
+}
+
+function addPeriodWhereNeeded ($string) {
+	// $string = "Built for pressure: How thick is kneecap cartilage?"; var_dump(substr($string, -1));
+	$string = trim($string);
+	$search = explode(" ","! ? ’ ” \" \' : ;"); // make an array from a list of common terminal punctuation marks
+	$terminator = ''; // default to empty string
+	if ( !in_array(substr($string, -1), $search)) // if the last character in the string is not one of the terminal marks…
+		$terminator = ".";
+	return $terminator;
+	}
+
+function strip_tags_p ($html) {
+	return preg_replace("|<[/]*p>|", null, $html);
+}
+
+
+function echoDebug ($debugmessage) {
+	global $debugEchoes;
+	if (!$debugEchoes) {
+		return;
+		}
+	else {
+		echo $debugmessage;
+		}
+	}

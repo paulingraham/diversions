@@ -1,33 +1,31 @@
-<?php // test
+<?php #pubsys > build procedure
 
-error_reporting(0);
-// error_reporting(E_ALL ^ E_NOTICE);
+/* PubSys, © 2014–2023 by Paul Ingraham
+A simple content management system focused on easy, simple data entry and management and robustly simple HTML output. PubSys reads text files that contain Markdown and other Markdown-like shorthands and turns them into website files for upload. PubSys runs in a browser locally. Most of the pubsys code is in 'pubsys-functions.php'.
 
+Development notes (extremely out of date as of 2023):
+craftdocs://open?blockId=EF2F7C6B-F8BB-46AA-A75E-281CC2F2CE3F&spaceId=bc7d854c-3e5b-a34e-4850-a6d2f31a1a59
 
-/* PubSys [working title]
-© 2014 by Paul Ingraham
-A simple content management system focused on easy, simple data entry and management and robustly simple HTML output. PubSys reads text files that contain Markdown and other Markdown-like shorthands and turns them into website files for upload. PubSys runs in a browser locally. Most of the pubsys code is in 'pubsys-functions.php'. 
-
-Development notes:
-evernote:///view/523333/s4/8c1bc00a-92ea-45a2-aac4-ec4bc9d35d17/8c1bc00a-92ea-45a2-aac4-ec4bc9d35d17/
-
-Manual:
-~/Dropbox/shared/family folder/pubsys manual.pages
+Manual (also extremely out of date):
+~/Sites/painscience/incs/pubsys-manual.pages
 
 */
 
-// !!! ENVIRONMENT AND CONTEXT
+error_reporting(0);
+error_reporting(E_ALL ^ E_NOTICE);
+
+// ENVIRONMENT AND CONTEXT
 // Where is PubSys running?
 // the identifier `path is used whereever most key paths are defined, as a troubleshooting aid
 
 $root_dev = $root_true = $_SERVER['DOCUMENT_ROOT'];
 $stage = $root_true 	. "/html";
-$root_parent = substr_replace($root_true, NULL, strrpos($root_dev, "/")); // to get the parent of the doc root dir, trim everything after from the rightmost slash
+$root_parent = substr_replace($root_true, '', strrpos($root_dev, "/")); // to get the parent of the doc root dir, trim everything after from the rightmost slash
 
-if (basename($_SERVER['PHP_SELF']) == "MAKE-SITE.php") exit("This is canonical source code that is not meant to be run directly. Only copies of it should be run, because they derive environmental variables from their location. Run /tools/make-site.php instead.");
+// if (basename($_SERVER['PHP_SELF']) == "MAKE-SITE.php") exit("This is canonical source code that is not meant to be run directly. Only copies of it should be run, because they derive environmental variables from their location. Run /tools/make-site.php instead.");
 
 // special case the source and output directories for PS
-if ($_SERVER['HTTP_HOST'] == "ps.test") { 
+if ($_SERVER['HTTP_HOST'] == "ps.test") {
 	$ps = true;
 	$blog_str = "blog";
 	$stage = $root_true 	. "/stage/blog";
@@ -36,37 +34,36 @@ if ($_SERVER['HTTP_HOST'] == "ps.test") {
 
 // and now make named constants, because these get used EVERYwhere
 define('ROOT_TRUE', $root_true);
+define('_ROOT', $root_true);
 define('ROOT_DEV', $root_dev);
 define('ROOT_PARENT', $root_parent);
 define('STAGE', $stage);
-	
-// copy the canonical make-site.php script and other resources to other blog folders as needed
-// do it when I run a make of Writerly
-// more exactly: do it if this is NOT the main (PS) blog and (importantly) *I* am the one running the build
-// this routine must ONLY run on MY Mac, because it’s basically just automation of a chore I need to do to keep my parents blogs’ running (plus my own)
-		
+
+// Copy the canonical PubSys build script and other resources to other blog folders as needed. It’s mostly only needed when I build Writerly. More exactly: only do it if this is NOT the main (PS) blog and (importantly) *I* am the one running the build. This routine must ONLY run on MY Mac, because it’s basically just automation of a chore I need to do to keep my parents blogs’ running (plus my own).
 if (!$ps AND stripos(ROOT_DEV, "paul") !== false) {
 	// special handling of THIS script, because we may be copying over it!
-	$makesite_canonical_fn = "$root_parent/painscience/tools/MAKE-SITE.php"; // the canonical code
-	$makesite_target_fn = ROOT_DEV . "/MAKE-SITE.php"; // this file in the current site filter (might be writerly, diversions, etc)
-	// #2do perhaps I should also check for the existence of the target files
-	if (file_get_contents($makesite_canonical_fn) !== file_get_contents($makesite_target_fn)) {
+	$makesite_canonical_fn = "$root_parent/painscience/tools/make-ps-blog.php"; // the canonical code
+	$makesite_target_fn = ROOT_DEV . "/make-site.php"; // this file in the current site filter (might be writerly, diversions, etc)
+
+/*
+if (file_get_contents($makesite_canonical_fn) !== file_get_contents($makesite_target_fn)) {
 		copy ($makesite_canonical_fn, "{$root_parent}/writerly/make-site.php");
-		copy ($makesite_canonical_fn, "{$root_parent}/diversions/make-site.php");
-		copy ($makesite_canonical_fn, "{$root_parent}/ephemeral/make-site.php");
+//		copy ($makesite_canonical_fn, "{$root_parent}/diversions/make-site.php");
+//		copy ($makesite_canonical_fn, "{$root_parent}/ephemeral/make-site.php");
 		echo "build script updated, please to reload!";
 		exit;
 		}
+
 	// now for all the other stuff — nothing fancy, no optimization, no diffing … just copy over the destinations
 	$rsrc_fns = array ("pubsys-functions.php", "misc-functions.php", "tag-engine.php", "table-sort.js", "table-sort-setup.js", "synonyms-pubsys-shorthands.txt", "synonyms-post-metadata.txt", "synonyms-image-options.txt", "easy-img.php","css-pubsys.css","lazyload-imgs.js");
-	$target_dirs = array ("writerly", "diversions", "ephemeral");
+//	$target_dirs = array ("writerly", "diversions", "ephemeral");
+	$target_dirs = array ("writerly");
 	foreach ($rsrc_fns as $rsrc_fn)
 		foreach ($target_dirs as $target_dir)
 			if (!copy ("{$root_parent}/painscience/incs/$rsrc_fn", "{$root_parent}/$target_dir/incs/$rsrc_fn"))
 				echo "failed to copy $rsrc_fn :-(";
-	}
-
-
+*/				
+	} 
 
 chdir (ROOT_DEV); // execute script as if running in a specific site folder
 define('CODE_BASE', 'pubsys');
@@ -77,15 +74,14 @@ if ($ps) {
 		}
 	}
 
-$GLOBALS['pubsys'] = true;
+$GLOBALS['pubsys'] = true;  #PHP8_pubsys, moved this from above the environment inclusion to after.  Why?  Because the main webdev environment now now initializes this variable as false (necessary for everything else)… but we want to proceed with it as true for this build script only.
 
-if (!$ps)  { // without the PS environment, we need at least Composer installed classes (chiefly php-markdown
+if (!$ps)  { // without the PS environment, we need at least Composer installed classes (chiefly php-markdown)
 	require_once __DIR__ . '/incs/vendor/autoload.php';
 	}
 
-// load code, function libraries
+// load code libraries
 set_include_path(".:$root_true/incs:$root_true/incs/snippets:$root_dev/guts:$root_dev/incs:$root_dev/guts/incs");
-
 require_once('pubsys-functions.php'); // functions for blogging, currently used by either Writerly or PainScience.com
 require_once('tag-engine.php'); // tag management functions
 require_once('easy-img.php'); // a large function for handling image markup, so it gets its own file
@@ -95,7 +91,6 @@ require_once('misc-functions.php'); // many functions originally written for Pai
 $settings = get_settings(); extract($settings); // a selection of fairly straightforward sitewide variables, parsed from a simple text file
 
 $md_syns = getArrFromFile("synonyms-post-metadata.txt",true);
-
 
 
 // OK, that’s setup. Time for a little output.
@@ -122,34 +117,55 @@ $md_syns = getArrFromFile("synonyms-post-metadata.txt",true);
 <p>View local preview: <a href="<?php echo $urlbase_stage ?>/index.html?rand=<?php echo mt_rand(1,10000) ?>" target="_blank"><?php echo $urlbase_stage ?></a><br>
 View live site: <a href="<?php echo $urlbase_prod ?>" target="_blank"><?php echo $urlbase_prod ?></a></p>
 
-<h2>Make Log</h2>
 
-<div style='font-size:.8em'>
 
-<?php 
 
-// logToFile("/Users/paul/Dropbox/Sites/logs/builds.log.txt", "Make $sitename $blog_str, PHP version " . phpversion());
+
+<?php
+
+// logToFile("/Users/paul/Sites/logs/builds.log.txt", "Make $sitename $blog_str, PHP version " . phpversion());
 
 // !!! PUBSYS BUILD ==========================
-// PubSys reads post files in the "posts" folder into a big array of posts, which contains ALL post metadata and content, aptly called $posts, plus a much lighter one, $index.  PubSys uses the array and or index to render and save posts in the HTML folder, and then some other important files like the homepage, RSS feed, and sitemap. It wraps up with a bit of file management.
+// PubSys reads post files in the "posts" folder into a big array of posts, which contains ALL post metadata and content, aptly called $posts, plus a much lighter one, $index.  PubSys uses the posts array to render and save posts in the HTML folder, just the three most recent in a fast "prep mode", and all of them otherwise, plus a bunch of other stuff: homepage, RSS feed, sitemap, and more. It wraps up with a bit of file management.
 
-$tags = getTags(); 		// read tags into array
-	// printArr($tags); exit;
-$posts = getPosts(); 		// read posts into array
-	// printArr($tags); exit;
-updateTags();				// add tags found in posts, make tag index files
-makePostFiles(); 			// make all post files (web-ready HTML5)
-makeHomepage();			// make the home page (index.html)
-make_sy_indexes(); 		// generate several custom post indexes
-makeRSS(); 					// make the RSS feeds (main and members-only)
-makeSitemap ();			// make the sitemap
-file_management ();		// make some aliases, symlinks, etc
-makePremiumPostList();
-make_post_matrix (); 	// make large table of all post data
+if ($_qry == "prep") { // #prepMode a much simpler, faster build of render initiate #postPrep mode, whihc builds just a single post
+	$prepMode = true;
+	echo "<h2>Make Log: Prep Mode</h2><div style='font-size:.8em'>";
+	$tags = getTags(); 			// read tags into array as usual
+	$posts = getPosts(); 		// read posts into array as usual
+	auditPsids();					// aborts for missing psids & generates one (common with new posts)
+	makeWebVersions(); 			// render 3 most recent posts into web-ready HTML5 (it aborts early when $prepMode==true)
+	echo "<p>Skipping many additional steps! Not making a variety of indexes, the RSS feeds, sitemap, member post lists, and more. Not rendering a mighty table of all historical posts (just a few for recent context). For a full build, <a href='http://ps.test/tools/make-ps-blog.php'>drop the 'prep' parameter.</a></p>";
+	make_post_matrix (); 	// make table of all data about several recent posts
+	echo "<br><h2>Raw post data for current post</h2>";
+	printArrTable2(array_slice($posts, 0, 5)); 			// print the first 3 posts in the post array
+	// the day after implementing these exec() calls, they stopped working…
+		// exec("open -a Safari '$urlPreview'"); // this opens the preview in a new tab in Safari automagically, which is probably what I want the majority of the time (and of course the make-site output is available to switch to)
+		// exec("echo '$urlProd' | pbcopy");
+		// exec("open -a BBEdit ~/Desktop/current-post-text-version.txt"); //not sure if this is useful, because most renders I probably don’t want it opening up
+	}
+else {
+	echo "<h2>Make Log: All Posts</h2><div style='font-size:.8em'>";
+	$tags = getTags(); 			// read tags into array
+	$psidsArr = array();
+	$posts = getPosts(); 		// read posts into array
+	if (!$ps) makeTagUsageList($posts); // save every post tag to a list, to be ingested and tallied by the tag-engine (PainSci does this in it’s own special way)
+	if ($ps) auditPsids();					// aborts for missing psids & generates one (common with new posts)
+	updateTags();				// add tags found in posts, make tag index files
+	makeWebVersions(); 		// make all post files (web-ready HTML5)
+	makeHomepage();			// make the home page (index.html)
+	make_sy_indexes(); 		// generate several custom post indexes
+	list_urls();
+	makeRSS(); 					// make the #RSS feeds (main and members-only)
+	if ($ps) makePodcast(); 		// make the #podcast feed
+	makeSitemap ();			// make the sitemap
+	file_management ();		// make some aliases, symlinks, etc
+	makeMemberPostLists();
+	make_post_matrix (); 	// make huge table of all post data
 
+	echo "<br><h2>Raw post data</h2>"; printArrTable2($posts); 			// print array of post metadata /**/
+	}
 
-echo "<br><h2>Raw post data</h2>";
-printArr($posts); 			// print array of post metadata /**/
 ?>
 
 </body>

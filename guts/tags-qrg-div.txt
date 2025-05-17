@@ -1,265 +1,263 @@
 TAGS QUICK REFERENCE GUIDE
 
 Aachen	6						
-abdominals			abs		abdominal muscles		
-abductors							
-activity						activities choosing an activity staying active	
-adapting exercise							
-adductors						adductor brevis adductor longus adductor magnus	
-aerobic						anaerobic	
-aging							
-air pollution							
-air quality							
+abdominals	0		abs		abdominal muscles		
+abductors	0						
+activity	0					activities choosing an activity staying active	
+adapting exercise	0						
+adductors	0					adductor brevis adductor longus adductor magnus	
+aerobic	0					anaerobic	
+aging	0						
+air pollution	0						
+air quality	0						
 Allen	2						
-allergies							
+allergies	0						
 Allison	2						
 American Civil War	2						
-American Revolution							
-ankle							
-arm bones							
-arthritis							
-asthma							
-autobiography							
+American Revolution	0						
+ankle	0						
+arm bones	0						
+asthma	0						
+autobiography	0						
 av	4						
-back							
-backbone							
-balance							
-ball							
-ball-and-socket joint							
-barometric pressure							
+back	0						
+backbone	0						
+balance	0						
+ball	0						
+ball-and-socket joint	0						
+barometric pressure	0						
 basketball	2						
-BCRPA							
+BCRPA	0						
 Beaver	1						
 best of	2						
-biceps							
-body systems							
-body temperature							
-bones							
+biceps	0						
+body systems	0						
+body temperature	0						
+bones	0						
 Boone	2						
-boot camp							
-brain							
+boot camp	0						
+brain	0						
 Brand	5						
-breathing							
-burn							
-calf							
-calf muscles							
-Canada's Food Guide							
-cancer							
-canoe							
-cardio							
-cardiovascular							
+breathing	0						
+burn	0						
+calf	0						
+calf muscles	0						
+Canada's Food Guide	0						
+cancer	0						
+canoe	0						
+cardio	0						
+cardiovascular	0						
 Cherbourg	9						
-cholesterol							
-chronic pain							
-cold							
-computers							
-COPD							
+cholesterol	0						
+chronic pain	0						
+cold	0						
+computers	0						
 Corbin	1						
-core							
+core	0						
 DeBolt	1						
-deltoids							
-dementia							
-depression							
-diabetes							
-diet						dieting diets food	
-digestive system							
+deltoids	0						
+dementia	0						
+depression	0						
+diabetes	0						
+diet	0					dieting diets food	
+digestive system	0						
 Eddy	4						
-elbow							
-elementary school							
-emergencies							
-emphysema						COPD	
-endocrine system							
-erector spinae							
-exercise							
-exercise research							
-exocrine system							
-eye health							
-eyes							
-Fairbury							
+elbow	0						
+elementary school	0						
+emergencies	0						
+emphysema	0					COPD	
+endocrine system	0						
+erector spinae	0						
+exercise	0						
+exercise research	0						
+exocrine system	0						
+eye health	0						
+eyes	0						
+Fairbury	0						
 Falaise Pocket	7						
-fall prevention						falling falls	
-family secrets							
-fascia							
-fascial system							
-feet							
-femur							
-fibula							
-fiction							
-Fierro							
-fitness class						fitness	
-fitness equipment							
-fitness instructors							
-fitness principles							
-fitness research							
-fitness terms							
-forearm							
-free weights							
-French and Indian War						French and Indian	
-gastrocnemius							
-genetics							
-glutes							
-Grand Canyon							
-Grizzly Den							
-group fitness							
-hamstrings							
-hand							
+fall prevention	0					falling falls	
+family secrets	0						
+fascia	0						
+fascial system	0						
+feet	0						
+femur	0						
+fibula	0						
+fiction	0						
+Fierro	0						
+fitness class	0					fitness	
+fitness equipment	0						
+fitness instructors	0						
+fitness principles	0						
+fitness research	0						
+fitness terms	0						
+forearm	0						
+free weights	0						
+French and Indian War	0					French and Indian	
+gastrocnemius	0						
+genetics	0						
+glutes	0						
+Grand Canyon	0						
+Grizzly Den	0						
+group fitness	0						
+hamstrings	0						
+hand	0						
 Hansen	4						
 Harness	2						
 Hastings	2						
 Hastings College	2						
 Hastings High School	2						
 Hatch	2						
-head							
-health							
-healthy							
-heart disease							
-Heartwell Nebraska		Heartwell		Heartwell			
-heat injuries						heat cramps heat exhaustion heatstroke	
+head	0						
+health	0						
+healthy	0						
+heart disease	0						
+Heartwell Nebraska	0	Heartwell		Heartwell			
+heat injuries	0					heat cramps heat exhaustion heatstroke	
 Herrick	5						
 Higby	4						
-high blood pressure							
-hike							
-hip						hip flexors hip joint	
-holiday							
-home safety							
-hormones							
+high blood pressure	0						
+hike	0						
+hip	0					hip flexors hip joint	
+holiday	0						
+home safety	0						
+hormones	0						
 Hornback	1						
-humerus							
+humerus	0						
 Hurtgen Forest	5						
-hypertension							
-iliotibial band							
-Illinois							
-immune system							
-impingement syndrome							
-individuality							
+hypertension	0						
+iliotibial band	0						
+Illinois	0						
+immune system	0						
+impingement syndrome	0						
+individuality	0						
 Ingraham	4						
-inheritance							
-injuries						exercise injuries	
-insomnia							
-instructors							
-Jasper							
+inheritance	0						
+injuries	0					exercise injuries	
+insomnia	0						
+instructors	0						
+Jasper	0						
 Jensen	3						
-joints		joint		joint	joint classification	ball-and-socket joint cartilagenous joint	
-judo							
-Kansas City							
-knee					knee injury	knee joint knee replacement	
-lab school							
-Lake							
-latissimus dorsi		lats		lats			
+joints	0	joint		joint	joint classification		ball-and-socket joint cartilagenous joint
+judo	0						
+Kansas City	0						
+knee	0				knee injury	knee joint knee replacement	
+lab school	0						
+Lake	0						
+latissimus dorsi	0	lats		lats			
 Lee	4						
-leg							
-Lewis County							
-lifestyle							
-Light Fit							
-longevity							
-lower leg							
-lunar landing							
+leg	0						
+Lewis County	0						
+lifestyle	0						
+Light Fit	0						
+longevity	0						
+lower leg	0						
+lunar landing	0						
 Mahoney	3						
-marriage							
+marriage	0						
 McDonald	3						
-medications							
-memory							
-metabolism							
-Mexican War							
-Minden							
-Minnestoa							
-mood							
+medications	0						
+memory	0						
+metabolism	0						
+Mexican War	0						
+Minden	0						
+Minnestoa	0						
+mood	0						
 Mortain	7						
 Mosher	3						
-motherhood							
-motivation					motivation to exercise		
-movement							
-muscles							
-muscular system							
-museum							
-music							
-musings							
-mystery							
+motherhood	0						
+motivation	0				motivation to exercise		
+movement	0						
+muscles	0						
+muscular system	0						
+museum	0						
+music	0						
+musings	0						
+mystery	0						
 Nebraska	2						
-nervous system							
-New Mexico							
+nervous system	0						
+New Mexico	0						
 Nissen	3						
 Normandy	10						
-novel							
-nutrition							
-obliques							
-older adults							
-old wives tales							
-opposing muscles							
-osteoarthritis						arthritis	
-osteopenia							
-osteoporosis							
-over-training							
+novel	0						
+nutrition	0						
+obliques	0						
+older adults	0						
+old wives tales	0						
+opposing muscles	0						
+osteoarthritis	0					arthritis	
+osteopenia	0						
+osteoporosis	0						
+over-training	0						
 Overturf	5					Oberdorf	
-pain							
-pandemic							
-pecs							
-pectoralis major							
-perceived exertion scale							
-perfume							
+pain	0						
+pandemic	0						
+pecs	0						
+pectoralis major	0						
+perceived exertion scale	0						
+perfume	0						
 Porter	2						
 Power	2						
-Prince George							
-quadriceps		quads		quads			
-Quebec							
-quotations							
-radius							
-research							
-respiratory system							
-review							
-rheumatoid arthritis							
-rhomboids							
-ribs						floating rib rib injuries	
-safety							
-Salem Witch Trials							
-scientific studies							
+Prince George	0						
+quadriceps	0	quads		quads			
+Quebec	0						
+quotations	0						
+radius	0						
+research	0						
+respiratory system	0						
+review	0						
+rheumatoid arthritis	0						
+rhomboids	0						
+ribs	0					floating rib rib injuries	
+safety	0						
+Salem Witch Trials	0						
+scientific studies	0						
 Sheldon	1						
-shins							
-shoulder							
-Silver City							
-singing							
+shins	0						
+shoulder	0						
+Silver City	0						
+singing	0						
 size L	12						
-size M							
+size M	0						
 size S	4						
 size XL	18						
-skeleton							
-sleep							
-small town							
+skeleton	0						
+sleep	0						
+small town	0						
 Solart	4						
-spine							
-sports							
+spine	0						
+sports	0						
 Steel	2						
 St Lo	8						
-strength training							
-stroke							
-studies							
-Sugarbowl							
-sweating							
-teaching							
-technology							
+strength training	0						
+stroke	0						
+studies	0						
+Sugarbowl	0						
+sweating	0						
+teaching	0						
+technology	0						
 Tegarden	1						
-temperature							
-thoughts							
-tibia							
-torn meniscus							
-trapezius							
-trends							
-triceps							
+temperature	0						
+thoughts	0						
+tibia	0						
+torn meniscus	0						
+trapezius	0						
+trends	0						
+triceps	0						
 Trumbo	2						
 Turpin	2						
-ulna							
-Valentine							
-Vancouver							
-video							
-Vietnam War							
-virus							
-walking							
-warm-up							
-War of 1812							
-weight loss							
+ulna	0						
+Valentine	0						
+Vancouver	0						
+video	0						
+Vietnam War	0						
+virus	0						
+walking	0						
+warm-up	0						
+War of 1812	0						
+weight loss	0						
 Wheeler	2						
-women health							
+women health	0						
 World War II	10						
-wrist							
-yoga							
+wrist	0						
+yoga	0						
 

@@ -1,0 +1,23 @@
+# configure caching
+<IfModule mod_expires.c>
+ExpiresActive on
+ExpiresByType text/css "access 1 month"
+ExpiresByType application/javascript "access 1 month"
+ExpiresByType text/plain "access 1 month"
+ExpiresByType image/jpeg "access 1 month"
+ExpiresByType image/ico "access 3 months"
+ExpiresByType image/gif "access 1 month"
+ExpiresByType image/png "access 1 month"
+ExpiresDefault "access 2 days" 
+</IfModule>
+
+<IfModule mod_rewrite.c>
+# redirect from non-www to www
+RewriteEngine on
+RewriteCond %{HTTP_HOST} ^susaningraham.net [NC] 
+RewriteRule ^(.*)$ http://www.susaningraham.net/$1 [L,R=301]
+</IfModule>
+
+# redirects for main resources from generic & standard locations to site-specific files
+redirect permanent	/feed.xml			http://www.susaningraham.net/feed-div.xml
+redirect permanent	/sitemap.xml	http://www.susaningraham.net/sitemap-div.xml

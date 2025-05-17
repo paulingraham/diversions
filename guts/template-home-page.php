@@ -35,17 +35,18 @@
 <body><!-- <##> -->
 
 
-<h1><img src="imgs/diversions-logo-50px.jpg" height="50" width="50" style="vertical-align:-10px"> <strong><a href="index.html">Diversions:</a></strong>  Fitness, Family, Fiction</h1>
+<h1><img src="imgs/diversions-logo-50px.jpg" height="50" width="50" style="vertical-align:-10px"> <strong><a href="index.html">Diversions:</a></strong> Fitness, Family, Fiction</h1>
   
 <article><!--  article start -->
 
 <body>
 
-<p>Diversions once explored ideas in the world of fitness for the older adult as well as the dynamics of family history, both real and fictional.  It was an eclectic mix of writing in two different, but sometimes related, categories. Many articles have been removed for various reasons which will not be discussed here. Suffice it to say that this page now only announces my fitness classes and has articles about my family and my husband's family.:</p>
+<p>Diversions once explored ideas in the world of fitness for the older adult as well as the dynamics of family history, both real and fictional.  It was an eclectic mix of writing in two different, but sometimes related, categories. Many articles have been removed for various reasons which will not be discussed here. Suffice it to say that this page now only announces my fitness classes and has articles about my family and my husband’s family:</p>
 
 <ul>
 <li>fitness for older adults, which I teach in downtown Vancouver, Canada</li>
 <li>the history of my family and my husband's family, particularly the Overturf, Hansen, Ingraham, and Herrick families</li>
+</ul>
 
 <p>Plus more diversions. In some ways these topics couldn’t be more different, and yet they have also inspired and informed each other. See below for more information.</p>
 
@@ -78,7 +79,7 @@ while(x=eval(x));
 
 <p><span class='red'>Light Fit</span> encourages people of any age (though the emphasis is on the older adult) to get active:warmup, strength training, cardiovascular exercise, balance training, stretch and flexibility. If you have been away from exercise, had a recent injury, or you are just starting to exercise, you should find this class a good one to start with, but many participants are "regulars" who enjoy the general mood and tone of the class. It meets from 10:45 a.m. to 11:45 a.m. on Tuesdays and Thursdays at the West End Community Centre, 870 Denman Street, in Vancouver, BC. </p>
 
-</p><span class='red'>Adapted Fit</span> is a fitness class for older adults (usually 55 and older) who may have strength or mobility issues. Participants do many exercises in a chair and they stand up for some activities while using the chair for support. It meets on Mondays and Fridays from 11:00 a.m. to noon.</p>
+<span class='red'>Adapted Fit</span> is a fitness class for older adults (usually 55 and older) who may have strength or mobility issues. Participants do many exercises in a chair and they stand up for some activities while using the chair for support. It meets on Mondays and Fridays from 11:00 a.m. to noon.</p>
 
 <li>MY FAMILY HISTORY: I have done research on my own family which includes: 
 <a href="family-history-home-page.html">Overturfs, Hansens, Mahoneys, and McDonalds."</a></li>

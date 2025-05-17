@@ -1,25 +1,26 @@
-<?php /*
+<?php /* #tag_engine
 
-TAG ENGINE: making `tags easier to use, for PubSys and now PainScience too!
+TAG ENGINE: making `tags easier to use, for PubSys originally, and PainSci more generally over time.
 
-Tagging is a powerful organizational tool. And yet a simple list of tags quickly becomes unwieldy as it grows. Just like the data they are applied to, tags themselves need organizing — there are different types and categories of tags, different forms of tags, aliases for ease of data entry, and so on.
+Tagging is a powerful organizational tool, and yet a simple list of tags quickly becomes unwieldy as it grows. Just like the data they are applied to, tags themselves need organizing — there are different types and categories of tags, different forms of tags, aliases for ease of data entry, and so on. 
 
-Goals for tagging:
+Goals for this system:
 
-•  efficient post tagging
+•  efficient tagging
 	✓	synonyms (and special forms for presentation, eg short, long, abbreviated, etc)
 	✓	case, space, and symbol insensitivity
 	✓	automatic addition of all parent tags
 	✓ simple plural and singular synonyms, eg 'cat' matches 'cats' and vice versa
-	✓	automatic tags implied by other metadata
-	✓	automatic tags inferred from content
+	✓	automatic-tagging (inferred from other metadata and content)
 •  efficient tag organizing
-	✓	very simple text file data format, easily to read and edit
-	✓  canonicalization of data file (standardized, alphabetized, metadata)
-	✓	new tags added to the database automatically
+	✓	simple text file data format, easy to read and edit
+	✓ public descriptions and private notes about tags
+	✓ alphabetization prefixes so related tags will sort together, e.g. "analgesics » opioids"
+	✓ canonicalization of data file (standardized, alphabetized, metadata)
+	✓	new tags from both CMSes added to the database automatically
 	✓	in the db, shorthands for the longer field names (desc, syn/s instead of description, synonyms)
-	✓ show tag usage in data file
-	✓ plain tag lists in post header for easy auditing/diffing
+	✓ show tag usage in data file (# of items)
+	✓ CSV tag lists in items for easy auditing/diffing
 	•  automatically generate quick-reference guides, reports
 		✓	condensed dictionary
 		•	untagged, under-tagged posts
@@ -33,7 +34,7 @@ Goals for tagging:
 
 Example tag data entry:
 
-quackery [auto tag count] 			< the main or “true” form of the tag, with correct case & punctuation
+altmed » quackery [#] 				< sorting prefix » the main, canonical tag (correct case & punctuation) [count of usages in blog]
 	notes: My favourite tag. 		< private notes about the tag, eg clarifying what kind of content
 	description:							< public description of the tag, eg appears in tooltips on mouseover
 	short: quackery						< a shorter form of the tag
@@ -41,9 +42,15 @@ quackery [auto tag count] 			< the main or “true” form of the tag, with corr
 	abbr: quack 							< abbreviation of the 
 	synonyms:	snake oil				< usage of these terms will always be replaced by the main tag
 	parents: skepticism				< significant umbrella categories, added to the tag list for the item
-	related: reflexology				< other related terms, replaced by the main
+	related: reflexology				< strongly related topics act as synonym for the main tag when they don’t otherwise exist; or just ignore
 
-(More about “related”: related terms are a trivial sub-type of synonym, semantic hair-splitting with little practical importance.  Synonyms are alternate forms of the very same word as the tag, or extremely similar concepts, like “snake oil” and “quackery.”  Related terms are not true synonyms, but terms I want to lump in with the main tag. They may be technically a parent, or a child, but not worth defining as such.  In practice, this will probably be the bucket where I put the terms that people tend to search for or ask about, a kind of redirecurly?)
+More about “synonyms” and “related” — Related terms are a trivial sub-type of synonym, some semantic hair-splitting.   Synonyms refer to truly identical concepts for my purposes, like cannabis and cannabinoids, that I never expect.  Related terms are more like "synonyms for now" … topics so closely related that I don’t want to exist as separate tags, at least not yet. That is, they are treated as synonyms for the main tag until I make a point of defining them as an independent tag.
+	* For example, if #cannabinoids is related to "cbd," then any usage of "cbd" will result in applying #cannabinoids, and counting as a usage of #cannabinoids, and a #cbd tag will not be automatically created.  But if I add #cbd to the database myself, all previous references switch to #cbd.  The term "cbd" could remain in the related list for #cannabis, or to be more taxonomically precise it could be re-defined as a child.  Why not just make it a child in the first place?  Well, it could be.  That basically works the same way.  But the relationship of many related terms isn't so clear.  It’s just a dumping ground for "close enough for my purposes" synonyms, while falling short of being an obvious synonym, child, etc.
+	* Duplication of related tags can get confusing. If both #A and #B tags claim that they are "related" to "C" (not it’s own tag)... then C can't be used as synonym for both, and it ends up getting assigned to the last one processed by getTags while building the thesaurus.
+
+Sort prefixes — Sort prefixes exist originally solely for "display", so that tags like "arthritis » osteoarthritis" and "arthritis » rheumatoid arthritis" are visually grouped together. The prefix was not used in any other way. getTags() removed them and saved them in the sort_prefix field, where they remain until updateTags() restores them right before regenerating the tags files. But the sort prefixes are a selected parent tag conceptually: the point is to group related (sibling) tags for organizational convenience, so that I can see several sibling tags together in the database. And so in time I decided to make them functionally equivalent. The sorting prefix syntax is now fully synonymous with declaring parentage.  When parsing, they are added to the parents list. Before output, the prefix syntax is restored for that parent.  If that prefix is the only parent, the parents field isn't even generated.
+
+Cleanup — Because the spontaneous creation of tags in various contexts actually spawns new tags in the tag db — e.g. if I spell a tag wrong and put "snackery" on a post instead of "quackery," then the #snackery tag will be created.  The practical implication is that it becomes necessary to go through the tag db and identify these stray tags and either correct the source, or merge the stray tag into another tag by making it a synonym or relative.
 
 TAG ENGINE GLOSSARY
 
@@ -58,64 +65,80 @@ TAG ENGINE GLOSSARY
 	ADMIN TAGS: tags for internal use only (denoted with . prefix)
 	ORPHAN TAGS: tags with suppressed ancestry (denoted with *)
 	TAG TAGS: tags that classify tags, not content (not used on posts, used on tags!)
+	STRAY TAG: tag created by usage in error or is never or very rarely used again
+	SORT PREFIX: a useful syntax for grouping tags alphabetically under a selected parent
 	
 
 Code overview
 
-	if there’s a tag db data file
-		parse the simple, editable tag data file into an array keyed with simplified tags
-		make a tag thesaurus
+	getTags
+		if there’s a tag db data file
+			parse the tag data file into an array keyed with simplified tags
+			make a tag thesaurus to facilitate lookups
 
-	for every post
-		lookup every given tag:
-			does it match a defined tag or synonym?
-			if not (simple)
-				add it to the post tags
-				add it to the new tags field
-			if it does (complicated!)
-				add it to the post tags
-				iterate the tag count
-				does it have parents?
-					for each parent
-						is the parent defined?
-							add the true parent to the post ancestry tags
-							does it have parents? [recursion]
-						if not
-							add it as-is to the post ancestry tags
+	updateTags
+		for every post
+			lookup every given tag:
+				does it match a defined tag or synonym?
+				if not (simple)
+					add it to the post tags
+					add it to the new tags field
+				if yes (complicated!)
+					add it to the post tags
+					iterate the tag count
+					does it have parents?
+						for each parent
+							is the parent defined?
+								add the true parent to the post ancestry tags
+								does it have parents? [recursion]
+							if not
+								add it as-is to the post ancestry tags
 
 	update the tags
 		for every post
 			add any new tags to a main list of new tags
 		add new tags to database
 		generate and save canonicalized tag data file
-		generate and save quick reference guide
+		generate and save quick reference guide	
 
 
-TO DO
+ABOUT PARENTS VS CHILDREN
 
-need to document, now that things are pretty settled
-feature: parent tags need _privacy too
-feature: teach test-tags to expand arbitrary lists of given tags (e.g. from a string, not from the database)
-mx* orphan syntax failed, but *mx succeeded, perhaps because it was at the end of the given tags
-redunancy: it’s routinely redundant to list parents, e.g. “science news” already contains “science”
-do we really need to explicitly state a simple substr as an abbreviation?  can we just check for substrings?  or will there be unintended consequences, false positives?
-merge description or syns into tag line in data file? no, unnecessary data entry confusion for minimal reward
-# separator instead of comma? no, significant dev challenge, and hashtags harder to type than comma
-PS COMPATIBILITY/OPPORTUNITIES
-	transition from literal array to simple text data file (without breaking anything ELSE)
-	can build tag indexes but … seems lame for them to be ONLY for blog posts
-	extract tags from database (e.g. if I’m blogging about something in the database, just get the tags from the item in the database)
+In early versions of this system, I listed tag CHILDREN in the data (e.g. children of “vegetables” are “carrots, peas … ”), and alogrithmically determined the parentage for carrots by looking for tags that specify carrots as children.  This was programatically expensive, but data entry was easy. Then I switched to listing parents in the data file, which is programatically efficient (it’s easy to lookup parents when they have been explicitly listed), but it makes for redundant data entry (you have to list “vegetables” as a parent for every single vegetable tag). I don’t really know what the right answer was.  Ultimately, it might be feasible to have it both ways: to list children OR parents, and let the tag engine canonicalize the data so that both sides of the equation are represented.
+
+
+SORTING PREFIXES, COMBO TAGS, and SHORTHANDS FOR DECLARING PARENTS
+
+Tags can be PREFIXED by parent tag to group children together alphabetically, which is organizationally useful. I call the prefix a "sorting prefix," but it is also logically equivalent to a parent. Tags can also be COMBINED with a + to denote pairing that is a topic in its own right, and where each term is also a parent. For instance:
+
+	activators + harms
+		parents = chiropractic, activators, harms
+		
+	===
 	
+	chiropractic » activators + harms
 
+The condensed syntax is more cryptic but clear enough, tidier, and saves real space, about 5% of the database file, 7% of the line count. The terms are written in the condensed format, but read as explicitly declared as parents.
 
-REGARDING PARENTS VS CHILDREN
+⚠️ It’s still easy to acidentally declare an illegal parent this way, and I may have some debugging ahead.
 
-In the first alpha version of this system, I listed tag CHILDREN in the data (e.g. children of “vegetables” are “carrots, peas … ”), and alogrithmically determined the parentage for carrots by looking for tags that specify carrots as children.  This was programatically expensive, but data entry was easy. Then I switched to listing parents in the data file, which is programatically efficient (it’s easy to lookup parents when they have been explicitly listed), but it makes for redundant data entry (you have to list “vegetables” as a parent for every single vegetable tag). I don’t really know what the right answer was.  Ultimately, it might be feasible to have it both ways: to list children OR parents, and let the tag engine canonicalize the data so that both sides of the equation are represented.
+And why have a combo tag like "activators+harms" instead of just tagging with each of those independently?  Every well-tagged post is theoretically tagged with a combo tag that combines all the tags on the post, e.g. 
+
+	#activators+harms   ~=   #activators #harms
+
+But only the combo tag will be in database as a combo tag FOR SPECIFIC CONTENT. In other words, it’s descriptive of existing content.  It says "yes, I have content that is specifically about the relationship between these things" … which otherwise could only be theoretically inferred from the presence of both tags, but that wouldn't even actually be possible, because that "signal" would be impossible to separate from the noise of countless other combinations of tags which do not apply to specific content.  Another way of putting it: if you're searching for content that id about both "activators" and "harms," you would want anything taged with "activators+harms" to be at the very top of that list … even though there might be several other articles that do actually have both of those tags.
 
 CATEGORIES
 
 A tag prefixed by an underscore is a “category.”  (The prefix is 100% non-functional: it’s stored, but never actually used in the tag-engine.  It’s parsed out of the input, and put back in when the tags are canonicalized. The sole purpose of the underscore is data-entry convenience in BibDesk.)  What does “category” mean?  Isn’t every tag a category?  It’s an imprecise distinction.  Category-ness is a rough expression of the importance of the tag, which is roughly an intersection of the number of items it applies to, how directly it applies to them.  The “back pain” tag is not only applied to more items than “elbow pain,” but the items it is applied to are mostly about back pain, whereas elbow pain is typically a peripheral or sub-topic.  Thus back pain is definitely a category, but it would be difficult to determine it algorithmically.   The underscore tags also began life in my file system as tags specifically referring to the TYPE of content, as opposed to what it was about or its tone.  To some extent, types of content tend to be large or important categories. In time, I may replace the category syntax with a more granular tag rating system.
 
+
+HOW DOES TAG TALLYING WORK?
+
+* PubSys counts tag usages as it builds blog posts and saves a list of all tags. Writerly gets its tag tallies from that file.
+* PainSci ignores that file, and instead gets tag tallies from a list of tag usages harvested from srcs.bib by Make Bib, which has all tag usages from both of two CMSes that PainSci is based on.  That includes three major types: tags on bibliographic records, tags on my own articles, and tags on blog post which are harvested from PubSys output. That is, all tag usages are logged in a file that is updated by BibliographyTagHarvester.pl, which gets updated by Make Bib (srcs.tags.txt).
+* Regardless of where the tag list comes from, updateTags() calls tallyTags() during a PubSys build to ingest, count, de-dupe, and add the counts to the main $tags array.
+* Tag tallies are saved to tags-ps.txt, but at this time they are NOT parsed by getTags().  That is, when the $tags array is initially created, it has no tallies, even though the number is right there. This is somewhat limiting. For instance, there would be no way to extract under-used tags from the array.  There are lines in getTags for ingesting tallies, but they are commented out for now.
 
 <##>
 
@@ -141,7 +164,7 @@ function getTags ($tag_fn = false) {
 	if ($journalling) journal("reading tags from file: $tag_fn",1,true);
 
 	$tags_header = "";
-	foreach ($lines as $line) {
+	foreach ($lines as $line) { // loop through all lines
 	if (!isset($finished_header)) { // if we’re not yet finished reading the header …
 		$tags_header .= $line; // build a duplicate of the header
 		if (inStr("*****", $line))  // the end of the header is marked by a row of at least 5 asterisks
@@ -150,18 +173,51 @@ function getTags ($tag_fn = false) {
 	else { // if reading data (done with header)
 		$line = rtrim($line); // trim line feeds (trim from right only because tabs on the left are meaningful in this format)
 		if (trim($line) == "") continue; // ignore empties; didn’t want to do this in the header, but we do for the data
-		$lines_tags[] = $line; // build an array of lines
-		if (strpos($line, "\t") !== 0) { // a line that does not start with a tab is a tag ??? is this wise? should there be a more definite syntax?
-			$line = preg_replace("@ \[.*?$@", null, $line); // remove the tag count from the line
+		$lines_tags[] = $line; // build an array of lines with tag data
+		if (strpos($line, "\t") !== 0) { // a non-blank line in the body that does not start with a tab… is a tag
+			# preg_match('@\[(\d+), (\d+)\]@', $line, $tagTallies); // get the tag tallies; they are recounted by updateTags() … disabled until such time as the tag engine is refactored so that this does not conflict with excerpttags adding to the ingested post tag tallies instead of replacing them # printArr($tagTallies); if ($x++ == 5) exit;
+			$line = preg_replace("@ \[.*?$@", '', $line); // strip the tag tallies from the line
 			$current_tag = $line; // now working on a new tag
-			// now going to make a KEY from the tag: an all-lower case, no-spaces version of the tag
-			$current_key = simplify($line); // remove punctuation, whitespace, and uppercase
+
+			// now going to make a KEY from the tag: an all-lower case, no-spaces version of the tag; but it may still have some other syntactical complications, such as prefixes (parent»tag) or combo tags (tag+tag)
+
+			$current_key = simplify($current_tag); // the key is made from a simplified version of the tag: uppercase and no whitespace or punctuation, which simplifies parsing and references significantly
+
+			if (inStr("»", $current_tag)) { // if there's a » symbol, the tag has a sorting prefix and parent, and it needs to be removed from the tag and added to the tag's parent list (which will always be empty at this point)
+				$parts = preg_split('|»|', $current_tag); // separate the sort prefix and the tag
+				$prefix = trim($parts[0]); // save the prefix
+				$current_tag	= trim($parts[1]); // re-save the current tag san prefix
+				$current_key = simplify($current_tag); // re-save the current key sans prefix
+				$tags[$current_key]["sort_prefix"] = $prefix; // save the sort prefix in a field as a string so that it can be restored to the data file by updateTags()
+				$tags[$current_key]["parents"] = array($prefix); //  also add it to a new parents array
+				// the sort prefix effectively no longer exists (for the purposes of most of the code in this file); it will be restored by updateTags()
+				// if ($current_key == "triggerpoints") {echo "<p>'{$current_tag}'<br>'{$current_key}'</p>"; printArr($tags[$current_key]); exit;}
+				} /**/
+
+			if (inStr("+", $current_tag)) { // if there's a + symbol, the tag is a combo tag, and we don’t need to change the tag, but we do want to extract parent tags from it
+				$parts = preg_split("|[+]|", $current_tag); // split it on +
+				$parts = array_map('trim', $parts); // trim whitespace from the parts (shouldn't space have already been removed by simplify()?
+				if (isset($tags[$current_key]["parents"])) { // if a parents array already exists
+					$tags[$current_key]["parents"] = array_merge($tags[$current_key]["parents"], $parts); // given "aardvarks + anteaters", save #aardvark and #anteaters to an array of parents of the combo tag #aardvark+anteaters
+				}
+				else {
+					$tags[$current_key]["parents"] = $parts;
+				}
+				$tags[$current_key]["parents"] = array_unique($tags[$current_key]["parents"]); // in many cases, one part of the combo tag is also a parent denoted by the sorting prefix, and there would be a duplicate this point
+				// echo $current_tag; printArr($tags[$current_key]); exit;
+				} /**/
+			
+			if (isset($tags[$current_key]["parents"])) $tags[$current_key]["parents_inferred"] = $tags[$current_key]["parents"]; // save the parents that have been inferred this way to a seperated array, to facilitate removing them before saving the tag data, which significantly reduces clutter
+
 			$tags[$current_key]["key"] = $current_key; // this is redundant, but it makes some chores easier (eg getTag can use a field lookup to return either the key or any other version of the tag)
-			$tags[$current_key]["true"] = ltrim($line,"_"); // this is where the true tag is set in stone (removing the underscore prefix from tags what have it, about a dozen)
-				if ($journalling) journal ("getting tag $line",2);
-			// so now we have an array item keyed with the simplified tag, and storing the true tag
+			$tags[$current_key]["true"] = ltrim($current_tag, "_"); // this is where the true tag is set in stone (removing the underscore prefix from tags what have it, about a dozen); off the top of my head on much-later review, I do not remember why this wouldn't also be done to the key, and it makes me wonder if this is buggy
+			if ($journalling) journal ("getting tag $current_key",2);
+			// so now we have an array item keyed with the simplified tag, and the key also also duplicated to a value, plus the "true tag" is 
 			// e.g. the true tag “Walking Dead” is now stored like so:
-			// array ("walkingdead" => array ("true" => "Walking Dead"))
+			// array ("walkingdead" => array ("key" => "walkingdead", "true" => "Walking Dead"))
+
+			# $tags[$current_key]['tally#'] = $tagTallies[2]; // assign the bib tag tally harvested earlier from the raw line
+
 			continue; // finish (could proceed with an ‘else’)
 			} // close if untabbed line
 		if (strpos($line, "\t") == 0) { // if a line DOES start with a tab, it’s data about the current tag (this could be “else” instead of another if)
@@ -171,43 +227,98 @@ function getTags ($tag_fn = false) {
 			$tag_data = trim($parts[1]); // and get the field data from the 2nd half
 			if ($tag_data == "") continue;  // move on if there’s no data 
 			if ($tag_field == "syns") 	$tag_field = "synonyms"; // expand shorthand for synonyms
+			if ($tag_field == "synos") 	$tag_field = "synonyms"; // expand shorthand for synonyms
 			if ($tag_field == "rel") 	$tag_field = "related"; // expand shorthand for synonyms
+			if ($tag_field == "re") 	$tag_field = "related"; // expand shorthand for synonyms
 			if ($tag_field == "syn") 	$tag_field = "synonyms"; // expand shorthand for synonyms
 			if ($tag_field == "parent") 	$tag_field = "parents"; // expand shorthand for parents
 			if ($tag_field == "par") 	$tag_field = "parents"; // expand shorthand for parents
 			if ($tag_field == "pars") 	$tag_field = "parents"; // expand shorthand for parents
 			if ($tag_field == "desc") 	$tag_field = "description"; // expand shorthand for description
 			if (!in_array($tag_field, $tag_fields)) continue; // #2do: error for incorrect fields
-			if (	$tag_field == "synonyms" or // for multi-item fields
-					$tag_field == "related" or
-					$tag_field == "parents") { 
+
+			if ($tag_field == "synonyms") {
 				$tag_data = arraynge($tag_data, ','); // get an array of CSVs
 				natcasesort($tag_data);
+			}
+			
+			if ($tag_field == "related") {
+				$tag_data = arraynge($tag_data, ','); // get an array of CSVs
+				natcasesort($tag_data);
+			}
+
+			if ($tag_field == "parents") { // the parents field may already have been populated above by shorthands, either the "parent»child" or the "parents+parent" syntax; if other parents are also declared, they will be added to that array
+				$tag_data = arraynge($tag_data, ','); // get an array of CSVs
+				natcasesort($tag_data);
+				if (isset($tags[$current_key]["parents"])) { // if a parents array already exists
+					$tag_data = array_merge($tags[$current_key]["parents"], $tag_data); // add these explicitly declared parents to any parents previously assigned to $parents by other conventions like parent»child or parent+parent
 				}
-			$tags[$current_key][$tag_field] = $tag_data; // add the data to the array
+				else {
+					$tags[$current_key]["parents"] = $tag_data;
+				}
+				$tag_data = array_values(array_unique($tag_data)); // kill dupes and re-index the array
+				natcasesort($tag_data);
+			// $foo = array_merge((array) $foo, $bar); // This is the syntax for merging a new array ($bar) into what may or may not already be an array ($foo)
+			}
+
+			$tags[$current_key][$tag_field] = $tag_data; // assign whatever field data has been generated to its field
+
+			// echo $current_tag; printArr($tags[$current_key]); exit;
+				
 			} // endif: tabbed line
 		} // endelse: reading data
 	} // endloop: lines
 
-	ksort($tags); // sort the tag database by key
+	ksort($tags, SORT_FLAG_CASE | SORT_NATURAL); // sort the tag database by key; sort_flag_case combined with either sort_natural OR sort_string will yield a case-insensitive result, but using _natural also sorts just "arthritis" before "arthritis » osteoarthritis", which is visually helpful
 	$tag_count = count($tags); // get a count
 	// echo "&nbsp;($tag_count tags found)";
 
+	# echo "khdfldfh"; printArr($tags); exit;
+
+	// The "sort_prefix » tag" syntax is conceptually equivalent to "parent » child" or "child¶parents=parent". I don’t want to have to declare the parent explicitly in BOTH the sorting prefix AND the tag data, so this subroutine automates that process.  It’s a little brute forcey, but it is conceptually clean.  Note that I will also REMOVE the tag parent before output if it’s the only parent, because it is also redundant visually.  But it does need to be in the data.
+	foreach($tags as $tag => $td) { // go through every tag
+		if (isset($td["sort_prefix"]) and
+			isset($td["abbr"]) and
+			$td["sort_prefix"] == $td["abbr"]
+			) { // if there's a sort prefix but no parents
+			$key = array_search($td["sort_prefix"], $tags[$tag]['parents']);
+			if ($key !== false) {
+				unset($tags[$tag]['parents'][$key]);
+			} // remove the sort prefix from the array of parents
+		}
+	} // end tag loop
+
 	// now that we we have the data in a lovely array, make a thesaurus: an array of all possible synonyms pointing to true tags
-	foreach($tags as $tag => $td) {
+	foreach($tags as $tag => $td) { // go through every tag
 			if (isset($td["synonyms"]))
 				foreach ($td["synonyms"] as $synonym) {
-					$GLOBALS['tag_thesaurus'][simplify($synonym)] = $tag;
+					if (isset($GLOBALS['tag_thesaurus'][simplify($synonym)])) exit("<p class='warning'>⚠️ The synonym '<strong><span class='copythis2' onClick='copy(this)'>$synonym</span></strong>' declared for #$tag already refers to another tag. Fix before proceeding.<p>"); // with the explosion in complexity of the tag database by 2025, there about three dozen duplicate synonyms; but they remain relatively rare, and easy to fix, with no complications in an of those; now that these warnings are in place, it should be trivial to fix new ones as they occur
+					else $GLOBALS['tag_thesaurus'][simplify($synonym)] = $tag;
 					}
-			if (isset($td["related"]))
-				foreach ($td["related"] as $related) {
-					$GLOBALS['tag_thesaurus'][simplify($related)] = $tag;
-					}
-			if (isset($td['short'])) $GLOBALS['tag_thesaurus'][simplify($td['short'])] = $tag;
-			if (isset($td['abbr'])) $GLOBALS['tag_thesaurus'][simplify($td['abbr'])] = $tag;
-			if (isset($td['long'])) $GLOBALS['tag_thesaurus'][simplify($td['long'])] = $tag;
+			if (isset($td['short'])) {
+				if (isset($GLOBALS['tag_thesaurus'][simplify($td['short'])])) exit("<p class='warning'>⚠️ The short tag '<strong><span class='copythis2' onClick='copy(this)'>{$td['short']}</span></strong>' declared for #$tag already refers to another tag. Fix before proceeding.<p>");
+				$GLOBALS['tag_thesaurus'][simplify($td['short'])] = $tag;
+				}
+			if (isset($td['abbr'])) {
+				if (isset($GLOBALS['tag_thesaurus'][simplify($td['abbr'])])) exit("<p class='warning'>⚠️ The tag abbreviation '<strong><span class='copythis2' onClick='copy(this)'>{$td['abbr']}</span></strong>' declared for #$tag already refers to another tag. Fix before proceeding.<p>");
+				$GLOBALS['tag_thesaurus'][simplify($td['abbr'])] = $tag;
+				}
+			if (isset($td['long']))  {
+				if (isset($GLOBALS['tag_thesaurus'][simplify($td['long'])])) exit("<p class='warning'>⚠️ The tag abbreviation '<strong><span class='copythis2' onClick='copy(this)'>{$td['long']}</span></strong>' declared for #$tag already refers to another tag. Fix before proceeding.<p>");
+				$GLOBALS['tag_thesaurus'][simplify($td['long'])] = $tag;
+				}
 			$GLOBALS['tag_thesaurus'][$tag] = $tag;
 		} // end tag loop
+
+		// now that all the primary tags are defined, we can check related tags to see if they already exist before assigning them
+		foreach($tags as $tag => $td) { // go through every tag	
+			if (isset($td["related"])) // if the tag has 'related' tags…
+			foreach ($td["related"] as $related) { // go through the related tags
+				if (!isset($GLOBALS['tag_thesaurus'][simplify($related)])) // if a related tag already exists, do nothing — e.g. we don’t re-assign DMSO to #pharmacokinetics just because it’s related to it, because it already exists as its own tag, so we want to keep dmso=>dimethylsulfoxide; but 'cbd' is not a tag, and I WANT usages of cbd to behave like a synonym for #cannabis indefinitely, so we want cbd=>cannabis
+					$GLOBALS['tag_thesaurus'][simplify($related)] = $tag;
+				}
+		}
+	
 	// add (very) simple plural and singular forms of all keys
 	foreach ($GLOBALS['tag_thesaurus'] as $key => $tag) {
 		// this really only covers the simpleset possible plural/singular variants
@@ -222,12 +333,11 @@ function getTags ($tag_fn = false) {
 			}
 
 
-	ksort($GLOBALS['tag_thesaurus']);
-
+	ksort($GLOBALS['tag_thesaurus'], SORT_FLAG_CASE | SORT_NATURAL); // sort the thesaurus database by key; sort_flag_case combined with either sort_natural OR sort_string will yield a case-insensitive result, but using _natural also sorts just "arthritis" before "arthritis » osteoarthritis", which is visually helpful
 	$GLOBALS["tag_db_header"] = $tags_header; // stored where the updateTags function can get to it
 
 /* echo "<pre><span class='boogers'>$tag_count tags<br>";
-	//echo $tag_qrg_str;
+	//echo $tags_str_qrg;
 	//echo $tags_header;
 	//echo $tags_str;
 	//print_r($lines_header);
@@ -240,7 +350,7 @@ function getTags ($tag_fn = false) {
 	}
 
 
-/** returns @string, html list: post tags marked up tag list */
+/** returns @string, html list: post tags marked up as HTML tag list for PubSys  */
 function markupTags ($arg_tags) {
 	$arg_tags = arraynge($arg_tags,',');
 	global $tags;
@@ -249,7 +359,7 @@ function markupTags ($arg_tags) {
 	else {
 		foreach ($arg_tags as $arg_tag) {
 			if (isset($tags[simplify($arg_tag)]['short'])) $arg_tag = $tags[simplify($arg_tag)]['short']; // use a short version, if available
-			if ($tags[simplify($arg_tag)]['#'] > 5) {
+			if (($tags[simplify($arg_tag)]['tally#']??null) > 5) {
 				$tags_str .= "<li class='tag'><a href='tag-" . titleToFn($arg_tag) . ".html'>{$arg_tag}</a></li>";
 				}
 			else
@@ -258,14 +368,6 @@ function markupTags ($arg_tags) {
 		}
 	return "<ul class='tag_list'>$tags_str</ul>";
 	}
-
-/** returns @string, html list: post tags marked up with hash tags and space-delimited, very simple */
-function markupTagsHashes ($arg_tags) {
-	$arg_tags = arraynge($arg_tags,',');
-	foreach ($arg_tags as &$arg_tag) $arg_tag = "#{$arg_tag}";
-	return implode(" ", $arg_tags);
-	}
-
 
 /** returns @string, true tag: looks up a given tag, returns true tag (default) or other (eg short, abbr) */
 function getTag($tag_given, $version='true') {
@@ -282,80 +384,83 @@ function getTag($tag_given, $version='true') {
 	return false;
 }
 
-
-/** returns @string, csv, tags: rich tag set (parents, synonyms, etc) derived from a list of given tags, independently or for a post*/
+/** returns @string, csv, tags: rich tag set (parents, synonyms, etc) derived from a set of given tags, independently or for a post*/
 function extractTags ($tags_str, $post = false) { 
-// more detail: for each post/item, extractTags generates a final list of tags from various sources (exact matches, synonyms, and parents of matches, and more in the future) by comparing the tags-as-written to the canonical tags.  The post data is updated with new fields for each type of tag, as well as a main tag field including all tags.
-	// if (inStr("daffod",$post["title"])) echo "!!!";
-	$tags_given = arraynge($tags_str, ","); // split the tag list into an array
+	// For each post/item, extractTags generates a final list of tags from various sources (exact matches, synonyms, and parents of matches, and more in the future) by comparing the tags-as-written to the canonical tags.  In the context of PubSys, the post data is also updated with new fields for each type of tag, as well as a main tag field including all tags.
+	// 2025-04-07 Does not appear to do synonyms?
+	if ($post and $post['rss_only_post']) return $post; // Don’t extract tags for RSS-only posts, because doing so affects tag counts in the global tags array, even though RSS-only posts are supposed to be post ghosts that have no effect on anything except the RSS feed.	More words: Athough RSS-only posts are taken out of the main posts array after being created, they still get created like a normal post in every other way… and when tags are extracted by extractTags(), the main tags array is updated with tag counts; keeping RSS-only posts out of the main posts array effectively ghosts them in every other way that I know of, but there is this one thing here where an RSS only post will have an effect outside itself if it isn't deliberately excluded.
 	global $tags;
-	$tags_final = array(); $tags_parents = array(); // initialize arrays
-	if ($post) {
+	// initialize arrays; tags_final ends up as the "tags" field, all others as fields with matching names
+	$tags_given = arraynge($tags_str, ","); // split the list of given tags into an array, assumes no spaces
+	$tags_final = array(); // the main destination, the array that will hold the tags that end up in the main, public tag list for the post
+	$tags_private = array(); // the complete array of tags for my administrative reference, including admin and category tags; this ends up in the final build of the post, and harvested by make bib
+	$tags_parents = array(); // an array of parents of all tags (that aren't designated orphans)
+	$tags_inferred = array(); // tags extracted from the post by inferTags()
+	$tags_adhoc = array(); // tags marked with #, not to be included in the tags db
+	$tags_new = array(); // tags that are new (not in the database, not adhoc) as of this build
+	$tags_admin = array(); // tags for administrative use only 
+
+	if ($post) { // only if there's a blog post involved…
 		$tags_inferred = inferTags($post); // infer tags from post content and metadata
 		$tags_given = array_merge($tags_given, $tags_inferred);
 		}
 		
-	foreach ($tags_given as $tag_given) { // work through given tags
-		$tag_given2 = $tag_given;
-		$orphan = false; if (inStr("*", $tag_given)) { // look for orphan tags
-			$tag_given2 = str_replace("*", null, $tag_given); // marked by * anywhere
-			$orphan = true;
-			}
-		$admin = false; if (strpos($tag_given, ".") === 0) { // look for admin tags
-			$tag_given2 = str_replace(".", null, $tag_given); // marked by . anywhere
-			$admin2 = true; // hmm, why is this admin2? got to be a bug! #2do
-			}
-		if (getTag($tag_given2)) { // if given tag matches a defined tag
-			$tmp = getTag($tag_given2); // defaults to getting the TRUE tag
-			if (strpos($tmp, ".") === 0) $admin = true; // another check for admin tags; if there is no . in the given tag, it is still recognized as an admin tag
-			if (in_array($tmp,$tags_final)) continue; // abort if we already have the tag for some reason (eliminates some minor sources of redundancy, such as the possibility that an inferred tag was added that already had it; I think it’s probably easiest to block the redundancy here
-			if ($admin) $tags_admin[] = $tmp; else $tags_final[] = $tmp; // add the true tag to the final array of tags for the item
-//			$tags[simplify($tmp)]["#"]++; // iterate the tag usage counter
-			if (!$orphan) // add any parents, if it’s not an orphan tag (marked with *)
-				$tags_parents = getTagParentsNew($tag_given2, $tags_parents);
-			} // endif: defined tags
-		else { // if tag is unrecognized
-			if (strpos($tag_given2, "#") === 0) { // an initial # denotes a joke tag (or just an explicitly unmanaged tag)
-				$tags_adhoc[] = $tags_final[] = ltrim($tag_given, "#"); continue; // nothing else to do
+	# printArr($tags_given); exit;
+	foreach ($tags_given as $tag_given) { // work through given and inferred tags, and do some sorting into the different lists of tags as we go
+		if ($tag_true = getTag($tag_given)) { // if given tag matches a defined tag
+			// if (isset($tags[simplify($tag_true)]['tags'])) $categorytags = $tags[simplify($tag_true)]['tags'];
+
+			//if ($post['psid'] == '2339003') echo "<p>given: $tag_given, true: $tag_true, $categorytags, " . simplify($tag_true) . "</p>";
+			//if ($post['psid'] == '2339003') printArr( $tags[simplify($tag_true)]);
+			
+			if (in_array($tag_true, $tags_final)) continue; // abort if we already have the tag for some reason (eliminates some minor sources of redundancy, like inferred tags)
+			
+			if (inStr("_size_", $tag_given)) { // special case of the size tag: save the true version to the final tags list (e.g. size M), but use the synonym (_size_m) for the admin and private tags (which matches my customary format in srcs.bib)
+				$tags_final[] = $tag_true; 
+				$tags_admin[] = $tag_given; 
+				$tags_private[] = $tag_given;
 				}
-			$tags_new[] = $tag_given; // use the original given tag, including symbols like _
+			elseif (isset($tags[simplify($tag_true)]['tags']) and inStr('admin', $tags[simplify($tag_true)]['tags'])) { // add admin tags to an independent array of just admin tags, and to the private tag list
+				$tags_admin[] = $tags_private[] = $tag_true; 
+				}
+			else { // some other tag (not a _size_ tag, not an admin tag)
+				$tags_final[] = $tags_private[] = $tag_true; 
+				}
+
+			if (!inStr("*", $tag_given)) // add any parents, if it’s not an orphan tag (marked with *)
+				$tags_parents = getTagParentsNew($tag_given, $tags_parents);
+			} // endif: defined tags
+
+		else { // if tag is undefined, then it is either an adhoc or a new tag
+			if (strpos($tag_given, "#") === 0) { // prefix of # denotes an adhoc tag (unmanaged tag, not intended to be saved in the database)
+				$tags_adhoc[] = $tags_final[] = ltrim($tag_given, "#"); continue; // add it to the adhoc tag list and the final tag list and move on
+				}
+			$tags_new[] = $tag_given; // add to an array of new tags to be processed seperately below, using the original given tag w symbols
 			} // endif: new tags
 		} // tag loop
 
-	$newtags["tags_given"] = implode(",", $tags_given); // store the original tags (mostly for troubleshooting)
-	if ($tags_parents) 	$newtags["tags_parents"] = implode(",", array_unique($tags_parents));
-	if (isset($tags_admin)) 	{
-		$newtags["tags_admin"] = implode(",", $tags_admin);
-		foreach ($tags_admin as $tag) // counter admin tags now that all the tags for the post are in, dupes eliminated
-			if ($tags[simplify($tag)]) { // checking the database prevents counting of admin-adhoc tags (unlikely, but maybe)
-				if (!isset($tags[simplify($tag)]["#"]))
-					$tags[simplify($tag)]["#"] = 1;
-				else
-					$tags[simplify($tag)]["#"]++; // iterate the tag count field (fieldname = #)
-				}
-		}
-	if (isset($tags_inferred))	$newtags["tags_inferred"] = implode(",", $tags_inferred);
-	if (isset($tags_adhoc)) 		$newtags["tags_adhoc"] = implode(",", $tags_adhoc); 
-	if (isset($tags_new))			$newtags["tags_new"] = implode(",", $tags_new);
-	$tags_final = array_merge($tags_final, $tags_parents); // add parent tags, if any
-	if ($tags_final) {
-		$tags_final = array_unique($tags_final); // eliminate duplicate tags
-		foreach ($tags_final as $tag) // count tags now that all the tags for the post are in, dupes eliminated
-			if (isset($tags[simplify($tag)])) { // checking the database prevents counting of admin-adhoc tags (unlikely, but maybe)
-				if (!isset($tags[simplify($tag)]["#"]))
-					$tags[simplify($tag)]["#"] = 1;
-				else
-					$tags[simplify($tag)]["#"]++; // iterate the tag count field (fieldname = #)
-				}
-		// sort($tags_final); // removed Dec 10, 2014: sorting was never really doing anything for the tags except tidying; removed to straightforwardly make way for meaningful data entry order: most applicable given tags are given first
-		$newtags["tags"] = implode(",", $tags_final); // convert to csv
-		}
-	else $newtags["tags"] = null;
+	$tag_lists["tags_given"] = implode(",", $tags_given); // store the original tags (mostly for troubleshooting)
+	
+	//						if ($post['psid'] == '2339003') echo "<p>tags_admin: $tag_given, tag_true: $tag_true</p>";
+
+	if (isset($tags_inferred))	$tag_lists["tags_inferred"] = implode(",", $tags_inferred);
+	if (isset($tags_adhoc)) 		$tag_lists["tags_adhoc"] = implode(",", $tags_adhoc); 
+	if (isset($tags_new))			$tag_lists["tags_new"] = implode(",", $tags_new);
+	if (isset($tags_parents)) 	$tag_lists["tags_parents"] = implode(",", array_unique($tags_parents));
+	if (isset($tags_admin)) 		$tag_lists["tags_admin"] = implode(",", $tags_admin);
+
+	$tags_final = array_unique(array_merge($tags_final, $tags_parents)); // add parent tags and de-dupe
+	$tag_lists["tags"] = implode(",", $tags_final); // convert to csv
+	// if ($post['psid'] == '2339003') {printArr($tags_private); printArr($tags_final);}
+	$tags_private = array_unique(array_merge($tags_private, $tags_parents)); // add parent tags and de-dupe
+	$tag_lists["tags_private"] = implode(", ", $tags_private);
+//	$tag_lists["tags_private"] = str_replace(", size ", ", _size_", $tag_lists["tags_private"]); // hack just for #blogharvest: convert the size tag generated by tag engine to the customary format I use for tags in srcs.bib, rather than trying to teach tag engine to produce this hair-splitting difference
+
 	if ($post) { // add the enhanced tags to the $post and return the post
-		foreach ($newtags as $field => $data) $post[$field] = $data;
+		foreach ($tag_lists as $field => $data) $post[$field] = $data;
 		return $post;
 		}
-	else return $newtags; // return the enhanced tags on their own
+	else return $tag_lists; // return the enhanced tags on their own
 }
 
 /** returns @array, post:  returns post with tags inferred from content/metadata */
@@ -373,7 +478,7 @@ function inferTags ($post) {
 	// posts are assigned a tag corresponding to their size
 	// just add the “size” prefix added to the size code set in the get_post_size function
 	// different scales for regular vs main pubsys use
-	$inf[] = "size " . strtoupper($post['size']);
+	$inf[] = "_size_" . $post['size'];
 	// all micro-img posts are, by definition, tagged with “av”
 	if ($post['post_class'] == "micro-img") 			$inf[] = 'av';
 	// all posts with a featured link are tagged with “link”
@@ -385,7 +490,7 @@ function inferTags ($post) {
 	}
 
 /** returns @array, tags: recursively lookup parents of given tag, return an array of parents */
-function getTagParentsNew ($tag_given, $tags_parents) {
+function getTagParentsNew ($tag_given, $tags_parents = array()) {
 	global $tags; // echo "$tag_given<br>"; var_dump($tags); exit;
 	$tags_parents_undef = array();	
 	$echo = false; if ($tag_given == "") { // TESTING
@@ -397,83 +502,58 @@ function getTagParentsNew ($tag_given, $tags_parents) {
 	if ($echo) foreach($parents as $parent) echo "Parents of given tag: —{$parent}— ";
 	if (isset($parents)) { // if the tag has parents (recursion stops here when we run out parents)
 		foreach ($parents as $parent) {
-			if (getTag($parent)) {
+			$parentTag = getTag($parent);
+			if ($parentTag) {
+				if ($parentTag == $tag_given) { // if a given parent is actually the same tag, e.g. "aging" is listed as a parent for the aging tag, which is unlikely to happen … or the more likely scenario for this mistake, if "beauty parlour syndrome" is listed as a parent for 'atlantoaxial instability' when it’s already defined as a synonym
+					exit("'$parent' is incorrectly defined as a parent for '$tag_given'");
+					}
 				if ($echo) echo "… getTag found <strong>$parent</strong> …";
-				$tags_parents[] = $tmp = getTag($parent);  // add it to the array of parents so far
-				$tags_parents = getTagParentsNew(getTag($parent),$tags_parents); // recursion
+				$tags_parents[] = $parentTag;  // add it to the array of parents so far
+				$tags_parents = getTagParentsNew($parentTag, $tags_parents); // recursion
 				}
 			else { // if the parent is an undefined tag
 				$tags_parents[] = $parent;
 				}
 			} // parents loop
 		} // endif: parents
-	return $tags_parents; // return array of parents (possibly unchanged, if there were no parents)
+	return array_unique($tags_parents); // return array of parents (possibly unchanged, if there were no parents)
 	}
 
 
-/** returns @multi: updates tag_db and makes tag QRGs  */
+/** returns @multi: builds the tags data file from PubSys posts and srcs.tags.bib and makes tag QRGs  */
 function updateTags() {
 	journal("looking for new tags in posts",1,true);
-	global $tags; if (!$tags) return; global $tag_fields;
-	global $posts; global $sitecode; $tags_new = array();
-	$tag_fn = "guts/tags-{$sitecode}.txt";
-		
-	foreach ($posts as $post) { // make an array of new tags found in posts, counting them along the way
-		if (!$post['tags_new']) continue;
-		$post_new_tags = arraynge($post['tags_new'], ",");
-		foreach ($post_new_tags as $newtag) $tags_new[$newtag]++;
-		// and perhaps adding them to tag_db right now? why wait?
-		}
-		
-// foreach($tags_new as $tn => $no) echo "$no $tn<br>"; // print simple list of new tags
+	global $tags; if (!$tags) return;
+	global $sitecode; $tag_fn = "guts/tags-{$sitecode}.txt";
+	$tags = tallyTags($tags); // add ALL tags from srcs.bib, major step
+	$tags = getBlogTags($tags); // add NEW tags from PubSys posts
+	$tags = removeRedundantParents($tags); // Remove redundant parent tags that don’t need to be declared explicitly in the parents field, because they are implied by the syntax of compound and/or prefixed tags, e.g. fruit » apples+oranges. 
+	$tags = restoreSortPrefixes($tags); // Restore sort-prefixes and sort …
+	
+	# echo 'akdshfldh '; printArr($tags); exit;
 
-	// add new tags to the tag_db
-	foreach($tags_new as $tn => $no) { // could do this above, instead of another loop?
-			$tags[simplify($tn)]['true'] = $tn;
-			$tags[simplify($tn)]['#'] = $no;
-			if (strpos($tn, ".") === 0) $tags[simplify($tn)]['tags'] = "admin";
-			journal("adding new tag “{$tn}” to tags",3,true);
-		}
-		
-if (count($tags_new) == 0)	echo "(" . count($tags_new) . " new tags found)"; // unnecessary as long as we’re journalling individual new tag finds
-
-	// now that we have all tags, old in new, we make some files from them
+	// now that we have the complete tags array, including new tags, and sorted (with sort-prefixes), we do just a tiny bit of cleanup and organizing, format each record in two ways for two destination files: the main tags database file, and a QRG
+	
 	foreach($tags as $tag => $td) { 
-		
-		// build a QRG (compact readable alphabetical list of tags and their synonyms)
-			if (is_array($td['synonyms'])) $synonyms = implode(" ", $td['synonyms']);
-			if (is_array($td['related'])) $related = implode(" ", $td['related']);
-			$tag_qrg_str .= $td['true'] . "\t{$td['#']}\t{$td['short']}\t{$td['abbr']}\t{$td['short']}\t{$td['long']}\t{$synonyms}\t{$related}\n";
-			unset($synonyms);	 unset($related);
-
-		// canonicalization of data file
-			if (inStr("category", $td["tags"])) $prefix = "_"; else $prefix = NULL; // add the underscore prefix back onto to the tag in the data file, for category tags only
-			$tags_str .= "\n{$prefix}{$td['true']} [{$td['#']}]\n";
-			foreach ($tag_fields as $tag_field) {
-				if (is_null($td[$tag_field])) continue; // exclude this line to include empty fields
-				$tags_str .= "\t" . $tag_field . " = ";
-				if (is_string($td[$tag_field])) $tags_str .= $td[$tag_field] . "\n";
-				if (is_array($td[$tag_field])) $tags_str .= implode(", ", $td[$tag_field]) . "\n";
-				if (is_null($td[$tag_field])) $tags_str .= "<##>\n"; // could put <##> here, maybe
-				} // end fields loop
-
+		$td['tally#'] = isset($td['tally#']) ? $td['tally#'] : '0';		
+		$tags_str_qrg .= formatTagRecord_QRG($td); // add a tag to the tag QRG list, a compact readable alphabetical list of tags and their synonyms
+		$tags_str_db .= formatTagRecord_DB($td); // add a tag to the main tags database
 		} // end tag loop
 
 	// save tag files …
 	
 	// modify the header: add the quick reference guide to the tags
-	$tag_qrg_str = "TAGS QUICK REFERENCE GUIDE\n\n" . $tag_qrg_str . "\n";
-
+	$tags_str_qrg = "TAGS QUICK REFERENCE GUIDE\n\n" . $tags_str_qrg . "\n";
 	$tag_qrg_fn = "guts/tags-qrg-{$sitecode}.txt";
-	if (fileExistsNoChange($tag_qrg_str, $tag_qrg_fn)) {
+	if (fileExistsNoChange($tags_str_qrg, $tag_qrg_fn)) {
 		journal("tags quick-reference guide has not changed, <em>not</em> writing file: $tag_qrg_fn",2,true);
 		}
 	else {
 		journal("<strong>tags quick-reference guide has changed</strong>, writing file: $tag_qrg_fn", 2, true);
-		saveAs($tag_qrg_str, $tag_qrg_fn);
+		saveAs($tags_str_qrg, $tag_qrg_fn);
 		}
 
-	$tags_canonicalized = $GLOBALS["tag_db_header"] . $tags_str;
+	$tags_canonicalized = $GLOBALS["tag_db_header"] . $tags_str_db;
 	if (fileExistsNoChange($tags_canonicalized, $tag_fn)) {
 		journal("tags file has not changed, <em>not</em> writing file: $tag_fn",2,true);
 		}
@@ -496,7 +576,7 @@ function makeTagIndexes () {
 	journal("making tag index pages",2, true);
 	global $tags; if (!$tags) return;
 	foreach ($tags as $tag) {
-		if ($tag['#'] < 6) continue; // exclude rare tags
+		if ($tag['tally#'] < 6) continue; // exclude rare tags
 		$tagged_posts = getPostsByTag($tag['true'], false); // get an array of posts with this tag; false param tells function not to bother find the true form of the tag via getTag, because we know we already have a true tag
 //		foreach ($tagged_posts as $x) echo $x['title'] . '… '; exit;
 		if (!$tagged_posts) continue;
@@ -504,7 +584,7 @@ function makeTagIndexes () {
 		$ti_page = renderPhpFile("guts/template-tag-index.php",false,true); // get the RENDERED contents of the template
 		// #2do probably should use the short version of the tag, if available; easy but not super important
 		$ti_page = str_replace('{$ti_tag}', $tag['true'], $ti_page); 
-		$ti_page = str_replace('{$ti_tag_count}', $tag['#'], $ti_page);
+		$ti_page = str_replace('{$ti_tag_count}', $tag['tally#'], $ti_page);
 		// why count()? in theory, we should know this from the # field for the tag in the main tag_db
 		// in practice there are probably going to be discrepancies, so let's just count what we actually have
 		$ti_page = str_replace('{$ti_posts_table}', $ti_posts_table, $ti_page);
@@ -512,7 +592,7 @@ function makeTagIndexes () {
 			// title is  "# posts tagged '[tag]'"
 			// description is [description]
 			// append to H1
-			$ti_page = str_replace('{$title_html}',"{$tag['#']} posts tagged {$tag['true']}", $ti_page);			
+			$ti_page = str_replace('{$title_html}',"{$tag['tally#']} posts tagged {$tag['true']}", $ti_page);			
 			$ti_page = str_replace('{$description}',"{$tag['description']}", $ti_page);
 			$ti_page = str_replace('</h1>', "<br><span id=\"subtitle\">{$tag['description']}</span></h1>", $ti_page);			
 			}
@@ -521,7 +601,7 @@ function makeTagIndexes () {
 			//	description is  "# posts tagged '[tag]'"
 			// nothing to append to H1
 			$ti_page = str_replace('{$title_html}',"Tag: " . ucfirst($tag['true']), $ti_page);			
-			$ti_page = str_replace('{$description}',"{$tag['#']} Writerly posts tagged '{$tag['true']}'.", $ti_page); // add it to the title element
+			$ti_page = str_replace('{$description}',"{$tag['tally#']} Writerly posts tagged '{$tag['true']}'.", $ti_page); // add it to the title element
 			}
 		// make filename, add filename to list of confirmed html files
 		$tag_as_fn = titleToFn($tag['true']); // yep, yet another form of the tag!
@@ -554,54 +634,6 @@ function getPostsByTag ($tag, $check_tag = true) {
 		if (in_array($tag, $tags_arr)) $post_matches[] = $post;
 		}
 	return $post_matches;
-	}
-
-function getSSFClasses($item_tags) { // from tags on an item (post or @article)
-	global $tags;
-	$tags_sff_arr = explode(", ", "pro, guides, self-help, debunkery, biology, fun, featured, back, head-neck, limbs, knee, running, massage, exercise, research, new, updated, old, micro, short, medium, big, huge, subtitles, word counts, dates, mind, muscle pain, science, treatment, problems, rsi, biomechanics, etiology, site-news, blog, none");
-	// for now, this is a perfectly good place to  define the ssf tags, but obviously it could be more elegant (e.g. extract them from the tags array)
-//	if (!is_array($item_tags)) return; // ??? not sure 
-	foreach ($tags_sff_arr as $ssf_tag)								// go through each possible SSF tag looking for any match in the item
-		foreach ($item_tags as $item_tag)							// go through the item’s tags
-			if ($tags[simplify($item_tag)])							// if the tag is in the database (e.g. #adhoc will get skipped)
-				if (array_search($ssf_tag, $tags[simplify($item_tag)]))	// if the SSF tag is anywhere the values for that tag (e.g. the short tag, or spelled out as the ssf tag)...
-					$SSFclasses[] = str_replace(" ", "-",$ssf_tag);				// add the ssf tag to the array of SSF tags for this item, for use as a classname
-	if ($SSFclasses) return array_unique($SSFclasses);
-	}
-
-
-function getTagsForSSF () {
-	$tags = getTags(_ROOT . '/blog/guts/tags-ps.txt');
-//		var_dump($tags); exit;
-	foreach ($tags as $tag_key => $tag) {
-		$tags2[$tag_key]['true'] = $tag['true'];
-
-		$all_synonyms = $all_synonyms2 = array();
-		$all_parents = array();
-		$children = array();
-		$all_related = array();
-		if (isset($tag['synonyms'])) $all_synonyms = $tag['synonyms']; // add synonyms, if any
-		if (isset($tag['related'])) $all_synonyms = array_merge($tag['related'],$all_synonyms); // add related terms, if any
-		if (isset($tag['short'])) $all_synonyms[] = $tag['short'];
-		if (isset($tag['abbr'])) $all_synonyms[] = $tag['abbr'];
-		if (isset($tag['long'])) $all_synonyms[] = $tag['long'];
-		if (isset($all_synonyms[0])) $all_synonyms = array_unique($all_synonyms);
-		foreach ($all_synonyms as $syn)
-			if  ($syn !== $tag['true'] and !inStr($syn,strtolower($tag['true']))) $all_synonyms2[] = $syn;
-		if (isset($all_synonyms2[0])) $tags2[$tag_key]['synonyms'] = $all_synonyms2;
-		if (isset($tag['parents'])) {
-
-			$parents = getTagParentsNew ($tag_key, $tag['parents']);
-			foreach ($parents as $parent)
-				$tags2[$tag_key]['parents'][getTag($parent,'key')] = getTag($parent,'true');
-			}
-		 $children = getTagChildren ($tag_key); // only 1 gen deep, good enough?
-		 if ($children[0]) {
-			foreach ($children as $child)
-				$tags2[$tag_key]['children'][getTag($child,'key')] = getTag($child,'true');
-			 }		
-		}
-	return $tags2;
 	}
 
 function getTagChildren ($tag_given) {
@@ -653,5 +685,132 @@ function getTagParents ($child_tag) {
 	if ($parents) return $parents;
 	else return false;
 	}
-		
-?>
+
+/** returns @array, tags: returns the tags array with tags from the PainSci bibliography added */
+function tallyTags ($tags) {
+
+	if ($GLOBALS['ps']) {
+		$tagsToCount = file($_SERVER['DOCUMENT_ROOT'] . '/srcs.tags.txt'); // get an array of all tags occurring in srcs.bib, many thousands of them; this file is produced by BibliographyTagHarvester.pl, which can be run independently with 'make bib tags only.command' or with 'make-ps-bib.command' as part of a full #makebib
+		}
+	else {
+		$tagsToCount = file($_SERVER['DOCUMENT_ROOT'] . '/guts/tags.used.txt'); // got this going 2025-04-15, just added a simple function to non-PS builds that saves all tags generated by the build to a file
+		}
+	
+	// first we're going to count and then eliminate duplicates
+	foreach ($tagsToCount as $tagToCount) {
+		$tagToCount = trim($tagToCount); // lines collecting by file have linefeeds (I thought there was a way to prevent the linefeeds, but I can't find it)
+		if ($tagToCount == "") continue; # empty items have mostly been eliminated, but sometimes they can crop up due to source data errors like a field that leads with a comma tags={,tag} or tags={tag,,tag}
+		$tagToCounts[$tagToCount]++; // save this tag to a new array and iterate a tally for that tag; if the tag is new to the array, it gets added with a value of 1; if the tag has already been added, then this just counts the occurrence
+		}
+	
+	# ksort($tagToCounts); // sort for no terribly important reason
+	# echo "<p>Unique tags tally: " . count($tagToCounts) . "</p>";
+	# printArr($tagToCounts); # exit;
+
+	foreach ($tagToCounts as $tagToCount => $count) { // go through the new array of bib tags
+		# echo $x++ . ". $tagToCount ($count) ";
+		if ($trueTag = getTag($tagToCount)) { // if the tagToCount matches a tag in the tag database…
+			$tags[simplify($trueTag)]['tally#'] = $tags[simplify($trueTag)]['tally#'] + $count; // add the number of occurences; this counter does not exist in the tags database until tags are harvested; that is, although previously generated tag counts exist in the tag database (tags-ps.txt), they are not actually put into the $tags array array by getTags() … this function adds them, so that they are there before the db is regenerated
+		}
+		else { // if the tag is new, then add it to the array
+			if (strpos($tagToCount, ".") === 0) // . prefix denotes "admin" type tag, add it to the tags field
+				$tags[simplify($tagToCount)]['tags'] = "admin"; // add the #admin tag to the tag
+			if (strpos($tagToCount, "_") === 0) { // _ prefix denotes "category" type tag, add it to the tags field
+				$tags[simplify($tagToCount)]['tags'] = "category"; // add the #category tag to the tag
+				$tagToCount = ltrim($tagToCount, '_'); // prefixes for categories are handled differently from admin tags, and it’s quiiiite confusing, and trying to handle them the same way runs into non-trivial complications regardless of which direction we go… for now the . prefix is maintained in the true tag, and _ is not
+				}
+			// NOTE: Prefixes for categories are handled differently from admin tags, and it’s quiiiite confusing, and trying to handle them the same way runs into significant complications regardless of which direction we go.
+			journal("adding new tag “{$tagToCount}” to tags",3,true);
+			$tags[simplify($tagToCount)]['true'] = $tagToCount; // save the tag as given, including prefixes
+			$tags[simplify($tagToCount)]['tally#'] = $count;
+			$tags[simplify($tagToCount)]['notes'] = 'new!';
+		}
+	}
+	# echo 'dkasfjgdafg '; printArr($tags); exit;
+	return $tags;
+}
+
+/** returns @array, tags: returns the tags array with new tags from all PubSys posts added and counted */
+function getBlogTags ($tags) {
+	global $posts; foreach ($posts as $post) { // make an array of new tags found in posts, counting them along the way
+		if (!$post['tags_new']) continue;
+		$post_new_tags = arraynge($post['tags_new'], ",");
+		foreach ($post_new_tags as $newtag) {
+			$tags[simplify($newtag)]['true'] = $newtag;
+			$tags[simplify($newtag)]['notes'] = "new from “{$post['title']}” [{$post['psid']}]";
+			if (strpos($newtag, ".") === 0) // _ prefix denotes "admin" type tag, add it to the tags field
+				$tags[simplify($newtag)]['tags'] = "admin";
+			if (strpos($newtag, "_") === 0) // _ prefix denotes "category" type tag, add it to the tags field
+				$tags[simplify($newtag)]['tags'] = "category";
+			// NOTE: Prefixes for categories are handled differently from admin tags, and it’s quiiiite confusing, and trying to handle them the same way runs into significant complications regardless of which direction we go.
+			journal("adding new post tag “{$newtag}” to tags",3,true);
+			}
+		}
+	return $tags;
+}
+
+/** returns @string, html list: tag record formatted for output in the tags QRG file  */
+function formatTagRecord_QRG ($td) {
+	if (isset($td["sort_prefix"])) $prefix = $td["sort_prefix"] . " » "; // prepare sort prefix for "display" by appending » (e.g. "arthritis" becomes "arthritis » " before it is inserted before "osteoarthritis"); the actual sorting has already been done, this is just preparing to restore the sort prefix for the file
+	if (is_array($td['synonyms'])) $synonyms = implode(" ", $td['synonyms']);
+	if (is_array($td['related'])) $related = implode(" ", $td['related']);
+	return $prefix . $td['true'] . "\t{$td['tally#']}\t{$td['short']}\t{$td['abbr']}\t{$td['short']}\t{$td['long']}\t{$synonyms}\t{$related}\n";
+}
+
+/** returns @string, html list: tag record formatted for output in the main tags data file  */
+function formatTagRecord_DB ($td) {
+	if (isset($td["sort_prefix"])) $prefix = $td["sort_prefix"] . " » "; // prepare sort prefix for "display" by appending » (e.g. "arthritis" becomes "arthritis » " before it is inserted before "osteoarthritis"); the actual sorting has already been done, this is just preparing to restore the sort prefix for the file
+	$tagRecord = "\n{$prefix}{$td['true']} [{$td['tally#']}]\n";
+	 global $tag_fields; foreach ($tag_fields as $tag_field) {
+		if (is_null($td[$tag_field])) continue; // exclude this line to include empty fields
+		$tagRecord .= "\t" . $tag_field . " = ";
+		if (is_string($td[$tag_field])) $tagRecord .= $td[$tag_field] . "\n";
+		if (is_array($td[$tag_field])) $tagRecord .= implode(", ", $td[$tag_field]) . "\n";
+		if (is_null($td[$tag_field])) $tagRecord .= "<##>\n"; // could put <##> here, maybe
+	} // end fields loop
+	return $tagRecord;
+}
+
+function makeThesaurusFile () {
+	if (!is_array($GLOBALS['tag_thesaurus'])) exit("\$GLOBALS['tag_thesaurus'] is not an array");
+	$tag_thesaurus_json = json_encode($GLOBALS['tag_thesaurus']);
+	$tag_thesaurus_fn = _ROOT . "/incs/tags-thesaurus.txt";
+	if (fileExistsNoChange($tag_thesaurus_json, $tag_thesaurus_fn)) {
+		journal("tags file has not changed, <em>not</em> writing file: $tag_thesaurus_fn",2,true);
+		}
+	else {
+		journal("<strong>tags file has changed</strong>, writing file: $tag_thesaurus_fn", 2, true);
+		saveAs($tag_thesaurus_json, $tag_thesaurus_fn);
+		}	
+}
+
+/** returns @array, tags: tag record with 'parents_inferred' removed from 'parents' */
+function removeRedundantParents($tags) { // Remove redundant parent tags that don’t need to be declared explicitly in the parents field, because they are implied by the syntax of compound and/or prefixed tags, e.g. fruit » apples+oranges. This saves real space when writing the tags data file: 4351 lines & 148kb before, 4072 lines & 140kb.
+	foreach($tags as $tag => $td) { // loop through the array of tags
+		if (!isset($td['parents_inferred'])) continue; // this is only relevant to compound and/or prefixed tags, e.g. fruit » apples+oranges
+		$tags[$tag]['parents'] = array_values(array_diff($td['parents'], $td['parents_inferred'])); // subtract the "inferred" parents from the main parents array; this value was saved aside waaaay back at the beginning of parsing the tags data file, just to make this step easier
+		if (empty($tags[$tag]['parents'])) unset($tags[$tag]['parents']);
+	}
+	return $tags;
+}
+
+/** returns @array, tags: tag record with 'parents_inferred' removed from 'parents' */
+function restoreSortPrefixes($tags) {
+	foreach($tags as $tag => $td) { // loop through the array of tags
+		if (isset($td["sort_prefix"])) { // if there is a sort prefix (fairly rare to date)…
+			$tags_resorted[$td["sort_prefix"].' » '.$tag] = $td; // add it to the key for this tag in a duplicate array
+			}
+		else { // most tags…
+			$tags_resorted[$tag] = $td; // copy unchanged tag data unchanged
+			}
+	}
+	ksort($tags_resorted, SORT_FLAG_CASE | SORT_NATURAL); // sort the new array with restored tag prefixes; sort_flag_case combined with either sort_natural OR sort_string will yield a case-insensitive result, but using _natural also sorts just "arthritis" before "arthritis » osteoarthritis", which is visually helpful
+	return $tags_resorted; // return the re-sorted tags
+}
+
+/** returns @string, html list: post tags marked up with hash tags and space-delimited, very simple */
+function markupTagsHashes ($arg_tags) {
+	$arg_tags = arraynge($arg_tags,',');
+	foreach ($arg_tags as &$arg_tag) $arg_tag = "#{$arg_tag}";
+	return implode(" ", $arg_tags);
+	}

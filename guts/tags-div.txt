@@ -30,220 +30,216 @@ Tags preceded by a DOT are “admin” tags for your eyes only. They will never 
 
 Aachen [6]
 
-abdominals []
+abdominals [0]
 	long = abdominal muscles
 	abbr = abs
 
-abductors []
+abductors [0]
 
-activity []
+activity [0]
 	synonyms = activities, choosing an activity, staying active
 
-adapting exercise []
+adapting exercise [0]
 
-adductors []
+adductors [0]
 	synonyms = adductor brevis, adductor longus, adductor magnus
 
-aerobic []
+aerobic [0]
 	synonyms = anaerobic
 
-aging []
+aging [0]
 
-air pollution []
+air pollution [0]
 
-air quality []
+air quality [0]
 
 Allen [2]
 
-allergies []
+allergies [0]
 
 Allison [2]
 
 American Civil War [2]
 
-American Revolution []
+American Revolution [0]
 
-ankle []
+ankle [0]
 
-arm bones []
+arm bones [0]
 
-arthritis []
+asthma [0]
 
-asthma []
-
-autobiography []
+autobiography [0]
 
 av [4]
 
-back []
+back [0]
 
-backbone []
+backbone [0]
 
-balance []
+balance [0]
 
-ball []
+ball [0]
 
-ball-and-socket joint []
+ball-and-socket joint [0]
 
-barometric pressure []
+barometric pressure [0]
 
 basketball [2]
 
-BCRPA []
+BCRPA [0]
 
 Beaver [1]
 
 best of [2]
 
-biceps []
+biceps [0]
 
-body systems []
+body systems [0]
 
-body temperature []
+body temperature [0]
 
-bones []
+bones [0]
 
 Boone [2]
 
-boot camp []
+boot camp [0]
 
-brain []
+brain [0]
 
 Brand [5]
 
-breathing []
+breathing [0]
 
-burn []
+burn [0]
 
-calf []
+calf [0]
 
-calf muscles []
+calf muscles [0]
 
-Canada's Food Guide []
+Canada's Food Guide [0]
 
-cancer []
+cancer [0]
 
-canoe []
+canoe [0]
 
-cardio []
+cardio [0]
 
-cardiovascular []
+cardiovascular [0]
 
 Cherbourg [9]
 
-cholesterol []
+cholesterol [0]
 
-chronic pain []
+chronic pain [0]
 
-cold []
+cold [0]
 
-computers []
-
-COPD []
+computers [0]
 
 Corbin [1]
 
-core []
+core [0]
 
 DeBolt [1]
 
-deltoids []
+deltoids [0]
 
-dementia []
+dementia [0]
 
-depression []
+depression [0]
 
-diabetes []
+diabetes [0]
 
-diet []
+diet [0]
 	synonyms = dieting, diets, food
 
-digestive system []
+digestive system [0]
 
 Eddy [4]
 
-elbow []
+elbow [0]
 
-elementary school []
+elementary school [0]
 
-emergencies []
+emergencies [0]
 
-emphysema []
+emphysema [0]
 	synonyms = COPD
 
-endocrine system []
+endocrine system [0]
 
-erector spinae []
+erector spinae [0]
 
-exercise []
+exercise [0]
 
-exercise research []
+exercise research [0]
 
-exocrine system []
+exocrine system [0]
 
-eye health []
+eye health [0]
 
-eyes []
+eyes [0]
 
-Fairbury []
+Fairbury [0]
 
 Falaise Pocket [7]
 
-fall prevention []
+fall prevention [0]
 	synonyms = falling, falls
 
-family secrets []
+family secrets [0]
 
-fascia []
+fascia [0]
 
-fascial system []
+fascial system [0]
 
-feet []
+feet [0]
 
-femur []
+femur [0]
 
-fibula []
+fibula [0]
 
-fiction []
+fiction [0]
 
-Fierro []
+Fierro [0]
 	parents = New Mexico
 
-fitness class []
+fitness class [0]
 	synonyms = fitness
 
-fitness equipment []
+fitness equipment [0]
 
-fitness instructors []
+fitness instructors [0]
 
-fitness principles []
+fitness principles [0]
 
-fitness research []
+fitness research [0]
 
-fitness terms []
+fitness terms [0]
 
-forearm []
+forearm [0]
 
-free weights []
+free weights [0]
 
-French and Indian War []
+French and Indian War [0]
 	synonyms = French and Indian
 
-gastrocnemius []
+gastrocnemius [0]
 
-genetics []
+genetics [0]
 
-glutes []
+glutes [0]
 
-Grand Canyon []
+Grand Canyon [0]
 
-Grizzly Den []
+Grizzly Den [0]
 
-group fitness []
+group fitness [0]
 
-hamstrings []
+hamstrings [0]
 
-hand []
+hand [0]
 
 Hansen [4]
 
@@ -258,325 +254,325 @@ Hastings High School [2]
 
 Hatch [2]
 
-head []
+head [0]
 
-health []
+health [0]
 
-healthy []
+healthy [0]
 
-heart disease []
+heart disease [0]
 
-Heartwell Nebraska []
+Heartwell Nebraska [0]
 	short = Heartwell
 
-heat injuries []
+heat injuries [0]
 	synonyms = heat cramps, heat exhaustion, heatstroke
 
 Herrick [5]
 
 Higby [4]
 
-high blood pressure []
+high blood pressure [0]
 
-hike []
+hike [0]
 
-hip []
+hip [0]
 	synonyms = hip flexors, hip joint
 
-holiday []
+holiday [0]
 
-home safety []
+home safety [0]
 
-hormones []
+hormones [0]
 
 Hornback [1]
 
-humerus []
+humerus [0]
 
 Hurtgen Forest [5]
 
-hypertension []
+hypertension [0]
 
-iliotibial band []
+iliotibial band [0]
 
-Illinois []
+Illinois [0]
 
-immune system []
+immune system [0]
 
-impingement syndrome []
+impingement syndrome [0]
 
-individuality []
+individuality [0]
 
 Ingraham [4]
 
-inheritance []
+inheritance [0]
 
-injuries []
+injuries [0]
 	synonyms = exercise injuries
 
-insomnia []
+insomnia [0]
 
-instructors []
+instructors [0]
 
-Jasper []
+Jasper [0]
 
 Jensen [3]
 
-joints []
+joints [0]
 	short = joint
 	long = joint classification
-	synonyms = ball-and-socket joint, cartilagenous joint
+	related = ball-and-socket joint, cartilagenous joint
 
-judo []
+judo [0]
 
-Kansas City []
+Kansas City [0]
 
-knee []
+knee [0]
 	long = knee injury
 	synonyms = knee joint, knee replacement
 
-lab school []
+lab school [0]
 
-Lake []
+Lake [0]
 
-latissimus dorsi []
+latissimus dorsi [0]
 	short = lats
 
 Lee [4]
 
-leg []
+leg [0]
 
-Lewis County []
+Lewis County [0]
 
-lifestyle []
+lifestyle [0]
 
-Light Fit []
+Light Fit [0]
 
-longevity []
+longevity [0]
 
-lower leg []
+lower leg [0]
 
-lunar landing []
+lunar landing [0]
 
 Mahoney [3]
 
-marriage []
+marriage [0]
 
 McDonald [3]
 
-medications []
+medications [0]
 
-memory []
+memory [0]
 
-metabolism []
+metabolism [0]
 
-Mexican War []
+Mexican War [0]
 
-Minden []
+Minden [0]
 
-Minnestoa []
+Minnestoa [0]
 
-mood []
+mood [0]
 
 Mortain [7]
 
 Mosher [3]
 
-motherhood []
+motherhood [0]
 
-motivation []
+motivation [0]
 	long = motivation to exercise
 
-movement []
+movement [0]
 
-muscles []
+muscles [0]
 
-muscular system []
+muscular system [0]
 
-museum []
+museum [0]
 
-music []
+music [0]
 
-musings []
+musings [0]
 
-mystery []
+mystery [0]
 
 Nebraska [2]
 
-nervous system []
+nervous system [0]
 
-New Mexico []
+New Mexico [0]
 
 Nissen [3]
 
 Normandy [10]
 
-novel []
+novel [0]
 
-nutrition []
+nutrition [0]
 
-obliques []
+obliques [0]
 
-older adults []
+older adults [0]
 
-old wives tales []
+old wives tales [0]
 
-opposing muscles []
+opposing muscles [0]
 
-osteoarthritis []
+osteoarthritis [0]
 	synonyms = arthritis
 
-osteopenia []
+osteopenia [0]
 
-osteoporosis []
+osteoporosis [0]
 
-over-training []
+over-training [0]
 
 Overturf [5]
 	synonyms = Oberdorf
 
-pain []
+pain [0]
 
-pandemic []
+pandemic [0]
 
-pecs []
+pecs [0]
 
-pectoralis major []
+pectoralis major [0]
 
-perceived exertion scale []
+perceived exertion scale [0]
 
-perfume []
+perfume [0]
 
 Porter [2]
 
 Power [2]
 
-Prince George []
+Prince George [0]
 
-quadriceps []
+quadriceps [0]
 	short = quads
 
-Quebec []
+Quebec [0]
 
-quotations []
+quotations [0]
 
-radius []
+radius [0]
 
-research []
+research [0]
 
-respiratory system []
+respiratory system [0]
 
-review []
+review [0]
 
-rheumatoid arthritis []
+rheumatoid arthritis [0]
 
-rhomboids []
+rhomboids [0]
 
-ribs []
+ribs [0]
 	synonyms = floating rib, rib injuries
 
-safety []
+safety [0]
 
-Salem Witch Trials []
+Salem Witch Trials [0]
 
-scientific studies []
+scientific studies [0]
 
 Sheldon [1]
 
-shins []
+shins [0]
 
-shoulder []
+shoulder [0]
 
-Silver City []
+Silver City [0]
 
-singing []
+singing [0]
 
 size L [12]
 
-size M []
+size M [0]
 
 size S [4]
 
 size XL [18]
 
-skeleton []
+skeleton [0]
 
-sleep []
+sleep [0]
 
-small town []
+small town [0]
 
 Solart [4]
 
-spine []
+spine [0]
 
-sports []
+sports [0]
 
 Steel [2]
 
 St Lo [8]
 
-strength training []
+strength training [0]
 
-stroke []
+stroke [0]
 
-studies []
+studies [0]
 
-Sugarbowl []
+Sugarbowl [0]
 
-sweating []
+sweating [0]
 
-teaching []
+teaching [0]
 
-technology []
+technology [0]
 
 Tegarden [1]
 
-temperature []
+temperature [0]
 
-thoughts []
+thoughts [0]
 
-tibia []
+tibia [0]
 
-torn meniscus []
+torn meniscus [0]
 
-trapezius []
+trapezius [0]
 
-trends []
+trends [0]
 
-triceps []
+triceps [0]
 
 Trumbo [2]
 
 Turpin [2]
 
-ulna []
+ulna [0]
 
-Valentine []
+Valentine [0]
 	parents = Nebraska
 
-Vancouver []
+Vancouver [0]
 	parents = British Columbia, Canada
 
-video []
+video [0]
 
-Vietnam War []
+Vietnam War [0]
 
-virus []
+virus [0]
 
-walking []
+walking [0]
 
-warm-up []
+warm-up [0]
 
-War of 1812 []
+War of 1812 [0]
 
-weight loss []
+weight loss [0]
 
 Wheeler [2]
 
-women health []
+women health [0]
 
 World War II [10]
 
-wrist []
+wrist [0]
 
-yoga []
+yoga [0]
