@@ -88,7 +88,7 @@ while(x=eval(x));
 
 <h2>Another Site of Interest</h2>
 
-<li>My husband, Bob Ingraham, offers you a very different web site. He says: “<a href="http://www.ephemeraltreasures.net">Ephemeral Treasures </a> is a mostly philatelic web site which reflects my interests in the early commercial aviation and the Second World War, and showcases items from my collections — old envelopes (aka covers), stamps, and postcards. But it also highlights some of the adventures I've had in my life, including surviving a plane crash in New Mexico's Black Range and being badly wounded in Vietnam when I was a Marine Corps hospital corpsman.”</li>
+<li>My husband, Bob Ingraham, offers you a very different web site. He says: “<a href="https://ephemeraltreasures.net">Ephemeral Treasures </a> is a mostly philatelic web site which reflects my interests in the early commercial aviation and the Second World War, and showcases items from my collections — old envelopes (aka covers), stamps, and postcards. But it also highlights some of the adventures I've had in my life, including surviving a plane crash in New Mexico's Black Range and being badly wounded in Vietnam when I was a Marine Corps hospital corpsman.”</li>
 </ul>
 </ul>
 
