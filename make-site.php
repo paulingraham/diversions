@@ -12,7 +12,7 @@ Manual (also extremely out of date):
 */
 
 error_reporting(0);
-error_reporting(E_ALL ^ E_NOTICE);
+// error_reporting(E_ALL ^ E_NOTICE);
 
 // ENVIRONMENT AND CONTEXT
 // Where is PubSys running?
@@ -42,27 +42,24 @@ define('STAGE', $stage);
 // Copy the canonical PubSys build script and other resources to other blog folders as needed. It’s mostly only needed when I build Writerly. More exactly: only do it if this is NOT the main (PS) blog and (importantly) *I* am the one running the build. This routine must ONLY run on MY Mac, because it’s basically just automation of a chore I need to do to keep my parents blogs’ running (plus my own).
 if (!$ps AND stripos(ROOT_DEV, "paul") !== false) {
 	// special handling of THIS script, because we may be copying over it!
-	$makesite_canonical_fn = "$root_parent/painscience/tools/make-ps-blog.php"; // the canonical code
+	$makesite_canonical_fn = "$root_parent/painscience/bin/make-ps-blog.php"; // the canonical code
 	$makesite_target_fn = ROOT_DEV . "/make-site.php"; // this file in the current site filter (might be writerly, diversions, etc)
 
-/*
 if (file_get_contents($makesite_canonical_fn) !== file_get_contents($makesite_target_fn)) {
 		copy ($makesite_canonical_fn, "{$root_parent}/writerly/make-site.php");
-//		copy ($makesite_canonical_fn, "{$root_parent}/diversions/make-site.php");
-//		copy ($makesite_canonical_fn, "{$root_parent}/ephemeral/make-site.php");
+		copy ($makesite_canonical_fn, "{$root_parent}/diversions/make-site.php");
+		copy ($makesite_canonical_fn, "{$root_parent}/ephemeral/make-site.php");
 		echo "build script updated, please to reload!";
 		exit;
 		}
-
 	// now for all the other stuff — nothing fancy, no optimization, no diffing … just copy over the destinations
 	$rsrc_fns = array ("pubsys-functions.php", "misc-functions.php", "tag-engine.php", "table-sort.js", "table-sort-setup.js", "synonyms-pubsys-shorthands.txt", "synonyms-post-metadata.txt", "synonyms-image-options.txt", "easy-img.php","css-pubsys.css","lazyload-imgs.js");
-//	$target_dirs = array ("writerly", "diversions", "ephemeral");
+	$target_dirs = array ("writerly", "diversions", "ephemeral");
 	$target_dirs = array ("writerly");
 	foreach ($rsrc_fns as $rsrc_fn)
 		foreach ($target_dirs as $target_dir)
 			if (!copy ("{$root_parent}/painscience/incs/$rsrc_fn", "{$root_parent}/$target_dir/incs/$rsrc_fn"))
-				echo "failed to copy $rsrc_fn :-(";
-*/				
+				echo "failed to copy $rsrc_fn :-(";			
 	} 
 
 chdir (ROOT_DEV); // execute script as if running in a specific site folder
@@ -100,7 +97,7 @@ $md_syns = getArrFromFile("synonyms-post-metadata.txt",true);
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Make <?php echo $sitename . " " . $blog_str; ?></title>
+<title>Make <?php echo $ps ? "BLOG" : "{$sitename} {$blog_str}"; ?></title>
 <link rel="stylesheet" type="text/css" 	href=	"/incs/css-tools.css" />
 <link rel="stylesheet" type="text/css" 	href=	"/incs/css-matrix.css" />
 <link rel="stylesheet" type="text/css" 	href=	"/incs/css-matrix-tools.css" />
@@ -108,7 +105,22 @@ $md_syns = getArrFromFile("synonyms-post-metadata.txt",true);
 <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
 <script src="/incs/table-sort.js"></script>
 <script src="/incs/table-sort-setup.js"></script>
-
+<script>
+function copy(obj) { /* primary #copy function, invoked by onclick of an inline element with HTML contents eg <span class='copyable' onClick="copy(this)"> */
+	var text = obj.textContent; // get the contents of the tapped object, assumed to be a simple string
+	var el = document.createElement('textarea'); // create a textarea element that we'll put the text in
+	el.value = text; // get the text from the copies object, while replacing the sciccors icon; regex because simple replace does not gracefully handle delims
+	el.setAttribute('readonly', ''); // make it a readonly textarea 
+	el.style.position = 'absolute';
+	el.style.left = '-9999px'; // set a position waaaay outside the window
+	document.body.appendChild(el); // add textarea to the DOM
+	el.select(); // select textarea contents
+	document.execCommand('copy'); // copy textarea contents
+	document.body.removeChild(el); // remove textarea from the DOM
+	tellUser('COPIED!'); // confirm the copy: briefly show a blue box with the confirmation message 
+	console.log('User copied to clipboard: "' + text + '"');
+	};
+</script>
 </head></body>
 <h1>Make <?php echo $sitename . " " . $blog_str; ?></h1>
 <p>You are running here: <code><?php echo $root_dev ?></code></p>
