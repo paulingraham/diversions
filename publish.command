@@ -1,5 +1,7 @@
 #!/bin/zsh
 
+# Script builds a summary of changes in a Git repo residing in the same folder where it is run, and then prompts for either exit or confirmation to proceed with a commit and a push. The commit subject is a generic summary of changes.  It is built to integrate with PubSys, and has little to no utility outside that context. It is intended to be "idiot proof," enabling my non-technical parents to get the benefits of a Git repo with near zero exposure to Git itself.
+
 # Exit immediately if any command exits with a non-zero status
 set -e
 
@@ -9,6 +11,7 @@ cd "$(dirname "$0")"
 
 # Derive a simple name for this repo from its root directory
 repo_name=$(basename "$(git rev-parse --show-toplevel)")
+repo_name=${repo_name:u}
 
 # Sanity check: make sure we're inside a Git working tree
 if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
