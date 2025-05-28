@@ -1,4 +1,4 @@
 #!/bin/zsh
 
-cd ~/Sites/diversion
+cd ~/Sites/diversions
 git pull
