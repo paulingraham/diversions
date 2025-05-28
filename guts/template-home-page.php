@@ -48,7 +48,7 @@
 <li>the history of my family and my husband's family, particularly the Overturf, Hansen, Ingraham, and Herrick families</li>
 </ul>
 
-<p>Plus more diversions. In some ways these topics couldn’t be more different, and yet they have also inspired and informed each other. See below for more information.</p>
+<p>Plus more diversions. In some ways these topics couldn’t be more different, and yet they have also inspired and informed each other.</p>
 
 <img src="imgs/susan-131x146-web.jpg" width="131" height="146" style="float:left;margin-right:2em;">
 <div class="metadata">
