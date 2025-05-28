@@ -163,8 +163,10 @@ else {
 	$posts = getPosts(); 		// read posts into array
 	if (!$ps) makeTagUsageList($posts); // save every post tag to a list, to be ingested and tallied by the tag-engine (PainSci does this in it’s own special way)
 	if ($ps) auditPsids();					// aborts for missing psids & generates one (common with new posts)
-	updateTags();				// add tags found in posts, make tag index files
-	makeWebVersions(); 		// make all post files (web-ready HTML5)
+	makeWebVersions(); 		// make all post files (web-ready HTML5); do this before updating tag database!
+	updateTags();				// add tags found in posts, make tag index files; this canonicalizes the tag database file … possible this should actually be at the end?  or … just should not change $tags
+	makeTagIndexes ();
+	remove_old_files($posts);
 	makeHomepage();			// make the home page (index.html)
 	make_sy_indexes(); 		// generate several custom post indexes
 	list_urls();
