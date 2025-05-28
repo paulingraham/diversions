@@ -13,6 +13,8 @@
 
 <title>{$title}</title>
 
+<link rel="canonical"						href="https://{$domain}/{$title_smpl}.html">
+
 <meta name='title' 						content='{$title}'>
 
 <meta name='og:url' 						content='http://{$domain}/{$title_smpl}.html'>
