@@ -28,551 +28,551 @@ Tags preceded by a DOT are “admin” tags for your eyes only. They will never 
 
 ***************************************
 
-Aachen [6]
+» Aachen [6]
 
-abdominals [0]
+» abdominals [0]
 	long = abdominal muscles
 	abbr = abs
 
-abductors [0]
+» abductors [0]
 
-activity [0]
+» activity [0]
 	synonyms = activities, choosing an activity, staying active
 
-adapting exercise [0]
+» adapting exercise [0]
 
-adductors [0]
+» adductors [0]
 	synonyms = adductor brevis, adductor longus, adductor magnus
 
-aerobic [0]
+» aerobic [0]
 	synonyms = anaerobic
 
-aging [0]
+» aging [0]
 
-air pollution [0]
+» air pollution [0]
 
-air quality [0]
+» air quality [0]
 
-Allen [2]
+» Allen [2]
 
-allergies [0]
+» allergies [0]
 
-Allison [2]
+» Allison [2]
 
-American Civil War [2]
+» American Civil War [2]
 
-American Revolution [0]
+» American Revolution [0]
 
-ankle [0]
+» ankle [0]
 
-arm bones [0]
+» arm bones [0]
 
-asthma [0]
+» asthma [0]
 
-autobiography [0]
+» autobiography [0]
 
-av [4]
+» av [4]
 
-back [0]
+» back [0]
 
-backbone [0]
+» backbone [0]
 
-balance [0]
+» balance [0]
 
-ball [0]
+» ball [0]
 
-ball-and-socket joint [0]
+» ball-and-socket joint [0]
 
-barometric pressure [0]
+» barometric pressure [0]
 
-basketball [2]
+» basketball [2]
 
-BCRPA [0]
+» BCRPA [0]
 
-Beaver [1]
+» Beaver [1]
 
-best of [2]
+» best of [2]
 
-biceps [0]
+» biceps [0]
 
-body systems [0]
+» body systems [0]
 
-body temperature [0]
+» body temperature [0]
 
-bones [0]
+» bones [0]
 
-Boone [2]
+» Boone [2]
 
-boot camp [0]
+» boot camp [0]
 
-brain [0]
+» brain [0]
 
-Brand [5]
+» Brand [5]
 
-breathing [0]
+» breathing [0]
 
-burn [0]
+» burn [0]
 
-calf [0]
+» calf [0]
 
-calf muscles [0]
+» calf muscles [0]
 
-Canada's Food Guide [0]
+» Canada's Food Guide [0]
 
-cancer [0]
+» cancer [0]
 
-canoe [0]
+» canoe [0]
 
-cardio [0]
+» cardio [0]
 
-cardiovascular [0]
+» cardiovascular [0]
 
-Cherbourg [9]
+» Cherbourg [9]
 
-cholesterol [0]
+» cholesterol [0]
 
-chronic pain [0]
+» chronic pain [0]
 
-cold [0]
+» cold [0]
 
-computers [0]
+» computers [0]
 
-Corbin [1]
+» Corbin [1]
 
-core [0]
+» core [0]
 
-DeBolt [1]
+» DeBolt [1]
 
-deltoids [0]
+» deltoids [0]
 
-dementia [0]
+» dementia [0]
 
-depression [0]
+» depression [0]
 
-diabetes [0]
+» diabetes [0]
 
-diet [0]
+» diet [0]
 	synonyms = dieting, diets, food
 
-digestive system [0]
+» digestive system [0]
 
-Eddy [4]
+» Eddy [4]
 
-elbow [0]
+» elbow [0]
 
-elementary school [0]
+» elementary school [0]
 
-emergencies [0]
+» emergencies [0]
 
-emphysema [0]
+» emphysema [0]
 	synonyms = COPD
 
-endocrine system [0]
+» endocrine system [0]
 
-erector spinae [0]
+» erector spinae [0]
 
-exercise [0]
+» exercise [0]
 
-exercise research [0]
+» exercise research [0]
 
-exocrine system [0]
+» exocrine system [0]
 
-eye health [0]
+» eye health [0]
 
-eyes [0]
+» eyes [0]
 
-Fairbury [0]
+» Fairbury [0]
 
-Falaise Pocket [7]
+» Falaise Pocket [7]
 
-fall prevention [0]
+» fall prevention [0]
 	synonyms = falling, falls
 
-family secrets [0]
+» family secrets [0]
 
-fascia [0]
+» fascia [0]
 
-fascial system [0]
+» fascial system [0]
 
-feet [0]
+» feet [0]
 
-femur [0]
+» femur [0]
 
-fibula [0]
+» fibula [0]
 
-fiction [0]
+» fiction [0]
 
-Fierro [0]
+» Fierro [0]
 	parents = New Mexico
 
-fitness class [0]
+» fitness class [0]
 	synonyms = fitness
 
-fitness equipment [0]
+» fitness equipment [0]
 
-fitness instructors [0]
+» fitness instructors [0]
 
-fitness principles [0]
+» fitness principles [0]
 
-fitness research [0]
+» fitness research [0]
 
-fitness terms [0]
+» fitness terms [0]
 
-forearm [0]
+» forearm [0]
 
-free weights [0]
+» free weights [0]
 
-French and Indian War [0]
+» French and Indian War [0]
 	synonyms = French and Indian
 
-gastrocnemius [0]
+» gastrocnemius [0]
 
-genetics [0]
+» genetics [0]
 
-glutes [0]
+» glutes [0]
 
-Grand Canyon [0]
+» Grand Canyon [0]
 
-Grizzly Den [0]
+» Grizzly Den [0]
 
-group fitness [0]
+» group fitness [0]
 
-hamstrings [0]
+» hamstrings [0]
 
-hand [0]
+» hand [0]
 
-Hansen [4]
+» Hansen [4]
 
-Harness [2]
+» Harness [2]
 
-Hastings [2]
+» Hastings [2]
 	parents = Nebraska
 
-Hastings College [2]
+» Hastings College [2]
 
-Hastings High School [2]
+» Hastings High School [2]
 
-Hatch [2]
+» Hatch [2]
 
-head [0]
+» head [0]
 
-health [0]
+» health [0]
 
-healthy [0]
+» healthy [0]
 
-heart disease [0]
+» heart disease [0]
 
-Heartwell Nebraska [0]
+» Heartwell Nebraska [0]
 	short = Heartwell
 
-heat injuries [0]
+» heat injuries [0]
 	synonyms = heat cramps, heat exhaustion, heatstroke
 
-Herrick [5]
+» Herrick [5]
 
-Higby [4]
+» Higby [4]
 
-high blood pressure [0]
+» high blood pressure [0]
 
-hike [0]
+» hike [0]
 
-hip [0]
+» hip [0]
 	synonyms = hip flexors, hip joint
 
-holiday [0]
+» holiday [0]
 
-home safety [0]
+» home safety [0]
 
-hormones [0]
+» hormones [0]
 
-Hornback [1]
+» Hornback [1]
 
-humerus [0]
+» humerus [0]
 
-Hurtgen Forest [5]
+» Hurtgen Forest [5]
 
-hypertension [0]
+» hypertension [0]
 
-iliotibial band [0]
+» iliotibial band [0]
 
-Illinois [0]
+» Illinois [0]
 
-immune system [0]
+» immune system [0]
 
-impingement syndrome [0]
+» impingement syndrome [0]
 
-individuality [0]
+» individuality [0]
 
-Ingraham [4]
+» Ingraham [4]
 
-inheritance [0]
+» inheritance [0]
 
-injuries [0]
+» injuries [0]
 	synonyms = exercise injuries
 
-insomnia [0]
+» insomnia [0]
 
-instructors [0]
+» instructors [0]
 
-Jasper [0]
+» Jasper [0]
 
-Jensen [3]
+» Jensen [3]
 
-joints [0]
+» joints [0]
 	short = joint
 	long = joint classification
 	related = ball-and-socket joint, cartilagenous joint
 
-judo [0]
+» judo [0]
 
-Kansas City [0]
+» Kansas City [0]
 
-knee [0]
+» knee [0]
 	long = knee injury
 	synonyms = knee joint, knee replacement
 
-lab school [0]
+» lab school [0]
 
-Lake [0]
+» Lake [0]
 
-latissimus dorsi [0]
+» latissimus dorsi [0]
 	short = lats
 
-Lee [4]
+» Lee [4]
 
-leg [0]
+» leg [0]
 
-Lewis County [0]
+» Lewis County [0]
 
-lifestyle [0]
+» lifestyle [0]
 
-Light Fit [0]
+» Light Fit [0]
 
-longevity [0]
+» longevity [0]
 
-lower leg [0]
+» lower leg [0]
 
-lunar landing [0]
+» lunar landing [0]
 
-Mahoney [3]
+» Mahoney [3]
 
-marriage [0]
+» marriage [0]
 
-McDonald [3]
+» McDonald [3]
 
-medications [0]
+» medications [0]
 
-memory [0]
+» memory [0]
 
-metabolism [0]
+» metabolism [0]
 
-Mexican War [0]
+» Mexican War [0]
 
-Minden [0]
+» Minden [0]
 
-Minnestoa [0]
+» Minnestoa [0]
 
-mood [0]
+» mood [0]
 
-Mortain [7]
+» Mortain [7]
 
-Mosher [3]
+» Mosher [3]
 
-motherhood [0]
+» motherhood [0]
 
-motivation [0]
+» motivation [0]
 	long = motivation to exercise
 
-movement [0]
+» movement [0]
 
-muscles [0]
+» muscles [0]
 
-muscular system [0]
+» muscular system [0]
 
-museum [0]
+» museum [0]
 
-music [0]
+» music [0]
 
-musings [0]
+» musings [0]
 
-mystery [0]
+» mystery [0]
 
-Nebraska [2]
+» Nebraska [2]
 
-nervous system [0]
+» nervous system [0]
 
-New Mexico [0]
+» New Mexico [0]
 
-Nissen [3]
+» Nissen [3]
 
-Normandy [10]
+» Normandy [10]
 
-novel [0]
+» novel [0]
 
-nutrition [0]
+» nutrition [0]
 
-obliques [0]
+» obliques [0]
 
-older adults [0]
+» older adults [0]
 
-old wives tales [0]
+» old wives tales [0]
 
-opposing muscles [0]
+» opposing muscles [0]
 
-osteoarthritis [0]
+» osteoarthritis [0]
 	synonyms = arthritis
 
-osteopenia [0]
+» osteopenia [0]
 
-osteoporosis [0]
+» osteoporosis [0]
 
-over-training [0]
+» over-training [0]
 
-Overturf [5]
+» Overturf [5]
 	synonyms = Oberdorf
 
-pain [0]
+» pain [0]
 
-pandemic [0]
+» pandemic [0]
 
-pecs [0]
+» pecs [0]
 
-pectoralis major [0]
+» pectoralis major [0]
 
-perceived exertion scale [0]
+» perceived exertion scale [0]
 
-perfume [0]
+» perfume [0]
 
-Porter [2]
+» Porter [2]
 
-Power [2]
+» Power [2]
 
-Prince George [0]
+» Prince George [0]
 
-quadriceps [0]
+» quadriceps [0]
 	short = quads
 
-Quebec [0]
+» Quebec [0]
 
-quotations [0]
+» quotations [0]
 
-radius [0]
+» radius [0]
 
-research [0]
+» research [0]
 
-respiratory system [0]
+» respiratory system [0]
 
-review [0]
+» review [0]
 
-rheumatoid arthritis [0]
+» rheumatoid arthritis [0]
 
-rhomboids [0]
+» rhomboids [0]
 
-ribs [0]
+» ribs [0]
 	synonyms = floating rib, rib injuries
 
-safety [0]
+» safety [0]
 
-Salem Witch Trials [0]
+» Salem Witch Trials [0]
 
-scientific studies [0]
+» scientific studies [0]
 
-Sheldon [1]
+» Sheldon [1]
 
-shins [0]
+» shins [0]
 
-shoulder [0]
+» shoulder [0]
 
-Silver City [0]
+» Silver City [0]
 
-singing [0]
+» singing [0]
 
-size L [12]
+» size L [12]
 
-size M [0]
+» size M [0]
 
-size S [4]
+» size S [4]
 
-size XL [18]
+» size XL [18]
 
-skeleton [0]
+» skeleton [0]
 
-sleep [0]
+» sleep [0]
 
-small town [0]
+» small town [0]
 
-Solart [4]
+» Solart [4]
 
-spine [0]
+» spine [0]
 
-sports [0]
+» sports [0]
 
-Steel [2]
+» Steel [2]
 
-St Lo [8]
+» St Lo [8]
 
-strength training [0]
+» strength training [0]
 
-stroke [0]
+» stroke [0]
 
-studies [0]
+» studies [0]
 
-Sugarbowl [0]
+» Sugarbowl [0]
 
-sweating [0]
+» sweating [0]
 
-teaching [0]
+» teaching [0]
 
-technology [0]
+» technology [0]
 
-Tegarden [1]
+» Tegarden [1]
 
-temperature [0]
+» temperature [0]
 
-thoughts [0]
+» thoughts [0]
 
-tibia [0]
+» tibia [0]
 
-torn meniscus [0]
+» torn meniscus [0]
 
-trapezius [0]
+» trapezius [0]
 
-trends [0]
+» trends [0]
 
-triceps [0]
+» triceps [0]
 
-Trumbo [2]
+» Trumbo [2]
 
-Turpin [2]
+» Turpin [2]
 
-ulna [0]
+» ulna [0]
 
-Valentine [0]
+» Valentine [0]
 	parents = Nebraska
 
-Vancouver [0]
+» Vancouver [0]
 	parents = British Columbia, Canada
 
-video [0]
+» video [0]
 
-Vietnam War [0]
+» Vietnam War [0]
 
-virus [0]
+» virus [0]
 
-walking [0]
+» walking [0]
 
-warm-up [0]
+» warm-up [0]
 
-War of 1812 [0]
+» War of 1812 [0]
 
-weight loss [0]
+» weight loss [0]
 
-Wheeler [2]
+» Wheeler [2]
 
-women health [0]
+» women health [0]
 
-World War II [10]
+» World War II [10]
 
-wrist [0]
+» wrist [0]
 
-yoga [0]
+» yoga [0]

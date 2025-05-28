@@ -57,7 +57,6 @@ $synonyms = array("left","le","l","lside");
 	if (array_intersect($synonyms,$args))
 		$position = "left";
 
-
 /* Look for compound arguments of the form “arg:data” */
 
 
@@ -70,6 +69,12 @@ foreach ($args as $arg) {
 	if (in_array($arg, $img_opt_syns["centre"]))
 		$position .= "centre";
 
+	if (substr($arg,-2) == 'px') { // if an arbitrary pixel width is declared ("300px"), the actual image width will be replaced, and browser image scaling is used to render the image at that width (generally great quality these days)
+		$resizeToWidth = str_replace("px", '', $arg);
+		$w = $resizeToWidth;
+//		exit("{$w}px");
+	}
+	
 	if ($arg == "inline") $containerType = "span"; // the default container type is a div; change it to a span only if the image is used inline
 	
 	// if the argument is not a compound and a long string, assume it’s a caption

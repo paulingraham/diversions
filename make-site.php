@@ -39,28 +39,40 @@ define('ROOT_DEV', $root_dev);
 define('ROOT_PARENT', $root_parent);
 define('STAGE', $stage);
 
-// Copy the canonical PubSys build script and other resources to other blog folders as needed. It’s mostly only needed when I build Writerly. More exactly: only do it if this is NOT the main (PS) blog and (importantly) *I* am the one running the build. This routine must ONLY run on MY Mac, because it’s basically just automation of a chore I need to do to keep my parents blogs’ running (plus my own).
+
+
+/* ⚠️ THIS NEXT PART ONLY HAPPENS WHEN I BUILD WRITERLY, VERY IDIOSYNCRATIC AND WEIRD BUILD STEP!!!
+
+The next ~20 lines copy the canonical PubSys build script and other resources to other project folders as needed. It’s mostly only needed when I build Writerly. More exactly: only do this if NOT the main (PS) blog and (importantly) *I* am the one running the build. This routine must ONLY run on MY Mac, because it’s basically just automation of a chore I need to do to keep my parents blogs’ running (plus my own). */
+
 if (!$ps AND stripos(ROOT_DEV, "paul") !== false) {
+
+
+	
 	// special handling of THIS script, because we may be copying over it!
 	$makesite_canonical_fn = "$root_parent/painscience/bin/make-ps-blog.php"; // the canonical code
 	$makesite_target_fn = ROOT_DEV . "/make-site.php"; // this file in the current site filter (might be writerly, diversions, etc)
 
-if (file_get_contents($makesite_canonical_fn) !== file_get_contents($makesite_target_fn)) {
+	if (file_get_contents($makesite_canonical_fn) !== file_get_contents($makesite_target_fn)) {
 		copy ($makesite_canonical_fn, "{$root_parent}/writerly/make-site.php");
 		copy ($makesite_canonical_fn, "{$root_parent}/diversions/make-site.php");
 		copy ($makesite_canonical_fn, "{$root_parent}/ephemeral/make-site.php");
 		echo "build script updated, please to reload!";
 		exit;
 		}
-	// now for all the other stuff — nothing fancy, no optimization, no diffing … just copy over the destinations
-	$rsrc_fns = array ("pubsys-functions.php", "misc-functions.php", "tag-engine.php", "table-sort.js", "table-sort-setup.js", "synonyms-pubsys-shorthands.txt", "synonyms-post-metadata.txt", "synonyms-image-options.txt", "easy-img.php","css-pubsys.css","lazyload-imgs.js");
+
+	// now for all the other stuff — nothing fancy, no optimization, no diffing … just always copy the canonical files to their destinations 
+	$filenames = array ("pubsys-functions.php", "misc-functions.php", "tag-engine.php", "table-sort.js", "table-sort-setup.js", "synonyms-pubsys-shorthands.txt", "synonyms-post-metadata.txt", "synonyms-image-options.txt", "easy-img.php","css-pubsys.css","lazyload-imgs.js");
 	$target_dirs = array ("writerly", "diversions", "ephemeral");
-	$target_dirs = array ("writerly");
-	foreach ($rsrc_fns as $rsrc_fn)
+
+	foreach ($filenames as $filename)
 		foreach ($target_dirs as $target_dir)
-			if (!copy ("{$root_parent}/painscience/incs/$rsrc_fn", "{$root_parent}/$target_dir/incs/$rsrc_fn"))
-				echo "failed to copy $rsrc_fn :-(";			
+			if (!copy ("{$root_parent}/painscience/incs/$filename", "{$root_parent}/$target_dir/incs/$filename"))
+				echo "failed to copy $filenames :-(";
 	} 
+
+
+
 
 chdir (ROOT_DEV); // execute script as if running in a specific site folder
 define('CODE_BASE', 'pubsys');

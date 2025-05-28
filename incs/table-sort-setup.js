@@ -1,5 +1,5 @@
 /* Stupid jQuery Table Sort
-http://joequery.github.io/Stupid-Table-Plugin/
+http://joequery.github.io/Stupid-Table-Plugin/  [StupidTable Plugin docs.webarchive]
 requires stupidtable.min.js and html5shiv.js
 
 Bare bones setup guide:

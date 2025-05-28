@@ -1,196 +1,196 @@
 World War II
-Normandy
-Cherbourg
-St Lo
-Mortain
-Falaise Pocket
-Aachen
-Hurtgen Forest
-size L
+ Normandy
+ Cherbourg
+ St Lo
+ Mortain
+ Falaise Pocket
+ Aachen
+ Hurtgen Forest
+ _size_l
 World War II
-Normandy
-Cherbourg
-St Lo
-Mortain
-Falaise Pocket
-Aachen
-Hurtgen Forest
-size L
+ Normandy
+ Cherbourg
+ St Lo
+ Mortain
+ Falaise Pocket
+ Aachen
+ Hurtgen Forest
+ _size_l
 World War II
-Normandy
-Cherbourg
-St Lo
-size L
+ Normandy
+ Cherbourg
+ St Lo
+ _size_l
 World War II
-Normandy
-size XL
+ Normandy
+ _size_xl
 World War II
-Normandy
-Cherbourg
-St Lo
-Mortain
-Falaise Pocket
-Aachen
-Hurtgen Forest
-size L
+ Normandy
+ Cherbourg
+ St Lo
+ Mortain
+ Falaise Pocket
+ Aachen
+ Hurtgen Forest
+ _size_l
 World War II
-Normandy
-Cherbourg
-St Lo
-Mortain
-Falaise Pocket
-size L
+ Normandy
+ Cherbourg
+ St Lo
+ Mortain
+ Falaise Pocket
+ _size_l
 World War II
-Normandy
-Cherbourg
-size L
+ Normandy
+ Cherbourg
+ _size_l
 World War II
-Normandy
-Cherbourg
-St Lo
-Mortain
-Falaise Pocket
-Aachen
-Hurtgen Forest
-size XL
+ Normandy
+ Cherbourg
+ St Lo
+ Mortain
+ Falaise Pocket
+ Aachen
+ Hurtgen Forest
+ _size_xl
 World War II
-Normandy
-Cherbourg
-St Lo
-Mortain
-Falaise Pocket
-Aachen
-size L
+ Normandy
+ Cherbourg
+ St Lo
+ Mortain
+ Falaise Pocket
+ Aachen
+ _size_l
 World War II
-Normandy
-Cherbourg
-St Lo
-Mortain
-Falaise Pocket
-Aachen
-Hurtgen Forest
-size XL
+ Normandy
+ Cherbourg
+ St Lo
+ Mortain
+ Falaise Pocket
+ Aachen
+ Hurtgen Forest
+ _size_xl
 Brand
-Higby
-Hatch
-American Civil War
-size XL
+ Higby
+ Hatch
+ American Civil War
+ _size_xl
 Brand
-Higby
-size XL
+ Higby
+ _size_xl
 Brand
-Higby
-size XL
+ Higby
+ _size_xl
 Herrick
-Solart
-American Civil War
-size L
+ Solart
+ American Civil War
+ _size_l
 Herrick
-Solart
-Brand
-size XL
+ Solart
+ Brand
+ _size_xl
 Herrick
-Solart
-size L
+ Solart
+ _size_l
 Mosher
-Allen
-Wheeler
-size XL
+ Allen
+ Wheeler
+ _size_xl
 Ingraham
-Lee
-Eddy
-Mosher
-size XL
+ Lee
+ Eddy
+ Mosher
+ _size_xl
 Ingraham
-Lee
-Eddy
-Herrick
-size XL
+ Lee
+ Eddy
+ Herrick
+ _size_xl
 Ingraham
-Lee
-Eddy
-size L
+ Lee
+ Eddy
+ _size_l
 McDonald
-Allison
-Hornback
-Power
-Boone
-Trumbo
-Harness
-size XL
+ Allison
+ Hornback
+ Power
+ Boone
+ Trumbo
+ Harness
+ _size_xl
 Mahoney
-Turpin
-Steel
-Porter
-size XL
+ Turpin
+ Steel
+ Porter
+ _size_xl
 Hansen
-Nissen
-Jensen
-size XL
+ Nissen
+ Jensen
+ _size_xl
 Hansen
-Nissen
-Jensen
-Mahoney
-size XL
+ Nissen
+ Jensen
+ Mahoney
+ _size_xl
 Overturf
-McDonald
-size XL
+ McDonald
+ _size_xl
 Overturf
-Hansen
-size XL
+ Hansen
+ _size_xl
 Overturf
-basketball
-Hastings College
-Hastings High School
-Hastings
-size XL
-Nebraska
+ basketball
+ Hastings College
+ Hastings High School
+ Hastings
+ _size_xl
+ Nebraska
 Overturf
-basketball
-Hastings College
-Hastings High School
-Hastings
-size XL
-Nebraska
-size S
-av
-size S
-av
-size S
-av
-size S
-av
+ basketball
+ Hastings College
+ Hastings High School
+ Hastings
+ _size_xl
+ Nebraska
+_size_s
+ av
+_size_s
+ av
+_size_s
+ av
+_size_s
+ av
 Overturf
-DeBolt
-Tegarden
-Sheldon
-Hatch
-Beaver
-Corbin
-Hansen
-Nissen
-Jensen
-McDonald
-Power
-Boone
-Harness
-Allison
-Trumbo
-Mahoney
-Turpin
-Steel
-Porter
-best of
-size L
+ DeBolt
+ Tegarden
+ Sheldon
+ Hatch
+ Beaver
+ Corbin
+ Hansen
+ Nissen
+ Jensen
+ McDonald
+ Power
+ Boone
+ Harness
+ Allison
+ Trumbo
+ Mahoney
+ Turpin
+ Steel
+ Porter
+ best of
+ _size_l
 Ingraham
-Lee
-Eddy
-Herrick
-Solart
-Mosher
-Allen
-Wheeler
-Brand
-Higby
-best of
-size L
+ Lee
+ Eddy
+ Herrick
+ Solart
+ Mosher
+ Allen
+ Wheeler
+ Brand
+ Higby
+ best of
+ _size_l

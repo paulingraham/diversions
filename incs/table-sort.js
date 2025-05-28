@@ -1,5 +1,5 @@
 /* Stupid jQuery table plugin, original file named “stupidtable.js”
-http://joequery.github.io/Stupid-Table-Plugin/
+http://joequery.github.io/Stupid-Table-Plugin/  [StupidTable Plugin docs.webarchive]
 see also table-sort-setup.js */
 
 (function($) {
