@@ -393,7 +393,7 @@ function markupTags ($arg_tags) {
 			$tag_display = (isset($tags[simplify($arg_tag)]['short'])) ? $tags[simplify($arg_tag)]['short'] : $arg_tag; // use a short version, if available
 			
 			if (($tags[simplify($arg_tag)]['tally#']??null) > 5) {
-				$tags_str .= "<li class='tag'><a href='tag-" . titleToFn($tag_display) . ".html'>{$tag_display}</a></li>";
+				$tags_str .= "<li class='tag'><a href='tag-" . titleToFn($tags[simplify($arg_tag)]['true']) . ".html'>{$tag_display}</a></li>";
 				}
 			else
 				$tags_str .= "<li class='tag' title='Not enough posts use this tag.'>{$tag_display}</li>";
