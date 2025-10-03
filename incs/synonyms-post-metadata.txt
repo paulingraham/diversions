@@ -18,9 +18,9 @@ I'm an example note!  This has no effect on the synonyms whatsoever.
 
 * priority, importance, rank
 
-* lock, locked, draft, ignore
+* lock, locked, ignore
 
-* preview, prev, prevew
+* preview, prev, draft
 
 * null, blank, 0, empty, zip, x, —
 

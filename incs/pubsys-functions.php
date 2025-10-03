@@ -506,10 +506,18 @@ $post = array('canonical' => null,
 	$paywall_marker = $header_marker = false; // #PHP8, highly destructive when I set these defaults for these vars inside the loop below!  should be fine here, but … flagged
 	foreach ($lines as $line) { // go through all post lines; in most cases we're looking for a header separated from the post by a *** row
 
-		if (inStr('***', $line)) { // if the header seperator is found …
+		if (inStr('*****', $line)) { // if the header seperator is found …
 			$header_marker = true;
 			continue;
 		} // … set a flag and skip
+
+		if (inStr('----------', $line)) { // if the end of content seperator is found …
+			break; // the rest of the file effectively doesn't exist, stop looping entirely
+		}
+
+		if (preg_match('|^//|', $line)) { // if there's a PHP comment marker
+			continue; // skip the line
+		}
 
 		if (inStr('<!-- === PAYWALL === -->', $line)) {  // as of 2021-12-14, this is much less important, but I left it in place so I could still save premium-only content in a field and do word counts on it... but I have not followed up on that yet
 			$paywall_marker = true;
@@ -542,7 +550,8 @@ $post = array('canonical' => null,
 			if ($md == 'http' or $md == 'https') {
 				$post['url'] = $md . ':' . $md_pt2;
 			} // reassemble URL
-			if (preg_match('@(jpg|gif|png)$@', $md, $tmp)) {
+			
+			if (preg_match('@(jpeg|jpg|gif|png)$@', $md, $tmp)) {
 				$post['post_img'] = "imgs/{$mdo}";
 			}
 
@@ -699,7 +708,7 @@ function makeWebVersions()
 		$thePost = str_replace('{$content}', $post['html'], $template); // BIG STEP! insert the prepared content, with translated custom markup/markdown and rendered PHP (thePost = template + content) — the output of prepareContent()
 
 		if ($post['preview']) {
-			$thePost = str_replace('<article>', "<article><h2 style='font-size:3em;color:#c66'>DRAFT</h2>", $thePost);
+			$thePost = str_replace('<article>', "<article><h2 style='font-size:3em;color:#c66'>DRAFT — NOT FOR PUBLICATION</h2>", $thePost);
 		}
 
 		$thePost = preg_replace("/.*rss_only_line.*\n\n/", "\n<!-- one line removed by flag rss_only_line -->\n", $thePost); // Remove lines from web version if when they contains the "rss_only_line" flag (this step must follow the insertion of the HTML, because it is IN the HTML). Exasperating-edge-case: the rss_only_line directive must be placed at the END of the line (<hr><!-- rss_only_line -->), not the start (<br><!-- rss_only_line -->). Even with that arbitrary convention, it still only works with a hack, see #comment_patch
@@ -962,7 +971,7 @@ exit;
 
 
 		==== WORD COUNT, READ ON PAINSCI, SOCIAL MEDIA LINKS
-		Continue reading below, or [on PainScience.com]({$thePost['url_live']}), about {$readingTime}-minutes more ({$wordCount} words). Comment on the [Facebook post](XXX) or [exTwitter](XXX) or [Threads](XXX), and you’re always welcome to reply to this email.
+		Continue reading below, or [on PainScience.com]({$thePost['url_live']}), about {$readingTime}-minutes more ({$wordCount} words). Comment on the [Facebook post](XXX) or [exTwitter](XXX) or [Threads](XXX), and you’re always welcome to reply directly to these emails.
 
 		Warm Regards,<br>
 
@@ -991,7 +1000,7 @@ exit;
 		}
 
 		$audio = <<<AUDIO
-			{% comment %} AUDIO EMBED for pst2 and pst3 members only. {% endcomment %}{% if subscriber.can_view_premium_content and subscriber.stripe_subscription.product != 'pst1' %}<p class="aside top">This post has an audio version for members only: <a href="https://www.painscience.com/{$thePost['post_audio']}">listen from your web browser</a> or <a href="https://www.painscience.com/login.php?{{ subscriber.email }}">login to subscribe to the podcast</a>.</p>{% endif %}
+			{% comment %} AUDIO EMBED for pst2 and pst3 members only. {% endcomment %}{% if subscriber.can_view_premium_content and subscriber.stripe_subscription.product != 'pst1' %}<p class="aside">This post has an audio version for members like you <a href="https://www.painscience.com/{$thePost['post_audio']}">listen from your web browser</a> or <a href="https://www.painscience.com/login.php?{{ subscriber.email }}">login to subscribe to the podcast</a>.</p>{% endif %}
 
 			{% comment %} AUDIO CTA x2, one for pst1 members, another for regular subscribers, just slightly different wording, and upgrade vs join links. {% endcomment %}{% if subscriber.stripe_subscription.product == 'pst1' %}<p class="aside">This post has an audio version for PainSci members paying $5+/month. <a href="{{ manage_premium_subscription_url }}">Upgrade now</a>.{$post_audio_desc}</p>{% endif %}{% if subscriber.can_be_upsold and subscriber.stripe_subscription.product != 'pst1' %}<p class="aside">This post has an audio version for PainSci members. <a href="{{ upgrade_url}}?product=pst2">Join now</a>.{$post_audio_desc}</p>{% endif %}
 			AUDIO;
@@ -1204,6 +1213,8 @@ function makeRSS($max = 25)
 
 		// Make some changes to content to prepare it for RSS, mostly removing or simplifying common components.  Starts with generic exclusions of content from RSS, either individual paras marked with <!-- rss_no_line --> and multiline content marked with <!-- START/rss_no_block_stop -->
 
+		$content = preg_replace("| *<span(.+?)x-show='!member'(.+?)>LOGIN</span>|", '', $content); // remove standard login prompt from RSS
+
 		$content = preg_replace("/.*rss_no_line.*\n/", "\n<!-- removed from RSS (one line) -->\n", $content); // remove one line from RSS
 		$content = preg_replace('|<!--\s*rss_no_block_start(.+?)rss_no_block_stop\s*-->|s', "\n<!-- removed from RSS: multiple lines -->\n", $content); // remove multiline content from RSS
 		$content = preg_replace("@src\s*=\s*(['\"])imgs@", "src=$1https://$domain/imgs", $content); // covert src URLs from relative to absolute
@@ -1243,7 +1254,7 @@ function makeRSS($max = 25)
 
 			// CREATE MEMBER VERSION OF THE POST by deleting teaser (non-member) content, which is delimited by <!-- paywall markup: non-member start/end -->. This will leave regular content intact. This does not change the $content variable — it just creates a modified copy of it in $content_member, and then saves appends it to $rss_posts_member.
 			$content_member = preg_replace('|<!-- paywall markup: non-member start -->(.+?)<!-- paywall markup: non-member end -->|s', null, $content);
-			$content_member = preg_replace('|<div.{0,100}x-show="\!member".{0,100}>.*?</div>|s', null, $content_member);
+			$content_member = preg_replace('|<div.{0,100}x-show=["\']\!member["\'].{0,100}>.*?</div>|s', null, $content_member);
 			$audio_blurb_top = $audio_blurb_bottom = null;
 			if ($post['post_audio'] and $title !== 'Podcast at last!') { //podcast_content #dated_content // had to special case the inclusion of the standard audio blurbs for the podcast announcement post because it was conspicuously redundant
 				$audio_blurb_top = "<p><em><small>There is an audio version of this post ({$post['post_audio_dur_time']}) in the PainSci Updates podcast for members only. See the end of the post for more information.</small></em></p>\n\n<hr>\n\n";
