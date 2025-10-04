@@ -46,7 +46,7 @@
 <ul>
 <li>fitness for older adults, which I teach in downtown Vancouver, Canada</li>
 <li>the history of my family and my husband's family, particularly the Overturf, Hansen, Ingraham, and Herrick families</li>
-<li>Family Legacies, Chapter 1</li>
+
 </ul>
 
 <p>Plus more diversions. In some ways these topics couldn’t be more different, and yet they have also inspired and informed each other.</p>
@@ -87,11 +87,14 @@ while(x=eval(x));
 
 <li>MORE FAMILY HISTORY: I have also done research on my husband's family history which includes: <a href="ingraham-family-home-page.html">Ingrahams, Herricks, Moshers, and Brands.</a></li>
 
+<li>A PORTION OF A NOVEL:  <a href="family-legacies.html">Family Legacies, Chapter 1</a></li>
+
+</ul>
+
 <h2>Another Site of Interest</h2>
 
-<li>My husband, Bob Ingraham, offers you a very different web site. He says: “<a href="https://ephemeraltreasures.net">Ephemeral Treasures </a> is a mostly philatelic web site which reflects my interests in the early commercial aviation and the Second World War, and showcases items from my collections — old envelopes (aka covers), stamps, and postcards. But it also highlights some of the adventures I've had in my life, including surviving a plane crash in New Mexico's Black Range and being badly wounded in Vietnam when I was a Marine Corps hospital corpsman.”</li>
-</ul>
-</ul>
+<p>My husband, Bob Ingraham, offers you a very different web site. He says: “<a href="https://ephemeraltreasures.net">Ephemeral Treasures </a> is a mostly philatelic web site which reflects my interests in the early commercial aviation and the Second World War, and showcases items from my collections — old envelopes (aka covers), stamps, and postcards. But it also highlights some of the adventures I've had in my life, including surviving a plane crash in New Mexico's Black Range and being badly wounded in Vietnam when I was a Marine Corps hospital corpsman.”</p>
+
 
 
 
