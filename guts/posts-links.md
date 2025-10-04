@@ -1,3 +1,8 @@
+PainScience.com/family-legacies.html
+https://www.painscience.com/family-legacies.html
+[Family Legacies: Adeline ](https://www.painscience.com/family-legacies.html)
+<a href="https://www.painscience.com/family-legacies.html">Family Legacies: Adeline </a>
+
 PainScience.com/uncle-bill.html
 https://www.painscience.com/uncle-bill.html
 [Uncle Bill and World War II](https://www.painscience.com/uncle-bill.html)

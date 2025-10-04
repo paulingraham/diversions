@@ -1,110 +1,113 @@
 <?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.sitemaps.org/schemas/sitemap-image/1.1" xmlns:video="http://www.sitemaps.org/schemas/sitemap-video/1.1">
 <url>
 <loc>http://susaningraham.net</loc>
-<lastmod>2021-03-29</lastmod>
+<lastmod>2025-10-01</lastmod>
 <changefreq>weekly</changefreq>
 <priority>1.0</priority></url>
 
-<!--#1--><url><loc>http://susaningraham.net/uncle-bill.html</loc>
+<!--#1--><url><loc>http://susaningraham.net/family-legacies.html</loc>
+<lastmod>2025-10-01</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
+
+<!--#2--><url><loc>http://susaningraham.net/uncle-bill.html</loc>
 <lastmod>2021-03-29</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#2--><url><loc>http://susaningraham.net/hoax.html</loc>
+<!--#3--><url><loc>http://susaningraham.net/hoax.html</loc>
 <lastmod>2021-03-29</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#3--><url><loc>http://susaningraham.net/bill-at-st-lo.html</loc>
+<!--#4--><url><loc>http://susaningraham.net/bill-at-st-lo.html</loc>
 <lastmod>2021-03-29</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#4--><url><loc>http://susaningraham.net/bill-at-normandy.html</loc>
+<!--#5--><url><loc>http://susaningraham.net/bill-at-normandy.html</loc>
 <lastmod>2021-03-29</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#5--><url><loc>http://susaningraham.net/bill-at-hurtgen.html</loc>
+<!--#6--><url><loc>http://susaningraham.net/bill-at-hurtgen.html</loc>
 <lastmod>2021-03-29</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#6--><url><loc>http://susaningraham.net/bill-at-falaise-pocket.html</loc>
+<!--#7--><url><loc>http://susaningraham.net/bill-at-falaise-pocket.html</loc>
 <lastmod>2021-03-29</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#7--><url><loc>http://susaningraham.net/bill-at-cherbourg.html</loc>
+<!--#8--><url><loc>http://susaningraham.net/bill-at-cherbourg.html</loc>
 <lastmod>2021-03-29</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#8--><url><loc>http://susaningraham.net/bill-at-battle-of-the-bulge.html</loc>
+<!--#9--><url><loc>http://susaningraham.net/bill-at-battle-of-the-bulge.html</loc>
 <lastmod>2021-03-29</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#9--><url><loc>http://susaningraham.net/bill-at-aachen.html</loc>
+<!--#10--><url><loc>http://susaningraham.net/bill-at-aachen.html</loc>
 <lastmod>2021-03-29</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#10--><url><loc>http://susaningraham.net/bill-as-radar.html</loc>
+<!--#11--><url><loc>http://susaningraham.net/bill-as-radar.html</loc>
 <lastmod>2021-03-29</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#11--><url><loc>http://susaningraham.net/samuel-and-martha.html</loc>
+<!--#12--><url><loc>http://susaningraham.net/samuel-and-martha.html</loc>
 <lastmod>2013-10-21</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#12--><url><loc>http://susaningraham.net/higby-family.html</loc>
+<!--#13--><url><loc>http://susaningraham.net/higby-family.html</loc>
 <lastmod>2013-10-21</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#13--><url><loc>http://susaningraham.net/baker-and-sarah.html</loc>
+<!--#14--><url><loc>http://susaningraham.net/baker-and-sarah.html</loc>
 <lastmod>2013-10-21</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#14--><url><loc>http://susaningraham.net/pierce-and-ann.html</loc>
+<!--#15--><url><loc>http://susaningraham.net/pierce-and-ann.html</loc>
 <lastmod>2013-10-20</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#15--><url><loc>http://susaningraham.net/bert-and-grace.html</loc>
+<!--#16--><url><loc>http://susaningraham.net/bert-and-grace.html</loc>
 <lastmod>2013-10-20</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#16--><url><loc>http://susaningraham.net/augustus-and-josephine.html</loc>
+<!--#17--><url><loc>http://susaningraham.net/augustus-and-josephine.html</loc>
 <lastmod>2013-10-20</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#17--><url><loc>http://susaningraham.net/george-and-gertrude.html</loc>
+<!--#18--><url><loc>http://susaningraham.net/george-and-gertrude.html</loc>
 <lastmod>2013-10-19</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#18--><url><loc>http://susaningraham.net/robert-and-ratie.html</loc>
+<!--#19--><url><loc>http://susaningraham.net/robert-and-ratie.html</loc>
 <lastmod>2013-10-18</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#19--><url><loc>http://susaningraham.net/robert-and-hazel.html</loc>
+<!--#20--><url><loc>http://susaningraham.net/robert-and-hazel.html</loc>
 <lastmod>2013-10-18</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#20--><url><loc>http://susaningraham.net/franklin-and-belle.html</loc>
+<!--#21--><url><loc>http://susaningraham.net/franklin-and-belle.html</loc>
 <lastmod>2013-10-18</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#21--><url><loc>http://susaningraham.net/charles-and-sarah.html</loc>
+<!--#22--><url><loc>http://susaningraham.net/charles-and-sarah.html</loc>
 <lastmod>2013-10-15</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#22--><url><loc>http://susaningraham.net/michael-and-josephine.html</loc>
+<!--#23--><url><loc>http://susaningraham.net/michael-and-josephine.html</loc>
 <lastmod>2013-10-13</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#23--><url><loc>http://susaningraham.net/hans-t-hansen-and-katherine.html</loc>
+<!--#24--><url><loc>http://susaningraham.net/hans-t-hansen-and-katherine.html</loc>
 <lastmod>2013-10-11</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#24--><url><loc>http://susaningraham.net/hans-and-stella.html</loc>
+<!--#25--><url><loc>http://susaningraham.net/hans-and-stella.html</loc>
 <lastmod>2013-10-11</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#25--><url><loc>http://susaningraham.net/george-and-nellie.html</loc>
+<!--#26--><url><loc>http://susaningraham.net/george-and-nellie.html</loc>
 <lastmod>2013-09-10</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#26--><url><loc>http://susaningraham.net/don-and-jo.html</loc>
+<!--#27--><url><loc>http://susaningraham.net/don-and-jo.html</loc>
 <lastmod>2013-09-10</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#27--><url><loc>http://susaningraham.net/don-overturf-hastings-high-basketball.html</loc>
+<!--#28--><url><loc>http://susaningraham.net/don-overturf-hastings-high-basketball.html</loc>
 <lastmod>2013-09-10</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#28--><url><loc>http://susaningraham.net/don-overturf-hastings-college-basketball.html</loc>
+<!--#29--><url><loc>http://susaningraham.net/don-overturf-hastings-college-basketball.html</loc>
 <lastmod>2013-09-10</lastmod><priority>0.7</priority><changefreq>never</changefreq></url>
 
-<!--#29--><url><loc>http://susaningraham.net/josephine-hansen-overturf.html</loc>
+<!--#30--><url><loc>http://susaningraham.net/josephine-hansen-overturf.html</loc>
 <lastmod>2013-09-10</lastmod><priority>0.5</priority><changefreq>never</changefreq></url>
 
-<!--#30--><url><loc>http://susaningraham.net/donald-sheldon-overturf.html</loc>
+<!--#31--><url><loc>http://susaningraham.net/donald-sheldon-overturf.html</loc>
 <lastmod>2013-09-10</lastmod><priority>0.5</priority><changefreq>never</changefreq></url>
 
-<!--#31--><url><loc>http://susaningraham.net/donald-s-overturf.html</loc>
+<!--#32--><url><loc>http://susaningraham.net/donald-s-overturf.html</loc>
 <lastmod>2013-09-10</lastmod><priority>0.5</priority><changefreq>never</changefreq></url>
 
-<!--#32--><url><loc>http://susaningraham.net/don-and-little-brother-george.html</loc>
+<!--#33--><url><loc>http://susaningraham.net/don-and-little-brother-george.html</loc>
 <lastmod>2013-09-10</lastmod><priority>0.5</priority><changefreq>never</changefreq></url>
 
-<!--#33--><url><loc>http://susaningraham.net/family-history-home-page.html</loc>
+<!--#34--><url><loc>http://susaningraham.net/family-history-home-page.html</loc>
 <lastmod>2013-09-08</lastmod><priority>0.10</priority><changefreq>never</changefreq></url>
 
-<!--#34--><url><loc>http://susaningraham.net/ingraham-family-home-page.html</loc>
+<!--#35--><url><loc>http://susaningraham.net/ingraham-family-home-page.html</loc>
 <lastmod>2013-09-08</lastmod><priority>0.10</priority><changefreq>never</changefreq></url>
 
 </urlset>
