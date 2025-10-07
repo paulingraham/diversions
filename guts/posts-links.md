@@ -1,7 +1,12 @@
-PainScience.com/family-legacies.html
-https://www.painscience.com/family-legacies.html
-[Family Legacies: Adeline ](https://www.painscience.com/family-legacies.html)
-<a href="https://www.painscience.com/family-legacies.html">Family Legacies: Adeline </a>
+PainScience.com/legacies-ch-2.html
+https://www.painscience.com/legacies-ch-2.html
+[Family Legacies: Janie in Illinois ](https://www.painscience.com/legacies-ch-2.html)
+<a href="https://www.painscience.com/legacies-ch-2.html">Family Legacies: Janie in Illinois </a>
+
+PainScience.com/legacies-ch-1.html
+https://www.painscience.com/legacies-ch-1.html
+[Family Legacies: Adeline ](https://www.painscience.com/legacies-ch-1.html)
+<a href="https://www.painscience.com/legacies-ch-1.html">Family Legacies: Adeline </a>
 
 PainScience.com/uncle-bill.html
 https://www.painscience.com/uncle-bill.html
