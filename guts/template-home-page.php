@@ -87,7 +87,9 @@ while(x=eval(x));
 
 <li>MORE FAMILY HISTORY: I have also done research on my husband's family history which includes: <a href="ingraham-family-home-page.html">Ingrahams, Herricks, Moshers, and Brands.</a></li>
 
-<li>A PORTION OF A NOVEL:  <a href="family-legacies.html">Family Legacies, Chapter 1</a></li>
+<li>A CHAPTER OF A NOVEL: Adeline and Nebraska (Adeline gives birth and waits for her house to be built):  <a href="family-legacies.html">Family Legacies, Chapter 1</a></li>
+
+<li>A CHAPTER OF A NOVEL: Janie in Illinois (a little girl says good-bye to her mother):  <a href="family-legacies.html">Family Legacies, Chapter 2</a></li>
 
 </ul>
 
