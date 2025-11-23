@@ -515,7 +515,7 @@ $post = array('canonical' => null,
 			break; // the rest of the file effectively doesn't exist, stop looping entirely
 		}
 
-		if (preg_match('|^//|', $line)) { // if there's a PHP comment marker
+		if (preg_match('|^\s*//|', $line)) { // if there's a PHP comment marker, with or without whitespace
 			continue; // skip the line
 		}
 
@@ -743,6 +743,7 @@ function makeWebVersions()
 			saveAs($thePost, $postPath); // `path
 		}
 
+		// Build a post-preview with tools. Start by creating a table of detailed metadata.
 		if ($n == 1) { // make extra useful files for the first post in the array
 			$postMetadata = $post;
 			$removeFields = [ // we're doing to display
@@ -761,8 +762,13 @@ function makeWebVersions()
 				}
 				}
 			$metadataTable = printArrTable1($postMetadata, true, 'Post metadata'); // returns a table of post metadata converted from the post array // parameters (array, true to return instead of echo, optional title, optional size class small|medium|large, label for key column th, label for value column th
-			$metadataTable = "<div style='width: 94vw; margin-left: calc(-48vw + 50%); padding: 0 1em;border: 2px solid #c66;border-radius:1em;font-size:.8em;'>$metadataTable</div>";
-			$thePost_preview = preg_replace('@<body (.+?)>@', "<body $1>\n\n{$metadataTable}", $thePost);
+
+			$shortcuts = "<p class='smallest font_narrow' style='text-align:center; color:gray'><strong>]</strong> chrome • <strong>|</strong> VIP pass</p>"; // see span#chromeToggle in javascript-setup.php
+				
+			$preview_tools = "<div id='metadata_dev' style='width: 94vw; margin-left: calc(-46vw + 50%); padding: 0 1em;border: 2px solid #c66;border-radius:1em;font-size:.8em;'>\n\n{$metadataTable}\n\n{$shortcuts}\n\n</div>";
+
+			// insert the tools into the preview just after <body>
+			$thePost_preview = preg_replace('@<body (.+?)>@', "<body $1>\n\n{$preview_tools}", $thePost);
 			$thePost_preview = str_replace('<title>', '<title>🔎 ', $thePost_preview);
 			$post['fn'] = '===CURRENT-POST-PREVIEW.html';
 			$postPath = $GLOBALS['filenames'][] = _ROOT . "/{$post['fn']}"; // if the path isn't added to the global list, it will get cleaned up
@@ -862,43 +868,57 @@ function makeButtondownVersion()
 	}
 	$theContent = $thePost['content']; // this post works with the content BEFORE it is rendered by prepareContent, which could and maybe should be the "makeHtmlVersion" function, which converts the source content (PHP/HTML/Markdown) into pure HTML, while this function converts it into DIFFERENT HTML/Markdown.
 
+	$theContent = processPullQuotes_buttondown($theContent); // tidy the pull quotes early
+		
 	if (inStr('<?php', $theContent)) { // process the PHP, mostly citations, images, and paywall includes
-		$theContent = renderPhpStr($thePost['content']);
+		$theContent = renderPhpStr($theContent);
 	}
-
+	
 	// >Q or >q mark blockquotes that are styled distinctively in the web version, and at some point I could also style them for Buttondown as well, but for the moment this code simply gets rid of the '>Q' or '>q' markup.
 	$theContent = preg_replace("/>*[qQ]\s+/", '>', $theContent);
 
-/* Given this web version output of an image:
 
-<div class="imgbox center" style="max-width:500px">
-<img class="" src="/imgs/filename.jpg" alt="This is the alt text." width="500" height="427">
-<p class="img_byline">TEST BYLINE</p>
-<p class="capt caphead below "><!--caption-->TEST CAPTION HEADING</p>
-<p class="capt below ">TEST CAPTION&nbsp;BODY, which <em>can</em> contain <a href="https://www.painscience.com/">some</a> Markdown in the source.<!--/caption--></p><!--/imgbox--></div>
+/* Converting images.  ⚠️ Complex!!! Note that Markdown in the source is converted to html by img(), and then then converted back to Markdown later (ignoring <figcaption>), but then must be converted back to html yet again!
 
-Convert to:
+Given this source code:
 
-<figure>XXX IMAGE: filename.jpg
+	<?php img('marijuana-1-banner--land2-760x400-70k.jpg---zoom---alt:This is the alt text for marijuana.---byline: This is the <a href="https://www.painscience.com">Byline</a> for marijuana.---cap: This is the caption for marijuana.') ?>
 
-<figcaption>TEST CAPTION HEADING — TEST CAPTION&nbsp;BODY, which <em>can</em> contain <a href="https://www.painscience.com/">some</a> Markdown in the source.</figcaption></figure>
+We get this web version output of an image:
 
-Note that Markdown in the source is converted to html by img() to html, then converted back to Markdown below (ignoring <figcaption>), but then must be converted back to html yet again.
+	<div class='imgbox center' style='max-width:750px'>	
+	<a href='/imgs/marijuana-1-banner--land2-1000x520-110k.jpg' target='_blank' title='Embiggen! Open larger version in new tab/window.'><img class='' src='/imgs/marijuana-1-banner--land2-760x400-70k.jpg' alt='This is the alt text for marijuana.' width='750' height='392'>
+	</a>
+	<p class='img_byline'>This is the <a href="https://www.painscience.com">Byline</a> for marijuana.</p>
+	<p class='capt below'><!--caption-->This is the caption for&nbsp;marijuana.<!--/caption--></p>
+	<!--/imgbox--></div>
+
+Convert that to:
+
+	<figure>XXX IMAGE: filename.jpg
+	
+	<figcaption>TEST CAPTION HEADING — TEST CAPTION&nbsp;BODY, which <em>can</em> contain <a href="https://www.painscience.com/">some</a> Markdown in the source.</figcaption></figure>
+
 */
 
-	if (preg_match("|<p class='img_byline'>(.+?)</p>|", $theContent, $bylineSearch)) $theByline = $bylineSearch[1]; // this is a PARTIAL, JANKY solution to including the byline in the figcaption; a few lines below I insert $theByline into the figcaption element; this works if there is ONE image with a byline, but it’s pretty janky and fails with multiples
-
-	$theContent = preg_replace("|<p.*?><!--caption-->(.+?)<!--\/caption--></p>|", '<figcaption>$1</figcaption>', $theContent);
-
-	$theContent = preg_replace("|<figcaption>(.+?)</p><p.+?>(.+?)</figcaption>|", '<figcaption>$1 —  $2</figcaption>', $theContent); // caption should contain all html at this point, no md
-
-	$theContent = str_replace("</figcap", "$theByline</figcap", $theContent);
-
-	 // TESTING: to print the output for a given post for auditing, identify it with a distinct title substr:
-/* if (inStr('TESTING20250509', $thePost['title'])) {
+// TESTING: to print the output for a given post for auditing, identify it with a distinct title substr:
+/*  if (inStr('Demo post', $thePost['title'])) {
 		echo "<br><textarea cols=80 rows=100 style='font-size:1em'>" . str_replace("\n", "¶\n\n", htmlentities($theContent)) . "</textarea>";
 		exit;
 		} /* */
+			
+	// first strip out zoom links; this doesn't remove the </a>, but that will get stripped out later
+	$theContent = preg_replace("|<a href='.+?' target='_blank' title='Embiggen! Open larger version in new tab/window.'>\n*|", '', $theContent);
+
+	// Managing captions and bylines is tricky because they are in the wrong order for the Buttondown format, and there may be one, the other, both, or neither.
+	$theContent = preg_replace("|<p class='capt .*?><!--caption-->(.+?)<!--/caption--></p>|", ' <CAPTION>$1</CAPTION> ', $theContent);
+	$theContent = preg_replace("|<p class='img_byline'>(.+?)</p>|", ' <BYLINE>$1</BYLINE> ', $theContent);
+	// If there is a byline and a caption, reverse their order:
+	$theContent = preg_replace("|<BYLINE>(.+?)</BYLINE>.*?<CAPTION>(.+?)</CAPTION>|", '<figcaption>$2 $1</figcaption>', $theContent);
+	// If there is only a byline, convert to figcaption:
+	$theContent = preg_replace("|<BYLINE>(.+?)</BYLINE>|", '<figcaption>$1</figcaption>', $theContent);
+	// If there is only a caption, covert to figcaption:
+	$theContent = preg_replace("|<CAPTION>(.+?)</CAPTION>|", '<figcaption>$1</figcaption>', $theContent);
 
 	$theContent = preg_replace('|<div class=\'imgbox[^>]*?>|', '<figure>', $theContent);
 	$theContent = str_replace('<!--/imgbox--></div>', '</figure>', $theContent);
@@ -973,7 +993,7 @@ exit;
 		==== WORD COUNT, READ ON PAINSCI, SOCIAL MEDIA LINKS
 		Continue reading below, or [on PainScience.com]({$thePost['url_live']}), about {$readingTime}-minutes more ({$wordCount} words). Comment on the [Facebook post](XXX) or [exTwitter](XXX) or [Threads](XXX), and you’re always welcome to reply directly to these emails.
 
-		Warm Regards,<br>
+		Warm regards,<br>
 
 		_Paul Ingraham, PainScience.com Publisher_
 
@@ -1012,15 +1032,22 @@ exit;
 
 	// if ($thePost['psid'] == 3322820) {echo "<pre>" . htmlentities($theContent) . "</pre>";}
 
-	$theContent = str_replace('Members-only post unlocked past this point. Welcome!', "____________________________________________\n\n***Members-only post unlocked past this point. Welcome!***", $theContent);
+
+	// There's an rss_only seperator that looks like this:
+	// <div class="unlocked_post_message isolated" data-nosnippet><br><hr><strong><em>Members-only content unlocked past this point. Thank you for your support, and welcome!</em></strong></div><!-- rss_only_line -->
+	// Which looks like this after processing here:
+	// ---\n\n***Members-only content unlocked past this point. Thank you for your support, and welcome!***
+	// And now convert that to:
+
+	$theContent = str_replace("---\n\n***Members-only content unlocked past this point. Thank you for your support, and welcome!***", "\n\n> **Members-only content unlocked past this point. Thank you for your support, and welcome!**", $theContent);
 
 	// some whitespace adjustments for readability, because this is a document that I will definitely tinker with directly
 	$theContent = str_replace('<figure>', "\n\n\n<figure>\n\n", $theContent); // vertical whitespace around <figure>
 	$theContent = str_replace('<figcaption>', "\n\n<figcaption>", $theContent); // vertical whitespace before <figcaption>
 	$theContent = str_replace('</figure>', "</figure>\n\n\n", $theContent); // // edge case! add whitespace after </figure> (it gets stripped out by the conversion to markdown, not sure what that's about).  But I also want extra for readability.
 	$theContent = str_replace("\n#", "\n\n\n\n#", $theContent); // add whitespace above headings for readability
-	//	$theContent = str_replace("{% if subscriber", "\n\n\n\n{% if subscriber", $theContent); // add whitespace above conditional Buttondown template tags
 	$theContent = preg_replace("|\n(\d+)\. |", "\n\n$1. ", $theContent);
+	$theContent = preg_replace("|\n{3,10}|", "\n\n", $theContent); // collapse all runs of >2 linefeeds
 
 	// echo "<br><pre>" . htmlentities($theContent) . "</pre><br>";
 
@@ -1219,7 +1246,24 @@ function makeRSS($max = 25)
 		$content = preg_replace('|<!--\s*rss_no_block_start(.+?)rss_no_block_stop\s*-->|s', "\n<!-- removed from RSS: multiple lines -->\n", $content); // remove multiline content from RSS
 		$content = preg_replace("@src\s*=\s*(['\"])imgs@", "src=$1https://$domain/imgs", $content); // covert src URLs from relative to absolute
 //		$content = preg_replace("@href=(['\"])/blog@", 'href=$1/blog', $content); // not sure what this was for, but removing it changes nothing
-		$content = preg_replace("@<div class='caption'>(.*?)</div>@", "<div class='caption'><small>$1</small></div><br>", $content); // add <small> and a <br> to captions
+
+// TESTING: to print the output for a given post for auditing, identify it with a distinct title substr:
+/*  if (inStr('Demo post', $thePost['title'])) {
+		echo "<br><textarea cols=80 rows=100 style='font-size:1em'>" . str_replace("\n", "¶\n\n", htmlentities($content)) . "</textarea>";
+		exit;
+		} /* */
+
+		// Managing captions and bylines is tricky because they are in the wrong order for the RSS format, and there may be one, the other, both, or neither.
+		$content = preg_replace("|<p class='capt .+?'><!--caption-->(.+?)<!--/caption--></p>|", ' <CAPTION>$1</CAPTION> ', $content);
+		$content = preg_replace("|<p class='img_byline'>(.+?)</p>|", ' <BYLINE>$1</BYLINE> ', $content);
+		// If there is a byline and a caption, reverse their order:
+		$content = preg_replace("|<BYLINE>(.+?)</BYLINE>.*?<CAPTION>(.+?)</CAPTION>|", '<p>[ Image caption: $2 $1 ]</p>', $content);
+		// If there is only a byline, convert to figcaption:
+		$content = preg_replace("|<BYLINE>(.+?)</BYLINE>|", '<p>[ Image caption: $1 ]</p>', $content);
+		// If there is only a caption, covert to figcaption:
+		$content = preg_replace("|<CAPTION>(.+?)</CAPTION>|", '<p>[ Image caption: $1 ]</p>', $content);
+
+
 		$content = str_replace("<p class='separator bullet'></p>", '<center>•</center>', $content); // convert class-based separator bullets to a plain bullet that doesn't need a stylesheet
 		$content = preg_replace("|<aside class=[\"'].+?[\"']>|", "<br><hr>\n\n<div>", $content);
 		$content = preg_replace("|</aside>|", "</div>\n\n<hr><br>", $content);
@@ -1238,10 +1282,10 @@ function makeRSS($max = 25)
 
 			$content = preg_replace('@<a href="#fcj\d+" id="frj\d+">(\d+)</a>@', ' [$1]', $content); // disable footnote reference links, which do not play nicely with RSS
 			// if (inStr("full-fledged evidence", $content)) exit("<pre>" . htmlentities($html) . "</pre>");
-			$content = preg_replace('@<!--=== PULL QUOTE === --><pq>(.+?)</pq>@', "<u><strong>$1</strong></u>", $content);
-			$content = preg_replace('@<p><!--=== PULL QUOTE === -->(.+?)</p>@', null, $content); // completely remove standalone pull-quotes (which are usually duplicates or near-duplicates of text)
 
-			$content = preg_replace("@<p class='capt(.*?)'>(.+?)</p>@", '<p>[Image caption: $2]</p>', $content);
+			$content = processPullQuotes_rss($content);
+
+
 			$content = preg_replace("@<a class='zoomer.+?/a>@", null, $content); // removes zoomer buttons markup
 			$content = preg_replace("@<span class='pupb'.+?<span class='pupw[^<]+>(.*?)<span class='pupx'.*?</span></span>@", ' [ $1 ] ', $content); // replaces simple popup markup with just the popup content wrapped in square brackets
 			// This next bit is hack to block my responsive-image solution in RSS, which involves a pair of img elements handled with different CSS at different window sizes; the "constrained" image is marked with "<!-- constrained IMG START -->" and "…END -->". I remove the inner comment delimiters to comment-out the whole image (much easier than cooking up reliable regex pattern to remove the whole thing):
@@ -1322,7 +1366,7 @@ function makeRSS($max = 25)
 }
 
 /*<##> make the #podcast (#rss feed for audio versions of posts, for members only)  */
-function makePodcast($max = 100)
+function makePodcast($max = 500)
 {
 	journal('making the podcast feed', 1);
 	/* Generates an RSS file using only $max of the most recent posts.  The original post array is not sorted, so this is a bit tricky.  The index array is sorted, so we use that, using the title_smpl to match it to the original, full post in the main posts array. This is important, because the searching is computationally expensive; using this method, we only ever do a small amount of searching through the big array.  */
@@ -2963,10 +3007,59 @@ function makeTagUsageList ($posts) { // Save every single usage of every tag on 
 		}
 	}
 
+function processPullQuotes_rss ($content) {
+	/* See also processPullQuotes_buttondown(), extremely similar but not quite similar enough to have one function.  The output is different: basically, HTML for RSS and Markdown for Buttondown. Maybe they could be merged.
+	
+	✓ does not block parsing of Markdown inside the pull quote.
+	
+	Pull quote handling is a bit tricky!  There are TWO KINDS of pull quotes, which I generate with three BBEdit clippings:
+	
+		pull quote from sel, verbatim
+		<!--=== PULL QUOTE === --><pq>original text</pq>
+	
+		pull quote from sel, modded
+		<!--=== PULL QUOTE === --><pq data-pqt="edited text">original text</pq>
+	
+	 They harmless in the RSS context: the parser simply ignores them.  However, they are indicating a kind of emphasis. The first always explicitly delimits the emphasized content, so I replace it with markup denoting another kind, <u><strong>: */
+	$content = preg_replace('@<!--=== PULL QUOTE === --><pq>(.+?)</pq>@', "<u><strong class='pq'>$1</strong></u>", $content);
+	
+	// The second type can be used two ways: it can both markup existing source content, but also present an alternate version that gets extracted from the data-pq attribute. In these cases, IF there is content, I can replace it with emphasis again:
+	$content = preg_replace('@<!--=== PULL QUOTE === --><pq data-pqt=".+?">(.+?)</pq>@', "<u><strong class='pq'>$1</strong></u>", $content);
+	
+	// But the second type may be "empty" (no content delimited by the pq element), usually so that the pull quote can be positioned somewhere other than the original content. It is probably standing alone close to the original text it is emphasizing, and so just getting rid of it is easiest (though not actually necessary, because it won't render anything, it’s just to reduce clutter):
+	$content = preg_replace('@<!--=== PULL QUOTE === --><pq data-pqt=".+?"></pq>@', '', $content);
+	$content = str_replace("<p></p>", '', $content); // there may be a stray <p> element remaining
+	return $content;
+	}
+
+function processPullQuotes_buttondown ($content) {
+
+	/* See also processPullQuotes_rss(), extremely similar but not quite similar enough to have one function.  The output is different: basically, HTML for RSS and Markdown for Buttondown. Maybe they could be merged.
+
+		Pull quote handling is a bit tricky!  There are TWO KINDS of pull quotes, which I generate with three BBEdit clippings:
+			
+		pull quote from sel, verbatim
+		<!--=== PULL QUOTE === --><pq>original text</pq>
+
+		pull quote from sel, modded
+		<!--=== PULL QUOTE === --><pq data-pqt="edited text">original text</pq>
+	
+	 They are mostly harmless in the Markdown context, but not entirely, as they may interfere with parsing Markdown.  And they are indicating a kind of emphasis. The first kind always explicitly delimits the emphasized content, so I replace it with markup denoting another kind, <strong>: */
+	$content = preg_replace('@<!--=== PULL QUOTE === --><pq>(.+?)</pq>@', "**$1**", $content);
+
+	// The second type can be used two ways: it can both markup existing source content, but also present an alternate version that gets extracted from the data-pq attribute. In these cases, IF there is content, I can replace it with emphasis again:
+	$content = preg_replace('@<!--=== PULL QUOTE === --><pq data-pqt=".+?">(.+?)</pq>@', "**$1**", $content);
+
+	// But the second type may be "empty" (no content delimited by the pq element), usually so that the pull quote can be positioned somewhere other than the original content. It is probably standing alone close to the original text it is emphasizing, and so just getting rid of it is easiest (though not actually necessary, because it won't render anything, it’s just to reduce clutter):
+	$content = preg_replace('@<!--=== PULL QUOTE === --><pq data-pqt=".+?"></pq>@', '', $content);
+	$content = str_replace("<p></p>", '', $content); // there might be a stray <p> element remaining?
+
+	return $content;
+}	
 ?>
-
-
-
-
-
-
+	
+	
+	
+	
+	
+	
