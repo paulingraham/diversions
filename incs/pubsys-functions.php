@@ -29,7 +29,7 @@ function getPosts()
 		if (preg_match('@POSTS*@', $fn)) {			// look for filenames including “POSTS”
 			$lns = array_reverse(file($fn, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES));
 			$micropost_files[] = $fn;
-			foreach ($lns as $ln) {
+			$lnno = 0; foreach ($lns as $ln) {
 				if (preg_match("/^20\d\d-\d\d-\d\d[a-p]{0,1}\s.*/", $ln) == 0) {
 					continue;
 				} // ignore lines that don’t begin with a date, eg 2013-07-20. in practice this means that lines without a leading date can be drafts or comments. (preg_match returns a zero if there's no match)
@@ -165,7 +165,7 @@ $post = array('canonical' => null,
 	// echo "&nbsp;&nbsp;processing $discovery_id<br>";
 	$post['post_class'] = 'micro';
 	$post['source_file'] = basename($fn);
-	$ln = preg_replace("@\s+http@", '---http', $ln); // set up trailing raw URLs for autodetection as featured URLs (that is, raw URLs preceded by whitespace; replace the space with more explicit, standard delimeters for parseSloppyData function)
+	//	$ln = preg_replace("@\s+http@", '---http', $ln); // set up trailing raw URLs for autodetection as featured links: replace whitespace preceding URLswith --- (more explicit, standard delimeters for parseSloppyData function); 2025-12-01 removing this touched a couple dozen posts, but I decided it was a hacky old convention that should die, so I just manually changed all of those old ones rather than automating it
 	$data = parseSloppyData($ln);
 	$post['date'] = $data[0];  // assume the first item is a date
 	$post = get_timestamp_from_post_date($post); // gets a timestamp from the date, optionally modified by day-order
@@ -187,9 +187,9 @@ $post = array('canonical' => null,
 	if (count($data) > 2) {
 		$metadata = array_splice($data, 2, count($data) - 2); // anything in the data array after the content is assumed to be metadata; this makes an array of that metadata only, if it's there
 		global $md_syns; // get the array of synonyms for metadata
-		/* The synonyms array is constructed from a simple text file ("metadata-synonyms.txt") by a function (getArrFromFile) in settings.php. The purpose of this is to enable (1) nearly frictionless expansion of the synonym list and (2) simple and readable in_array checks to see if user-submitted metadata matches any term in a list of synonyms, eg, if user uses "url" in the metadata for a post, we check to see if it's a link post like so:
-		if (in_array($md, $md_syns["link"])) $post["url"] = extract1stUrl($content);
-		if "url" is in the array of metadata synonyms for "link", then do stuff */
+		/* The synonyms array is constructed from a simple text file ("metadata-synonyms.txt") by a function (getArrFromFile) in settings.php. The purpose of this is to enable (1) nearly frictionless expansion of the synonym list and (2) simple and readable in_array checks to see if user-submitted metadata matches any term in a list of synonyms, eg, if user uses "ftd_url" in the metadata for a post, we check to see if it's a link post like so:
+		if (in_array($md, $md_syns["link"])) $post["ftd_url"] = extract1stUrl($content);
+		if "ftd_url" is in the array of metadata synonyms for "link", then do stuff */
 		foreach ($metadata as $mdo) { // look at each piece of metadata found (mdo = metadata original)
 			$md = mb_strtolower($mdo); // work with a lowercase version, to reduce the potential for matching failures
 			if ($colonPos = strpos($mdo, ':')) { // find first occurrence of a colon in the string
@@ -197,14 +197,14 @@ $post = array('canonical' => null,
 				$md_pt2 = trim(substr($mdo, $colonPos + 1)); // echo "<p>md_pt2 = `$md_pt2`</p>";
 			}
 			if ($md == 'http' or $md == 'https') {
-				$post['url'] = $md . ':' . $md_pt2;
-			} // reassemble URL
+				$post['ftd_url'] = $md . ':' . $md_pt2;
+			} // reassemble featured URL
 			if (preg_match('@(jpg|gif|png)$@', $md, $tmp)) {
 				$post['post_img'] = "imgs/{$mdo}";
 			}
 
 			if (preg_match('@mp3$@', $md, $tmp)) {
-				$post['post_audio'] = "media/{$mdo}";
+				$post['post_audio'] = "assets/audio/{$mdo}";
 				$post['post_audio_size_bytes'] = filesize(_ROOT . '/' . $post['post_audio']); // audio file size in bytes
 				$post['post_audio_dur'] = getDurationOfAudioInSecs(_ROOT . '/' . $post['post_audio']);
 				$post['post_audio_dur_time'] = intval($post['post_audio_dur'] / 60) . ':' . str_pad($post['post_audio_dur'] % 60, 2, '0', STR_PAD_LEFT); // The seconds may be <10secs and those need to zero-padded. Surprisingly tricky, but str_pad does the job, adding 0 only to increase 1-9 to 01-09, but leaving 10-59 alone. I think ;-)
@@ -223,11 +223,11 @@ $post = array('canonical' => null,
 			}
 
 			if (in_array($md, $md_syns['link'])) {
-				$post['url'] = extract1stUrl($content);
-				$post['hidelink'] = true;
-			} // hack! by default, do not show the link (because prettifyURL didn’t really work out); I should really fix that function and/or properly strip it out of the code, but this will do the job
+				$post['ftd_url'] = extract1stUrl($content);
+				// $post['hidelink'] = true; // hack! by default, do not show the link
+			} 
 			if (in_array($md, $md_syns['hidelink'])) {
-				$post['url'] = extract1stUrl($content);
+				$post['ftd_url'] = extract1stUrl($content);
 				$post['hidelink'] = true;
 			}
 			if (in_array($md, $md_syns['description'])) {
@@ -292,7 +292,7 @@ $post = array('canonical' => null,
 	•••			\n*				newline + ul list item mark
 	111.			\n*_				newline + ol list item mark */
 
-	$content = preg_replace('| *……… *|', "\n\n", $content);
+	$content = preg_replace('|\s*………\s*|', "\n\n", $content);
 	$content = preg_replace('| *>>> *|', "\n\n>", $content); // >>> (triple greater-than) denotes both a paragraph break AND a blockquote, which in Markdown is a \n\n>
 	$content = preg_replace('| *(#{2,3}) *|', "\n\n$1", $content); // ## and ### denote <h2> and <h3> (must match more than 1, because a single hash is quite common)
 	$content = preg_replace('| *••• *|', "\n* ", $content); // ••• denotes a UL list item; 1st item must be preceded by extra newlines (eg ………••• )
@@ -328,7 +328,7 @@ $post = array('canonical' => null,
 	//	if (strpos($content, "\n\n") !== false)  $multi = true; // not sure $multi matters any more
 	// detect metadata in the content
 	if (preg_match('@href="(.*?)">\\w+§.*?</a>@ui', $content, $matches)) {
-		$post['url'] = str_replace('§', null, $matches[1]);
+		$post['ftd_url'] = str_replace('§', null, $matches[1]);
 	} // position [1] matches the href attribute value in the post followed by anchor text containing a title-marking symbol, if any
 
 	//	$post = get_auto_tags($post);
@@ -337,7 +337,7 @@ $post = array('canonical' => null,
 	$post = get_post_urls($post);
 	$post['link'] = "<a href='{$post['url_live']}'>{$post['title']}" . addPeriodWhereNeeded($post['title']) . '</a>';
 	$post['link_quoted'] = "“{$post['link']}”";
-	$post = extractTags($tags_given, $post); // Caution! This modifies the main tags array, a global effect from inside a function that otherwise affects only the data for one post. Specifically, it iterates tag tallies for each tag used in the post, and adds new tags to the database.  The post data is also updated.
+	$post = extractTags($tags_given??'', $post); // Caution! This modifies the main tags array, a global effect from inside a function that otherwise affects only the data for one post. Specifically, it iterates tag tallies for each tag used in the post, and adds new tags to the database.  The post data is also updated.
 
 	return $post; // return micropost
 }
@@ -504,6 +504,7 @@ $post = array('canonical' => null,
 	}
 
 	$paywall_marker = $header_marker = false; // #PHP8, highly destructive when I set these defaults for these vars inside the loop below!  should be fine here, but … flagged
+	$content = $content_premium = '';
 	foreach ($lines as $line) { // go through all post lines; in most cases we're looking for a header separated from the post by a *** row
 
 		if (inStr('*****', $line)) { // if the header seperator is found …
@@ -548,8 +549,8 @@ $post = array('canonical' => null,
 			}
 
 			if ($md == 'http' or $md == 'https') {
-				$post['url'] = $md . ':' . $md_pt2;
-			} // reassemble URL
+				$post['ftd_url'] = $md . ':' . $md_pt2;
+			} // reassemble featured URL
 			
 			if (preg_match('@(jpeg|jpg|gif|png)$@', $md, $tmp)) {
 				$post['post_img'] = "imgs/{$mdo}";
@@ -568,7 +569,7 @@ $post = array('canonical' => null,
 			}
 
 			if (preg_match('@mp3$@', $md, $tmp)) {
-				$post['post_audio'] = "media/{$mdo}";
+				$post['post_audio'] = "assets/audio/{$mdo}";
 				$post['post_audio_size_bytes'] = filesize(_ROOT . '/' . $post['post_audio']); // audio file size in bytes
 				$post['post_audio_dur'] = getDurationOfAudioInSecs(_ROOT . '/' . $post['post_audio']);
 				$post['post_audio_dur_time'] = intval($post['post_audio_dur'] / 60) . ':' . str_pad($post['post_audio_dur'] % 60, 2, '0', STR_PAD_LEFT); // The seconds may be <10secs and those need to zero-padded. Surprisingly tricky, but str_pad does the job, adding 0 only to increase 1-9 to 01-09, but leaving 10-59 alone. I think ;-)
@@ -597,11 +598,11 @@ $post = array('canonical' => null,
 			}
 			//			if ($md == "fblike")									$post["fblike"] = true;
 			if (in_array($md, $md_syns['link'])) {
-				$post['url'] = extract1stUrl($content);
-				$post['hidelink'] = true;
-			} // hack! by default, do not show the link (because prettifyURL didn’t really work out); I should really fix that function and/or properly strip it out of the code, but this will do the job
+				$post['ftd_url'] = extract1stUrl($content);
+				// $post['hidelink'] = true; // hack to make hidelink automatic when a link is found; 
+			} 
 			if (in_array($md, $md_syns['hidelink'])) {
-				$post['url'] = extract1stUrl($content);
+				$post['ftd_url'] = extract1stUrl($content);
 				$post['hidelink'] = true;
 			}
 			if (in_array($md, $md_syns['description'])) {
@@ -668,7 +669,7 @@ $post = array('canonical' => null,
 	$post = get_post_urls($post);
 	$post['link'] = "<a href='{$post['url_live']}'>{$post['title']}" . addPeriodWhereNeeded($post['title']) . '</a>';
 	$post['link_quoted'] = "“{$post['link']}”";
-	$post = extractTags($tags_given, $post); // this can modify the main tags array, a global effect from a function that otherwise affects only the data for a single post
+	$post = extractTags($tags_given??'', $post); // this can modify the main tags array, a global effect from a function that otherwise affects only the data for a single post
 
 	return $post;
 }
@@ -801,7 +802,7 @@ function makeTextVersion()
 
 	// many modifications…
 	$theContent = preg_replace("|<div class=[\"']imgbox.*?<!--/imgbox--></div>|uism", null, $theContent); // remove all images completely
-//	$theContent = preg_replace('|<div x-data="loginForm.*?<!--/loginForm--></div>|uism', null, $theContent); // remove the #login form, refundant since it was moved out of the body and into the template
+//	$theContent = preg_replace('|<div x-data=\"loginForm.*?<!--/loginForm--></div>|uism', null, $theContent); // remove the #login form, refundant since it was moved out of the body and into the template
 	$theContent = preg_replace('|<ul class="member_benefits_list">.*?<!--/member_benefits_list--></ul>|uism', null, $theContent);
 	$theContent = preg_replace('/<!-- paywall markup: member start -->(.+?)<!-- paywall markup: member end -->/uism', null, $theContent); // remove member content
 	$theContent = preg_replace('/<!-- rss_no_block_start -->(.+?)<!-- rss_no_block_stop -->/uism', null, $theContent); // remove all blocks excluded from RSS
@@ -832,13 +833,15 @@ function makeTextVersion()
 
 		$theContent = $theContent . "\n~ Paul Ingraham, PainScience.com publisher";
 		$theContent = "{$thePost['title']}\n\n{$theContent}\n\nWeb version of this post:\n\n{$thePost['url_live']}";
-		preg_match_all('|<a href="(.+?)">|', $theContent, $results); // save links
+		preg_match_all('|<a href="(.+?)">|', $theContent, $found_urls); // save links
 }
 
-	foreach ($results[1] as $url) {
-		$theContent = $theContent . "\n$url";
+	// extract URLs from the content and append them
+	foreach ($found_urls[1] as $found_url) {
+		$theContent = $theContent . "\n$found_url";
 	}
 	$theContent = str_replace('https://www.painscience.com', 'PainScience.com', $theContent); // replace full PainSci URLs with prettified URLs
+	
 	$theContent = preg_replace('|<.+?>|', null, $theContent);
 	$theContent = preg_replace('|<!--.*?-->|', null, $theContent); // remove all comments
 	$theContent = tidyWhitespace($theContent);
@@ -846,11 +849,11 @@ function makeTextVersion()
 	// okay, done building the text version, now to save it
 	$path = '/Users/paul/Desktop/';
 	$fn = "TEMP {$thePost['title_smpl']}.sm.txt";
-	$url = "x-bbedit://open?url=file:///$path$fn";
+	$url_bbe = "x-bbedit://open?url=file:///$path$fn";
 	if (fileExistsNoChange($theContent, $path.$fn)) {
-		journal("skipping <a href='$url'>current post TEXT version</a> (file unchanged: {$fn})", 2, true);
+		journal("skipping <a href='$url_bbe'>current post TEXT version</a> (file unchanged: {$fn})", 2, true);
 	} else { // go ahead and save it
-		journal("making <a href='$url'>current post TEXT version</a> of '{$thePost['title']}'", 2, true);
+		journal("making <a href='$url_bbe'>current post TEXT version</a> of '{$thePost['title']}'", 2, true);
 		saveAs($theContent, $path.$fn); // `path
 	}
 }
@@ -869,14 +872,25 @@ function makeButtondownVersion()
 	$theContent = $thePost['content']; // this post works with the content BEFORE it is rendered by prepareContent, which could and maybe should be the "makeHtmlVersion" function, which converts the source content (PHP/HTML/Markdown) into pure HTML, while this function converts it into DIFFERENT HTML/Markdown.
 
 	$theContent = processPullQuotes_buttondown($theContent); // tidy the pull quotes early
+
 		
 	if (inStr('<?php', $theContent)) { // process the PHP, mostly citations, images, and paywall includes
 		$theContent = renderPhpStr($theContent);
 	}
 	
+	 /* if (inStr('Demo post', $thePost['title'])) {
+		echo "<h3 class='warning' style='margin-top:3em'>Test output: " . __FILE__ . " : " . __FUNCTION__ . " : " . __LINE__ . "</h3>" . 
+		"<textarea cols=80 rows=30 style='font-size:1em;margin:0 0 3em'>" . str_replace("\n", "¶\n\n", htmlentities($theContent)) . "</textarea>";
+		exit;
+		} /* */
+		
 	// >Q or >q mark blockquotes that are styled distinctively in the web version, and at some point I could also style them for Buttondown as well, but for the moment this code simply gets rid of the '>Q' or '>q' markup.
 	$theContent = preg_replace("/>*[qQ]\s+/", '>', $theContent);
+	
+//	$theContent = preg_replace("@<aside class='sidebar'>(.+?)</aside>@", "<div class='sidebar'>$1</div>", $theContent); // #2do: fix this, but it’s not terribly important; the idea here is to change to <div class='meta'>, but divs are stripped out below, and other markup and even artificial delimters do not work: html conversion below seperated any <p> elements with vertical whitespace, effectively disassociating my delimiters here from what the delimit; I can imagine workarounds, but it’s all just too ridiculous
 
+
+		
 
 /* Converting images.  ⚠️ Complex!!! Note that Markdown in the source is converted to html by img(), and then then converted back to Markdown later (ignoring <figcaption>), but then must be converted back to html yet again!
 
@@ -923,7 +937,7 @@ Convert that to:
 	$theContent = preg_replace('|<div class=\'imgbox[^>]*?>|', '<figure>', $theContent);
 	$theContent = str_replace('<!--/imgbox--></div>', '</figure>', $theContent);
 	$theContent = str_replace('<div class=\'clear\'></div>','',$theContent);
-	$theContent = preg_replace("|(<img[^>]+)alt\s*=\s*'([^']+?)'(.+?>)|", "$1$3¶¶COPY THIS ALT ATTRIBUTE INTO THE IMG ELEMENT:¶alt='$2'>\n\n", $theContent); // this extracts any alt attribute and moves it to a line after image block; this will preserve it for convenient copy/paste in the final version
+	$theContent = preg_replace("|(<img[^>]+)alt\s*=\s*'([^']+?)\'(.+?>)|", "$1$3¶¶COPY THIS ALT ATTRIBUTE INTO THE IMG ELEMENT:¶alt='$2'>\n\n", $theContent); // this extracts any alt attribute and moves it to a line after image block; this will preserve it for convenient copy/paste in the final version
 	$theContent = preg_replace("|<img.*?src='/imgs/(.+?)'.*?>|", "=====================================¶UPLOAD THIS FILE TO BUTTONDOWN AND CONVERT TO HTML:¶$1", $theContent);
 	// the ¶ symbols get converted to linefeeds below
 
@@ -939,7 +953,7 @@ Convert that to:
 
 	$theContent = preg_replace('@</*(div|template).*?>@', null, $theContent); // 2024-10-04 fixed bug, added '?' so that just tags themselves are removed, not the content between them
 
-	// We now have a mixture of both HTML and Markdown+Buttondown!  If we try to convert Markdown to Markdown, we get a bunch of escaping of symbols and such.  So we have to, good grief, convert the HTML to Markdown, and then immediately converting the fully Markdownified post right back to HTML! Sheesh.
+	// We now have a mixture of both HTML and Markdown+Buttondown!  If we try to convert Markdown to Markdown, we get a bunch of escaping of symbols and such.  So we have to, good grief, convert the HTML to Markdown, and then immediately convert the fully Markdownified post right back to HTML! Sheesh.
 	$theContent = MarkdownExtra::defaultTransform($theContent); // convert the mixture of Markdown and HTML to pure HTML...
 
 	$html2md = new HtmlConverter(['header_style'=>'atx']);  // invoke HtmlConverter (to remove specified notes: new HtmlConverter(array('remove_nodes' => 'span div'));
@@ -948,7 +962,7 @@ Convert that to:
 
 $theContent = str_replace("•\n", "<p class='separator'>•</p>\n", $theContent);
 
-	$theContent = preg_replace_callback('|<figcaption>(.+?)</figcaption>|', 	 // Having converted everything to Markdown, some content needs to be converted *back* to HTML!  HtmlConverter converts everything that it can convert to Markdown, which does not include the <figcaption> element, but does include its contents. So if there's markup in the caption, it is now Markdown … but Markdown inside any html element is protected from processing, so Buttondown will not convert it.  Which means that we need to do it HERE: that is the contents of the <figcaption> element should now be converted back to HTML.  That is, <figcaption>Some *italics* here</figcaption> is the output of HtmlConverter here, but that won't work in Buttondown — it needs to be <figcaption>Some <em>italics</em> here</figcaption>
+	$theContent = preg_replace_callback('|<figcaption>(.+?)</figcaption>|', 	 // Having already done a Markdown→HTML→Markdown, still some content needs to be converted *back* to HTML! Sheesh! HtmlConverter converts everything that it can convert to Markdown, which does not include the <figcaption> element, but does include its CONTENTS. So if there's markup in the caption, it is now Markdown … but Markdown inside any html element is protected from processing, so Buttondown will not convert it.  Which means that we need to do it HERE: that is the contents of the <figcaption> element should now be converted back to HTML.  That is, <figcaption>Some *italics* here</figcaption> is the output of HtmlConverter here, but that won't work in Buttondown — it needs to be <figcaption>Some <em>italics</em> here</figcaption>
 		function ($matches) {
 			$convertedMatch = MarkdownExtra::defaultTransform($matches[1]);  // Convert the match
 			$convertedMatch = str_replace("<p>", "", $convertedMatch); // remove the added paragraph tags
@@ -968,8 +982,8 @@ exit;
 	$theContent = str_replace('UNDERSCORE', '_', $theContent); // restore underscores to Buttondown template tags
 	$theContent = str_replace('&lt;', '<', $theContent); // restore some angle brackets that got rendered into entities
 	$theContent = str_replace('&gt;', '>', $theContent); // restore some angle brackets that got rendered into entities
-	$theContent = str_replace('¶', "\n", $theContent); // insert some intended CRs that got nuked
-
+	$theContent = str_replace('¶', "\n", $theContent); // insert some intended CRs that got nuked	
+	
 	// the worst is over, but still plenty of busy work now…
 
 	// Patch an occasional instance of a relative URL for a blog post, probably usually from an annotation for a citation.  Arguably these should simply be corrected in the source, and I will… but I will forget to do that! And this will fix it when I do.
@@ -984,14 +998,30 @@ exit;
 
 	$wordCount = roundDown($thePost['words_exact'] * .8); // calculate an estimated post-intro wordcount , ~80% of the whole
 	$readingTime = roundDown($wordCount / 300);  // maybe these values should be in the post data?
+
 	// make a Buttondown intro template
-
-	$introTemplate = <<<introtemplate
-		==== INTRODUCTION
-
+	$introTemplate .=<<<introtemplate
+		¶¶¶¶¶==== INTRODUCTION¶¶¶¶¶
 
 		==== WORD COUNT, READ ON PAINSCI, SOCIAL MEDIA LINKS
-		Continue reading below, or [on PainScience.com]({$thePost['url_live']}), about {$readingTime}-minutes more ({$wordCount} words). Comment on the [Facebook post](XXX) or [exTwitter](XXX) or [Threads](XXX), and you’re always welcome to reply directly to these emails.
+		introtemplate;
+
+	// add a default "continue reading" blurb for non-premium posts
+	if (! $thePost['premium']) { 
+		$introTemplate .= <<<introtemplate
+			
+			Continue reading below, or [on PainScience.com]({$thePost['url_live']}), about {$readingTime}-minutes more ({$wordCount} words).
+			introtemplate;
+	} else { // or an audience-targeted version in member posts
+		$introTemplate .= <<<introtemplate
+			
+			 {% if subscriber.can_view_premium_content %}Continue reading the full members-only post below. {% if subscriber.can_view_premium_content and subscriber.stripe_subscription.product != 'pst1' %}As a full member, you can also reading [the full post on PainScience.com]({$thePost['url_live']}), about another {$readingTime}-minutes more ({$wordCount} words). (Why read there? Footnotes are better, links are more convenient, the layout is a bit richer and more polished, audio versions are embedded, and — most important — they may include updates.){% endif %}{% endif %}
+			introtemplate;
+	}
+
+	// finish 
+	$introTemplate .=<<<introtemplate
+		 Comment on the Facebook post or BlueSky or Threads, and you’re always welcome to reply directly to these emails.
 
 		Warm regards,<br>
 
@@ -1012,19 +1042,41 @@ exit;
 		introtemplate;
 	}
 
-	$theContent = $introTemplate . "\n\n\n\n\n\n\n\n===== title + template ↑ ======================== post content ↓ ==============\n\n\n\n\n\n\n\n" . $theContent;
+	$theContent = $introTemplate . "¶¶¶¶¶¶===== title + template ↑ ======================== post content ↓ ==============¶¶¶¶¶¶" . $theContent;
+
+	// There's an rss_only seperator that looks like this:
+	// <div class="unlocked_post_message isolated" data-nosnippet><br><hr><strong><em>Members-only content unlocked for you past this point. Thank you for your support, and welcome!</em></strong></div><!-- rss_only_line -->
+	// Which looks like this after processing here:
+	// ***Members-only content unlocked past this point. Thank you for your support, and welcome!***
+	// And now convert that to (minor change):
+
+	$theContent = str_replace("---\n\n***Members-only content unlocked for you past this point. Thank you for your support, and welcome!***", "---\n\n> **Members-only content unlocked for you past this point. Thank you for your support, and welcome!**", $theContent);
 
 	if ($thePost['post_audio']) { // inject audio template if there's audio, #podcast
-		if (isset($thePost['post_audio_desc'])) {
-			$post_audio_desc = ' ' .  $thePost['post_audio_desc'];
-		}
 
-		$audio = <<<AUDIO
-			{% comment %} AUDIO EMBED for pst2 and pst3 members only. {% endcomment %}{% if subscriber.can_view_premium_content and subscriber.stripe_subscription.product != 'pst1' %}<p class="aside">This post has an audio version for members like you <a href="https://www.painscience.com/{$thePost['post_audio']}">listen from your web browser</a> or <a href="https://www.painscience.com/login.php?{{ subscriber.email }}">login to subscribe to the podcast</a>.</p>{% endif %}
-
-			{% comment %} AUDIO CTA x2, one for pst1 members, another for regular subscribers, just slightly different wording, and upgrade vs join links. {% endcomment %}{% if subscriber.stripe_subscription.product == 'pst1' %}<p class="aside">This post has an audio version for PainSci members paying $5+/month. <a href="{{ manage_premium_subscription_url }}">Upgrade now</a>.{$post_audio_desc}</p>{% endif %}{% if subscriber.can_be_upsold and subscriber.stripe_subscription.product != 'pst1' %}<p class="aside">This post has an audio version for PainSci members. <a href="{{ upgrade_url}}?product=pst2">Join now</a>.{$post_audio_desc}</p>{% endif %}
-			AUDIO;
-		$theContent = $audio . "\n\n\n\n\n\n" . $theContent;
+		if (! $thePost['premium']) { // for non-member posts, use the p.aside format, and use it somewhere early in the post: audio-cta for free subscribers, audio-cta-upsell for pst1 members, and links for the full members; placement varies, but the top is often best for regular posts, given that they are usually shorter and so advertise the audio option sooner rather than later
+			$audio = <<<AUDIO
+				<p class="aside top">
+				{% comment %} AUDIO CTA FOR FREE SUBSCRIBERS {% endcomment %}
+				{% if subscriber.can_be_upsold and subscriber.stripe_subscription.product != 'pst1' %}This post has an audio version for PainSci members. <a href="{{ upgrade_url}}?product=pst2">Join now</a>.{% endif %}
+				{% comment %} AUDIO CTA UPSELL FOR PST1 {% endcomment %}
+				{% if subscriber.stripe_subscription.product == 'pst1' %}This post has an audio version for PainSci members paying $5+/month. <a href="{{ manage_premium_subscription_url }}">Upgrade now</a>.{% endif %}
+				{% comment %} AUDIO INFO FOR FULL (PST2 AND PST3) MEMBERS ONLY {% endcomment %}
+				{% if subscriber.can_view_premium_content and subscriber.stripe_subscription.product != 'pst1' %}This post has an audio version for full members like you. <a href="https://www.painscience.com/{$thePost['post_audio']}">Listen in your web browser</a> or <a href="https://www.painscience.com/login.php?{{ subscriber.email }}">login to get your personal podcast subscription link</a>.{% endif %}
+				</p>
+				AUDIO;
+			$theContent = $audio . "\n\n\n\n\n\n" . $theContent;
+		} else if ($thePost['premium']) { // for member posts, I don’t want to distract from the main CTA: I don’t tell free subscribers about it at all; I still upsell it to pst1 members, and provide info to pst2&3 members, but it goes at the paywall
+			$audio = <<<AUDIO
+				<p class="aside top">			
+				{% comment %} AUDIO CTA UPSELL FOR PST1 {% endcomment %}
+				{% if subscriber.stripe_subscription.product == 'pst1' %}This post has an audio version for PainSci members paying $5+/month. All audio versions are available from a private podcast. To get audio versions and more <strong><a href="{{ manage_premium_subscription_url }}">Upgrade now</a></strong>.{% endif %}
+				{% comment %} AUDIO INFO FOR FULL (PST2 AND PST3) MEMBERS ONLY {% endcomment %}
+				{% if subscriber.can_view_premium_content and subscriber.stripe_subscription.product != 'pst1' %}This post has an audio version for full members like you. <a href="https://www.painscience.com/{$thePost['post_audio']}">Listen in your web browser</a> or <a href="https://www.painscience.com/login.php?{{ subscriber.email }}">login to get your personal podcast subscription link</a>.{% endif %}
+				</p>
+				AUDIO;
+			$theContent = str_replace('and welcome!**', "and welcome!**\n\n{$audio}", $theContent); // insert after "and welcome" 
+			}
 	}
 
 	// minor fine tuning
@@ -1032,36 +1084,40 @@ exit;
 
 	// if ($thePost['psid'] == 3322820) {echo "<pre>" . htmlentities($theContent) . "</pre>";}
 
-
-	// There's an rss_only seperator that looks like this:
-	// <div class="unlocked_post_message isolated" data-nosnippet><br><hr><strong><em>Members-only content unlocked past this point. Thank you for your support, and welcome!</em></strong></div><!-- rss_only_line -->
-	// Which looks like this after processing here:
-	// ---\n\n***Members-only content unlocked past this point. Thank you for your support, and welcome!***
-	// And now convert that to:
-
-	$theContent = str_replace("---\n\n***Members-only content unlocked past this point. Thank you for your support, and welcome!***", "\n\n> **Members-only content unlocked past this point. Thank you for your support, and welcome!**", $theContent);
-
 	// some whitespace adjustments for readability, because this is a document that I will definitely tinker with directly
-	$theContent = str_replace('<figure>', "\n\n\n<figure>\n\n", $theContent); // vertical whitespace around <figure>
+	$theContent = str_replace('<figure>', "¶\n\n<figure>\n\n", $theContent); // vertical whitespace around <figure>
 	$theContent = str_replace('<figcaption>', "\n\n<figcaption>", $theContent); // vertical whitespace before <figcaption>
-	$theContent = str_replace('</figure>', "</figure>\n\n\n", $theContent); // // edge case! add whitespace after </figure> (it gets stripped out by the conversion to markdown, not sure what that's about).  But I also want extra for readability.
+	$theContent = str_replace('</figure>', "</figure>\n\n¶", $theContent); // // edge case! add whitespace after </figure> (it gets stripped out by the conversion to markdown, not sure what that's about).  But I also want extra for readability.
 	$theContent = str_replace("\n#", "\n\n\n\n#", $theContent); // add whitespace above headings for readability
 	$theContent = preg_replace("|\n(\d+)\. |", "\n\n$1. ", $theContent);
-	$theContent = preg_replace("|\n{3,10}|", "\n\n", $theContent); // collapse all runs of >2 linefeeds
+	$theContent = preg_replace("|\n{3,10}|", "\n\n", $theContent); // collapse all runs of >2 linefeeds, but then …
+	$theContent = str_replace("¶", "\n", $theContent); // restore any linefeeds that had been marked with ¶ to protect them from the collapse (I want some big vertical spaces for template clarity)
 
 	// echo "<br><pre>" . htmlentities($theContent) . "</pre><br>";
 
-	// add title and endmark to finish!
-	$theContent = "{$thePost['title']}\n\n{$theContent}\n\n<figure><img src='https://buttondown.s3.amazonaws.com/images/1e4c1d47-0715-4578-b5df-a4182e00d6b7.png' alt='Illustration of the blue salamander logo/mascot for PainScience.com.'></figure>";
+	// add title and an eof-marker
+	$theContent = "{$thePost['title']}\n\n{$theContent}<!--end-->";
+	
+	// add endmark to finish, start by assigning the markup to a var
+	$endmark = "<figure><img src='https://buttondown.s3.amazonaws.com/images/1e4c1d47-0715-4578-b5df-a4182e00d6b7.png' alt='Illustration of the blue salamander logo/mascot for PainScience.com.'></figure>";
+	if (inStr("## Notes", $theContent)) { // If there is a notes section, the endmark goes above it, regardless of anything else (e.g. paywall)
+		$theContent = str_replace("## Notes", "\n\n{$endmark}\n\n## Notes", $theContent);
+	}
+	elseif (inStr("{% endif %}<!--end-->", $theContent)) { // If there is a paywall at the end, put the endmark at the end of the paywalled content
+		$theContent = str_replace("{% endif %}<!--end-->", "\n\n{$endmark}\n\n{% endif %}<!--end-->", $theContent);
+	}
+	else { // and if there isn't a paywall, just put it at the end
+		$theContent = str_replace("<!--end-->", "\n\n{$endmark}\n\n<!--end-->", $theContent);
+	}
 
 	// okay, done building the text version, now to save it
 	$path = '/Users/paul/Desktop/';
 	$fn = "TEMP {$thePost['title_smpl']}.bd.md";
-	$url = "x-bbedit://open?url=file:///$path$fn";
+	$url_bbe = "x-bbedit://open?url=file:///$path$fn";
 	if (fileExistsNoChange($theContent, $path.$fn)) {
-		journal("skipping <a href='$url'>current post NEWSLETTER version</a> (file unchanged: {$fn})", 2, true);
+		journal("skipping <a href='$url_bbe'>current post NEWSLETTER version</a> (file unchanged: {$fn})", 2, true);
 	} else { // go ahead and save it
-		journal("making <a href='$url'>current post NEWSLETTER version</a> of '{$thePost['title']}'", 2, true);
+		journal("making <a href='url_bbe'>current post NEWSLETTER version</a> of '{$thePost['title']}'", 2, true);
 		saveAs($theContent, $path.$fn); // `path
 	}
 }
@@ -1269,12 +1325,14 @@ function makeRSS($max = 25)
 		$content = preg_replace("|</aside>|", "</div>\n\n<hr><br>", $content);
 
 		$content = str_replace(" loading='lazy'", null, $content); // remove loading=lazy	attributes, unnecessary in feed (probably doesn’t hurt either)
-		if ($url) { // if the post has a featured URL
-			$url_rss = "\n\t<link>$url</link>";
+
+		/*		2025-12-01, removed at least for now, because it isn't even hooked up: these vars are never used
+		if ($ftd_url) { // if the post has a featured_link
+			$url_rss = "\n\t<link>$ftd_url</link>";
 			$url_rss_link = "<p>Featured link for this post: $url_rss</p>";
-			$url_pretty = '<p><small>' . prettifyURL($url) . '</small></p>';
-			$url_pretty = "<p>[<a href='$url'>Go to the link featured in this post</a>]</p>";
-		}
+			$url_pretty = '<p><small>' . prettifyURL($ftd_url) . '</small></p>';
+			$url_pretty = "<p>[<a href='$ftd_url'>Go to the link featured in this post</a>]</p>";
+		} */
 
 		if ($GLOBALS['ps']) { // #psmod: tweaks for the PainSci RSS feed, mostly simplifications, starting with explicit exclusions, and moving on to a variety of page elements that won't look good in RSS (e.g. pull quotes)
 
@@ -1326,7 +1384,7 @@ function makeRSS($max = 25)
 		// if (inStr("Charles", $content)) exit(htmlspecialchars("<pre>$rss_post</pre>"));
 		$rss_posts .= stripslashes($rss_post); // remove the slashes we just added
 		$rss_posts = preg_replace("|\n{3,5}|", "\n\n", $rss_posts); // standardize vertical whitespace (to minimize spurious whitespaces diffs)
-		unset($url, $url_rss, $url_pretty); // cleanup some vars
+		unset($ftd_url, $url_rss, $url_pretty); // cleanup some vars
 	}
 
 	// We now have a string containing all posts: $content.  For PainSci, that string has had all member content removed, leaving any teaser content.  And for PainSci, there's a second string containing all posts — $content_member — which has all teaser stuff removed.
@@ -1380,7 +1438,7 @@ function makePodcast($max = 500)
 		if ($post['preview'] or $post['rss_no_post']) {
 			continue;
 		} // exclude post previews & posts explicitly excluded from RSS
-		unset($title, $date_rss, $psid, $url_live, $post_audio, $post_audio_size_bytes, $post_audio_dur, $description, $link, $link_quoted, $url, $url_rss, $url_pretty, $post_img); // cleanup some vars
+		unset($title, $date_rss, $psid, $url_live, $post_audio, $post_audio_size_bytes, $post_audio_dur, $description, $link, $link_quoted, $ftd_url, $url_rss, $url_pretty, $post_img); // cleanup some vars
 		extract($post); // get all the data for the found post
 		if (! $post_img) {
 			$post_img = 'imgs/painsci-updates-badge--sq-3000x3000-300k.jpg';
@@ -2097,30 +2155,7 @@ function make_sy_indexes()
 		$date_str = str_replace(' ', '&nbsp;', $date_str);
 		$date_str_link = "<a href='https://www.painscience.com$postPageUrl' title='click for post page'>$date_str</a>";
 
-		// lots to do with featured urls
-		if ($post['url']) {
-			// first, link title to a featured URL
-			$featured_link = "<a href='{$post['url']}' title='$symbol_help'><span style=\"color:#DDD\" title='click for featured item'>∞</span></a>";
-			$title_str = "<h3><a href='{$post['url']}'>{$post['title']}</a> $featured_link </h3>\n";
-			$post['url'] = preg_replace("@ca/blog/0(.*?)\.php@", 'ca/$1', $post['url']); // kill this off someday when all the blog posts have expired
-	if (! isset($post['hidelink'])) { // stop now if the hidelink flag is set
-		$link = $post['htmlFeaturedCk'] ? $post['htmlFeaturedCk'] : "<p class='widebar featured_link'><a href='{$post['url']}'>" . prettifyURL($post['url']) . '</a></p>';
-	}
-		} else {
-			$title_str = "<h3>{$post['title']}</h3>\n";
-		}
-
 		$postIdDivider = "\n\n<!-- ==================================================== -->\n<!-- === <# {$post['date']}</a>: {$post['title']} [{$post['words_exact']}] #>]\n\n{$post['description']} -->";
-
-		/* $post_template_inline = <<<TEMPLATE
-		$postIdDivider
-		<div class='css_micropost' id='{$post['smpl']}'>
-		<div class='css_micropost_md font_accent'>$date_str_link</div>
-		$title_str {$post['html']} $link
-		</div>\n
-		TEMPLATE;
-		$postsAllInlineStr .= $post_template_inline;
-		if (++$postsRecentInlinCount <= 25) $postsRecentInlineStr .= $post_template_inline; */
 
 		if (++$postsRecentPopupListCount <= 5):
 		$postTemplatePopupList = <<<TEMPLATE
@@ -2309,7 +2344,7 @@ function deal_with_citekeys($md, $post)
 			$post['citekey'] = $ck = $md;
 		}
 	}
-	$url_lc = strtolower(($post['url']??''));
+	$url_lc = strtolower(($post['ftd_url']??''));
 
 	if (! ($ck??null) and ! $url_lc) {
 		return $post;
@@ -2320,23 +2355,23 @@ function deal_with_citekeys($md, $post)
 			or inStr('/blog', $url_lc)) {
 			return $post;
 		} // wrong kind of url :-(
-		if (preg_match('@php#(.*)@', $post['url'], $anchor)) {
+		if (preg_match('@php#(.*)@', $post['ftd_url'], $anchor)) {
 			$post['url_anchor'] = $anchor[1];
 		}
 		// at this point the rule pretty much has to be a URL we get a ck from, so we do
-		$post['citekey'] = $ck = extract_citekey($post['url']);
+		$post['citekey'] = $ck = extract_citekey($post['ftd_url']);
 	}
 
 	// we now have a ck, either from metadata or from a url
 	// if there isn't a url yet, time to set it (now that we're done with url checking logic)
-	if (! $post['url']) {
-		$post['url'] = citation($ck, '[smarturl]');
+	if (! ($post['ftd_url']??null)) {
+		$post['ftd_url'] = citation($ck, '[smarturl]');
 	}
 
 	$post['citekey_type'] = $ck_type = citation($post['citekey'], '[type]');
 	$formats = ['mine' => 'featured', 'article' => 'fn3', 'wepage' => '']; // This is a nice bit of work, but a bit cryptic too.  The default xref templates for some record types don’t work very well for the blog, but new templates just for the blog aren’t really necessary either. In this array I specify the name of the template that should be used for specific record types — or, if nothing is specified, then there is no value and the default template is used.  ;-)
-	 $htmlFeaturedCk = citation($ck, $formats[$ck_type]); // get rich HTML for a featured PS link
-	 if ($post['url_anchor']) {
+	 $htmlFeaturedCk = citation($ck, $formats[$ck_type]??null); // get rich HTML for a featured PS link
+	 if (($post['url_anchor']??null)) {
 		 $htmlFeaturedCk = str_replace('.php', ".php#{$post['url_anchor']}", $htmlFeaturedCk);
 	 } // add the anchor, if any
 	$post['htmlFeaturedCk'] = $htmlFeaturedCk;
@@ -2405,8 +2440,8 @@ function make_post_matrix($echo = true, $save = true)
 		// #2do, maybe someday I can figure out how to build a link for opening files again
 		// $src_file_url = "file://localhost{$stage}/posts/" . rawurlencode($src_file);
 		// $src_file = "zzz <a href=\"{$src_file_url}\">$src_file_short</a>"; // alas, safari seems to strip localhost out of these URLs, probably for security reasons
-		if ($post['url']) {
-			$featured_url = "<a href='{$post['url']}'>∞</a>";
+		if ($post['ftd_url']) {
+			$featured_url = "<a href='{$post['ftd_url']}'>∞</a>";
 		}
 
 		if ($post['post_img']) { // if there is a post img …
@@ -2823,15 +2858,15 @@ function prepareTemplate($post, $templateFile)
 	if ($post['canonical']) { //psmod, stopped short of using because I don’t grok the effect of declaring one URL for link rel and another for og:url etc)
 		$tmp = $post['canonical'];
 
-		if (citation($post['canonical'], '[type]') == 'mine') {
-			$url = citation($post['canonical'], '[url]');
+		if (citation($post['canonical'], '[type]') == 'mine') { // if the canonical URL is for one of my own articles
+			$canonical_url = citation($post['canonical'], '[url]'); // get that URL
 		} else {
-			$url = citation($post['canonical'], '[biburl]');
+			$canonical_url = citation($post['canonical'], '[biburl]'); // else it’s probably a BibUrl, so use that instead
 		}
 
 		// <link rel="canonical"	href="http://{$domain}/blog/{$title_smpl}.html">
 
-		$thisTemplate = preg_replace('@<link rel=.canonical.*?>@', "<link rel='canonical' href='$url'>", $thisTemplate);
+		$thisTemplate = preg_replace('@<link rel=.canonical.*?>@', "<link rel='canonical' href='$canonical_url'>", $thisTemplate);
 	} /**/
 
 	// a little tweaking …
@@ -2865,13 +2900,13 @@ function prepareTemplate($post, $templateFile)
 	$thisTemplate = str_replace('{$date1}', $post_date1, $thisTemplate);
 	$thisTemplate = str_replace('{$date2}', $post_date2, $thisTemplate);
 
-	if ($post['url']) {  // work with featured URLs
-		// link title to a featured URL
-		$thisTemplate = preg_replace("/<h1(.*?)>(.*?)<\/h1>/uism", '<h1$1><a href="' . $post['url'] . "\">$2&nbsp;<span style='color:#DDD'>∞</span></a></h1>", $thisTemplate);
+	if ($post['ftd_url']) {  // work with featured links
+		// link title to a featured link
+		$thisTemplate = preg_replace("/<h1(.*?)>(.*?)<\/h1>/uism", '<h1$1><a href="' . $post['ftd_url'] . "\">$2&nbsp;<span style='color:#DDD'>∞</span></a></h1>", $thisTemplate);
 		if (! isset($post['hidelink'])) { // stop now if the hidelink flag is set
 			// make a featured link at the bottom of the post, #psmod, now for either a regular URL or citekey
-			$link = $post['htmlFeaturedCk'] ? $post['htmlFeaturedCk'] : "<p class='widebar featured_link'><a href='{$post['url']}'>" . prettifyURL($post['url']) . '</a></p>';
-			$thisTemplate = str_replace('</article>', "{$link}\n\n</article>", $thisTemplate); // add the link to the post
+			$link = $post['htmlFeaturedCk'] ? $post['htmlFeaturedCk'] : "<p class='widebar featured_link'><a href='{$post['ftd_url']}'>" . prettifyURL($post['ftd_url']) . '</a></p>';
+			$thisTemplate = str_replace('</article>', "\n{$link}\n\n</article>", $thisTemplate); // add the link to the post; 2025-12-01 fixed bug: </article> was placed after </footer> in the template for the PS blog, so this was putting the featured link in a very un-featured location; I moved </article> to before <footer> in the template which solved that problem tidily, and is probably also more structurally correct (the footer doesn't really pertain to the article, so should be a child)
 		}
 	}
 
@@ -2913,7 +2948,7 @@ function auditPsids()
 }
 
 function getdescription_audio($description_audio)
-{ /* The description_audio field is a rich text field supporting a some key PubSys shorthand conventions (but not all), citation shorthands (<<epsom>>), plus MarkdownExtra, plus PHP parsing.  This example will produce a 2-para HTML description:
+{ /* The description_audio field is a rich text field supporting some key PubSys shorthand conventions (but not all), citation shorthands (<<epsom>>), plus MarkdownExtra, plus PHP parsing.  This example will produce a 2-para HTML description:
 
 	It’s one thing to *think* that the “medicine” is doing something. It’s another to *feel* it doing something. I reckon *sensation-enhanced placebo* is the engine that powers most manual therapies — it’s actually *the main reason they exist*. For better or worse, this is *why* patients love to be massaged, adjusted, stretched, jostled and vibrated, taped and scraped, zapped and jabbed. And more. ……… Read more about the concept of a “<a href='<?php u('placebo') ?>#sensation-enhancement'>sensation-enhanced placebo</a>.” */
 	if (inStr('<<', $description_audio)) {
@@ -2921,7 +2956,11 @@ function getdescription_audio($description_audio)
 		$description_audio = $record->parseNestedxRefs($description_audio); // The parseNestedxRefs function was originally designed to deal with an arbitrary number of citations inside another citation (the annote field of a bib record), but it works quite well for this. Once in this file, I assigned new XRefRecord() to $record, and that makes the parseNestedxRefs method available.
 	}
 	$description_audio = renderPhpStr($description_audio); // The description_audio field also supports inline PHP, which mostly means that cite() calls are processed.  (The function aborts if there's no PHP tags.)
-	$description_audio = str_replace('………', "\n\n", $description_audio);
+	$description_audio = preg_replace('|\s*………\s*|', "\n\n", $description_audio);
+	$description_audio = preg_replace('| *••• *|', "\n* ", $description_audio); // ••• denotes a UL list item; 1st item must be preceded by extra newlines (eg ………••• )
+	$description_audio = preg_replace('| *111\. *|', "\n1. ", $description_audio); // 111 denotes an OL list item; 1st item must be preceded by extra newlines (………111.)
+//	if (inStr('riley25', $description_audio)) exit ("<pre>$description_audio</pre>");
+	
 	$description_audio = MarkdownExtra::defaultTransform($description_audio); // parse Markdown, but…
 	// if (inStr("ously light can affect us emotionally, but is t", $description_audio)) echo "`". htmlentities($description_audio) . "`";
 	$description_audio = str_replace('  ', ' ', $description_audio);

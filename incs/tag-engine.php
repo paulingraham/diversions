@@ -318,6 +318,7 @@ function getTags ($tag_fn = false) {
 	} // end tag loop
 
 	// now that we we have the data in a lovely array, make a thesaurus: an array of all possible synonyms pointing to true tags
+	global $pubsys;
 	foreach($tags as $tag => $td) { // go through every tag
 // Important! This will crash some dynamic pages. For each kind of synonym, we'll be checking to see if it has already been previously set, and it should happen only in the context of a build.  For unclear reasons, doing it on, say, bibliography pages results in an exit with a false positive warning. So it’s if (isset AND $pubsys) for each check.  #todo Someday I'll figure out why it needs pubsys.
 		if (isset($td["synonyms"]))
@@ -523,9 +524,9 @@ function inferTags ($post) {
 	// different scales for regular vs main pubsys use
 	$inf[] = "_size_" . $post['size'];
 	// all micro-img posts are, by definition, tagged with “av”
-	if ($post['post_class'] == "micro-img") 			$inf[] = 'av';
+	if ($post['post_class'] == "micro-img") 		$inf[] = 'av';
 	// all posts with a featured link are tagged with “link”
-	if ($post['url']) 											$inf[] = 'link';
+	if (($post['ftd_url']??null)) 							$inf[] = 'link';
 	// all posts with a featured quot are tagged with “quotes”
 	if (inStr("<!--tag:qt-->",$post["html"]))		$inf[] = 'quotes';
 	$inf = array_unique($inf);
