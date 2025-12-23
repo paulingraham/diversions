@@ -326,7 +326,7 @@ function wordifyNumbersOrdinals($number) {
 
 /** returns @timestamp: gets a timestamp from structured date like 2013-03-09 (default); does not parse hours, mins, secs */
 function parseDate($date, $format = "Y-m-d") { #936491636 no longer need % prefixes in default format, e.g. "%Y-%m-%d"
-/* What a fine use of a function this is, because it requires two tricky steps to get a timestamp out of a random date every damned time, so it’s a terrific wheel not to have to reinvent. Why there isn’t a PHP function that already does this is beyond me. How it works ...
+/* What a fine use of a function this is, because it requires two tricky steps to get a timestamp out of a random date every damned time, so it’s a terrific wheel not to have to reinvent. Why there isn’t a PHP function that already does this is beyond me. [FFS, there is: strtotime()!  Seriously?  I think so.  I think that is exactly what strtotime does.] How it works ...
 
 Tricky step 1: the php function STRPTIME (string parsed to time) compares a string with a date format and (if it can) returns a strange array of values.  Matching a format to the input date can be hellacious. We default to my own very commonly used date format (2013-06-18), but the function will take arbitrary formats.
 
@@ -552,7 +552,7 @@ if (!is_array($arr)) { echo "That’s no array! That’s …<br> ";  var_dump($a
 //	echo "<caption>" . count($arr) . " posts:</caption>";
 
 	foreach ($arr as $key => $value) {
-	unset($fieldNo);
+	$fieldNo = 0;
 	$fieldCount = count($value);
 		foreach ($value as $field => $subvalue) {
 		if (is_array($subvalue)) $subvalue = implode(' • ', $subvalue); // many field values are simple array themselves, and many of them can be trivially and meaningfully imploded into a string (rather than getting into the complexity of another layer of hierarchy
@@ -576,11 +576,19 @@ if (!is_array($arr)) { echo "That’s no array! That’s …<br> ";  var_dump($a
 function renderPhpStr ($string) {
 	/* Note: renderPhpStr(file_get_contents(file)) === renderPhpFile(file,true) */
 	if (!inStr("<?php", $string)) return $string; // is there PHP in the string?
+	$string = str_replace("?>\n", "?>RPS_MARKER\n", $string); // for unknown reasons, eval will consume LFs directly following to a PHP closure, which has implications for Markdown parsing, which is sensitive to LFs; inserting a marker prevents the destruction, and then it’s converted back below.
 	ob_start();
 	eval("?>$string"); // On the use of eval in the PainSci CMS: craftdocs://open?blockId=D8BB4DEF-66B7-4395-9020-1CACBE6BBFC4&spaceId=bc7d854c-3e5b-a34e-4850-a6d2f31a1a59
 	$string = ob_get_contents();
 	ob_end_clean();
-//	if (inStr("XXX", $string)) exit("<pre>`". htmlentities($string) . "`</pre>");
+	$string = str_replace('RPS_MARKER', '', $string); // remove markers inserted ~5 lines back
+	// TESTING: to print the output for a given post for auditing, identify it with a unique substr:
+/*	  if (inStr('demo post', $string)) {
+		echo "<h3 class='warning' style='margin-top:3em'>Test output: " . __FILE__ . " : " . __FUNCTION__ . " : " . __LINE__ . "</h3>" . 
+		"<textarea cols=80 rows=30 style='font-size:1em;margin:0 0 3em'>" . str_replace("\n", "¶\n\n", htmlentities($string)) . "</textarea>";
+//		exit;
+		} /* */
+
 	return $string;
 }
 
@@ -1196,10 +1204,12 @@ function straightenQuotes($string) {
 /* replaces most characters in email address with asterisks */
 function obfuscateEmail($email, $numchars = 3) {
 	$emailArr = str_split($email);
+	$x = 0;
+	$result = '';
 	foreach ($emailArr as $char) {
 		$x++;
-		if ($char == '@') {$result .= $char; $domain = true; continue;}
-		if ($domain)  {$result .= $char; continue;}
+		if ($char == '@') {$result .= $char; $domain = true; continue;} // set domain to true so that the loop breaks next iteration
+		if ($domain??false)  {$result .= $char; continue;}
 		if ($x < $numchars) {$result .= $char; continue;}
 		if ($x % 3 === 0) {$result .= $char; continue;} // echo every other character
 		if ($x == count($emailArr)) {$result .= $char; continue;}
@@ -1466,7 +1476,7 @@ function echoDev ($string) {
 	
 function embed_audio ($filename, $paywalled = false, $figcaption = "Audio version of this section:") {
 // 2023-12-22 — Just got a start on using this function, but it’s still too simple to use for all my audio embedding needs.  Audio embeds can be featured (audio for a whole post/article) vs. minor (just a sub-section), and they can be independently paywalled or not.  This function so far only puts out an unpaywalled minor audio embed, and I need to figure out a solution for the others before I can start using it more widely.
-$url = "/media/$filename";
+$url = "/assets/audio/$filename";
 if (!file_exists($_SERVER['DOCUMENT_ROOT'] . $url)) error("Audio file does not exist: '$filename'");
 //$url = "https://www.painscience.com" . $url;
 
