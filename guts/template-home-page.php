@@ -41,11 +41,12 @@
 
 <body>
 
-<p>Diversions once explored ideas in the world of fitness for the older adult as well as the dynamics of family history, both real and fictional.  It was an eclectic mix of writing in two different, but sometimes related, categories. Many articles have been removed for various reasons which will not be discussed here. Suffice it to say that this page now only announces my fitness classes and has articles about my family and my husband’s family:</p>
+<p>Diversions once explored ideas in the world of fitness for the older adult as well as the dynamics of family history, both real and fictional.  It was an eclectic mix of writing in two different, but sometimes related, categories. Many articles have been removed for various reasons which will not be discussed here. Suffice it to say that this page now only announces my fitness classes, has articles about my family and my husband’s family, and some excerpts from novels I have written:</p>
 
 <ul>
 <li>fitness for older adults, which I teach in downtown Vancouver, Canada</li>
 <li>the history of my family and my husband's family, particularly the Overturf, Hansen, Ingraham, and Herrick families</li>
+
 </ul>
 
 <p>Plus more diversions. In some ways these topics couldn’t be more different, and yet they have also inspired and informed each other.</p>
@@ -75,7 +76,7 @@ while(x=eval(x));
 <ul>
 <li>FITNESS</li>
 
-<p>After retirement from 32 years of public school teaching, at the age of 57, I started exercising for my own well being and found that I wanted to impart my knowledge to others. It took a year to earn my qualifications: several courses and a pretty tough exam from the British Columbia Parks and Recreation Association. Plus, I’m expected to update my qualifications every year, including CPR and First Aid. I have also had special training in teaching Older Adults and Adapted Fit. Today, at 77, I continue to teach four classes a week.</p>
+<p>After retirement from 32 years of public school teaching, at the age of 57, I started exercising for my own well being and found that I wanted to impart my knowledge to others. It took a year to earn my qualifications: several courses and a pretty tough exam from the British Columbia Parks and Recreation Association. Plus, I’m expected to update my qualifications every year, including CPR and First Aid. I have also had special training in teaching Older Adults and Adapted Fit. Today, at 80, I continue to teach four classes a week.</p>
 
 <p><span class='red'>Light Fit</span> encourages men and women of any age (though the emphasis is on the older adult) to get active:warmup, strength training, cardiovascular exercise, balance training, stretch and flexibility. If you have been away from exercise, had a recent injury, or you are just starting to exercise, you should find this class a good one to start with, but many participants are "regulars" who enjoy the general mood and tone of the class. It meets from 10:45 a.m. to 11:45 a.m. on Tuesdays and Thursdays at the West End Community Centre, 870 Denman Street, in Vancouver, BC. </p>
 
@@ -86,11 +87,16 @@ while(x=eval(x));
 
 <li>MORE FAMILY HISTORY: I have also done research on my husband's family history which includes: <a href="ingraham-family-home-page.html">Ingrahams, Herricks, Moshers, and Brands.</a></li>
 
+<li>A CHAPTER OF A NOVEL: Adeline and Nebraska (Adeline gives birth and waits for her house to be built):  <a href="family-legacies.html">Family Legacies, Chapter 1</a></li>
+
+<li>A CHAPTER OF A NOVEL: Janie in Illinois (a little girl says good-bye to her mother):  <a href="family-legacies.html">Family Legacies, Chapter 2</a></li>
+
+</ul>
+
 <h2>Another Site of Interest</h2>
 
-<li>My husband, Bob Ingraham, offers you a very different web site. He says: “<a href="https://ephemeraltreasures.net">Ephemeral Treasures </a> is a mostly philatelic web site which reflects my interests in the early commercial aviation and the Second World War, and showcases items from my collections — old envelopes (aka covers), stamps, and postcards. But it also highlights some of the adventures I've had in my life, including surviving a plane crash in New Mexico's Black Range and being badly wounded in Vietnam when I was a Marine Corps hospital corpsman.”</li>
-</ul>
-</ul>
+<p>My husband, Bob Ingraham, offers you a very different web site. He says: “<a href="https://ephemeraltreasures.net">Ephemeral Treasures </a> is a mostly philatelic web site which reflects my interests in the early commercial aviation and the Second World War, and showcases items from my collections — old envelopes (aka covers), stamps, and postcards. But it also highlights some of the adventures I've had in my life, including surviving a plane crash in New Mexico's Black Range and being badly wounded in Vietnam when I was a Marine Corps hospital corpsman.”</p>
+
 
 
 
