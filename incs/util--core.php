@@ -203,9 +203,9 @@ function parseURL($url) {
 	$domain_main = $domain_parts[1]; // … and the main domain is 2nd
 
 	// subdomains are tricky: there might be one or two of them … I had never actually ever noticed a 2-part subdomain until I was trying to automatically markup a bunch of domains :-) … the third one is overkill (pretty sure they don't exist), but included for completeness
-	if ($domain_parts[2]) $domain_sub = $domain_parts[2];
-	if ($domain_parts[3]) $domain_sub = $domain_parts[3] . "." . $domain_sub; // add the next subdomain, if it exists
-	if ($domain_parts[4]) $domain_sub = $domain_parts[4] . "." . $domain_sub; // add the next subdomain, if it exists
+	if (isset($domain_parts[2])) $domain_sub = $domain_parts[2];
+	if (isset($domain_parts[3])) $domain_sub = $domain_parts[3] . "." . $domain_sub; // add the next subdomain, if it exists
+	if (isset($domain_parts[4])) $domain_sub = $domain_parts[4] . "." . $domain_sub; // add the next subdomain, if it exists
 
 	// now for the path: long paths are common and often inconvenient for display, so this function returns an abbreviated version of any path longer than 50 chars; the snipped section is marked by an ellipsis
 	if (strlen($url_path) > 40):
@@ -217,8 +217,8 @@ function parseURL($url) {
 	
 	$domain_final['domain_full'] = $domain_full;
 	$domain_final['url_path'] = $url_path;	
-	$domain_final['url_path_abbr'] = $url_path_abbr;
-	$domain_final['domain_sub'] = $domain_sub;
+	$domain_final['url_path_abbr'] = $url_path_abbr??'';
+	$domain_final['domain_sub'] = $domain_sub??'';
 	$domain_final['domain_main'] = $domain_main;
 	$domain_final['domain_tld'] = $domain_tld;
 	
@@ -513,7 +513,7 @@ function printArrTable1($arr, $return=false, $title=null, $size="large", $headKe
 		headKey/headVal = <th> contents for key and value columns
 	Example data: $testArr = array("field1" => "data1", "field2" => "data2", "field3" => "data3"); */
 	if (!is_array($arr)) { echo "That’s no array! That’s …<br> ";  var_dump($arr); return;}
-	$table .= "<table class='$size' style='font-family:\"Avenir Next Condensed\"; margin:2em 0;border-spacing:10px 0'>"; 
+	$table = "<table class='$size' style='font-family:\"Avenir Next Condensed\"; margin:2em 0;border-spacing:10px 0'>"; 
 	if ($title) $table .= "<caption>$title</caption>";
 	// $table .= '<caption>Simple associative array with count ' . count($arr) . ' fields';
 	if ($headKey and $headVal) $table .= "<tr><th>$headKey</th><th>$headVal</th></tr>";
@@ -548,7 +548,7 @@ function printArrTable2($arr, $return=false) { /* basic database structure: an a
 					"field3" => "data")); */
 
 if (!is_array($arr)) { echo "That’s no array! That’s …<br> ";  var_dump($arr); return;}
-	$table .= '<table class="large" style="font-family:\'Avenir Next Condensed\'; margin:2em 0;border-spacing:10px 0">';
+	$table = '<table class="large" style="font-family:\'Avenir Next Condensed\'; margin:2em 0;border-spacing:10px 0">';
 //	echo "<caption>" . count($arr) . " posts:</caption>";
 
 	foreach ($arr as $key => $value) {
@@ -577,10 +577,14 @@ function renderPhpStr ($string) {
 	/* Note: renderPhpStr(file_get_contents(file)) === renderPhpFile(file,true) */
 	if (!inStr("<?php", $string)) return $string; // is there PHP in the string?
 	$string = str_replace("?>\n", "?>RPS_MARKER\n", $string); // for unknown reasons, eval will consume LFs directly following to a PHP closure, which has implications for Markdown parsing, which is sensitive to LFs; inserting a marker prevents the destruction, and then it’s converted back below.
+
+	// reminder: eval processes code in the current scope; whatever is un/defined right now is what you'll get in the eval'd code
 	ob_start();
+	$memberButnId = 0; // hacky initialization of this variable that is used in some strings processed without the document context; this problem is explained in notes at the top of PubSys: "There are TWO big loops in the PubSys build script that process content for every post with eval(), a tortuous architecture"
 	eval("?>$string"); // On the use of eval in the PainSci CMS: craftdocs://open?blockId=D8BB4DEF-66B7-4395-9020-1CACBE6BBFC4&spaceId=bc7d854c-3e5b-a34e-4850-a6d2f31a1a59
 	$string = ob_get_contents();
 	ob_end_clean();
+
 	$string = str_replace('RPS_MARKER', '', $string); // remove markers inserted ~5 lines back
 	// TESTING: to print the output for a given post for auditing, identify it with a unique substr:
 /*	  if (inStr('demo post', $string)) {
@@ -1326,7 +1330,7 @@ Significant limitations:
 //	printArr($matches);
 	$headingsNum = count($matches[0]);
 	
-	while ($x++ < $headingsNum) {
+	$x=0;while ($x++ < $headingsNum) {
 		if ($matches[0][$x-1] == "notes") continue; // exclude meta sections
 		if ($matches[0][$x-1] == "updates") continue; // exclude meta sections
 		if ($matches[0][$x-1] == "rr") continue; // exclude meta sections

@@ -1,7 +1,9 @@
 <?php #pubsys > build procedure
 
-/* PubSys, © 2014–2023 by Paul Ingraham
-A simple content management system focused on easy, simple data entry and management and robustly simple HTML output. PubSys reads text files that contain Markdown and other Markdown-like shorthands and turns them into website files for upload. PubSys runs in a browser locally. Most of the pubsys code is in 'pubsys-functions.php'.
+/* PubSys, © 2014–2026 by Paul Ingraham
+A "simple" (ha ha) content management system focused on easy, simple data entry and management and robustly simple HTML output. PubSys reads text files that contain Markdown and other Markdown-like shorthands and turns them into website files for upload. PubSys runs in a browser locally. Core PubSys code is in 'PubSys.php'.  It is used primarily by this build script, or a default build script make-site.php.  When those scripts run, the constant MODE_PUBSYS is true.
+
+THIS build script uses PubSys to build the PainScience.com blog with many special cases. In this context, $ps is true, and PubSys has a lot of "if ($ps) {painsci stuff}".
 
 Development notes (extremely out of date as of 2023):
 craftdocs://open?blockId=EF2F7C6B-F8BB-46AA-A75E-281CC2F2CE3F&spaceId=bc7d854c-3e5b-a34e-4850-a6d2f31a1a59
@@ -47,8 +49,6 @@ The next ~20 lines copy the canonical PubSys build script and other resources to
 
 if (!$ps AND stripos(ROOT_DEV, "paul") !== false) {
 
-
-	
 	// special handling of THIS script, because we may be copying over it!
 	$makesite_canonical_fn = "$root_parent/painscience/bin/make-ps-blog.php"; // the canonical code
 	$makesite_target_fn = ROOT_DEV . "/make-site.php"; // this file in the current site filter (might be writerly, diversions, etc)
@@ -62,39 +62,29 @@ if (!$ps AND stripos(ROOT_DEV, "paul") !== false) {
 		}
 
 	// now for all the other stuff — nothing fancy, no optimization, no diffing … just always copy the canonical files to their destinations 
-	$filenames = array ("pubsys-functions.php", "misc-functions.php", "tag-engine.php", "table-sort.js", "table-sort-setup.js", "synonyms-pubsys-shorthands.txt", "synonyms-post-metadata.txt", "synonyms-image-options.txt", "easy-img.php","css-pubsys.css","lazyload-imgs.js");
+	$filenames = array ("PubSys.php", "util--core.php", "content--tags.php", "table-sort.js", "table-sort-setup.js", "synonyms-pubsys-shorthands.txt", "synonyms-post-metadata.txt", "synonyms-image-options.txt", "easy-img.php","css-pubsys.css","lazyload-imgs.js");
 	$target_dirs = array ("writerly", "diversions", "ephemeral");
 
 	foreach ($filenames as $filename)
 		foreach ($target_dirs as $target_dir)
 			if (!copy ("{$root_parent}/painscience/incs/$filename", "{$root_parent}/$target_dir/incs/$filename"))
-				echo "failed to copy $filenames :-(";
+				echo "failed to copy $filename :-(";
 	} 
 
-
-
-
 chdir (ROOT_DEV); // execute script as if running in a specific site folder
-define('CODE_BASE', 'pubsys');
 
-if ($ps) {
-	if (require_once($_SERVER['DOCUMENT_ROOT'] . "/incs/environment.php")) {
-		$env = true; // #psmod: LOTS of extra code for PainSci!
-		}
-	}
-
-$GLOBALS['pubsys'] = true;  #PHP8_pubsys, moved this from above the environment inclusion to after.  Why?  Because the main webdev environment now now initializes this variable as false (necessary for everything else)… but we want to proceed with it as true for this build script only.
+if ($ps) require_once($_SERVER['DOCUMENT_ROOT'] . "/incs/environment.php");
 
 if (!$ps)  { // without the PS environment, we need at least Composer installed classes (chiefly php-markdown)
 	require_once __DIR__ . '/incs/vendor/autoload.php';
 	}
 
 // load code libraries
-set_include_path(".:$root_true/incs:$root_true/incs/snippets:$root_dev/guts:$root_dev/incs:$root_dev/guts/incs");
-require_once('pubsys-functions.php'); // functions for blogging, currently used by either Writerly or PainScience.com
-require_once('tag-engine.php'); // tag management functions
+set_include_path(".:$root_true/incs:$root_true/incs/content--library:$root_dev/guts:$root_dev/incs:$root_dev/guts/incs");
+require_once('PubSys.php'); // functions for blogging, currently used by either Writerly or PainScience.com
+require_once('content--tags.php'); // tag management functions
 require_once('easy-img.php'); // a large function for handling image markup, so it gets its own file
-require_once('misc-functions.php'); // many functions originally written for PainScience.com, but most are generic
+require_once('util--core.php'); // many functions originally written for PainScience.com, but most are generic
 
 // load site settings
 $settings = get_settings(); extract($settings); // a selection of fairly straightforward sitewide variables, parsed from a simple text file
@@ -189,7 +179,9 @@ else {
 	makeMemberPostLists();
 	make_post_matrix (); 	// make huge table of all post data
 
-	echo "<br><h2>Raw post data</h2>"; printArrTable2($posts); 			// print array of post metadata /**/
+	echo "<br><h2>Raw post data</h2>";
+//	printArrTable2(array_slice($posts, 0, 50)); 			// print the first 50 posts in the post array
+//	printArrTable2($posts); 			// print entire array of post metadata /**/
 	}
 
 ?>

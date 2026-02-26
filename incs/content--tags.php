@@ -318,24 +318,23 @@ function getTags ($tag_fn = false) {
 	} // end tag loop
 
 	// now that we we have the data in a lovely array, make a thesaurus: an array of all possible synonyms pointing to true tags
-	global $pubsys;
 	foreach($tags as $tag => $td) { // go through every tag
-// Important! This will crash some dynamic pages. For each kind of synonym, we'll be checking to see if it has already been previously set, and it should happen only in the context of a build.  For unclear reasons, doing it on, say, bibliography pages results in an exit with a false positive warning. So it’s if (isset AND $pubsys) for each check.  #todo Someday I'll figure out why it needs pubsys.
+// Important! This will crash some dynamic pages. For each kind of synonym, we'll be checking to see if it has already been previously set, and it should happen only in the context of a build.  For unclear reasons, doing it on, say, bibliography pages results in an exit with a false positive warning. So it’s if (isset AND MODE_PUBSYS) for each check.  #todo Someday I'll figure out why it needs pubsys.
 		if (isset($td["synonyms"]))
 			foreach ($td["synonyms"] as $synonym) {
-				if (isset($GLOBALS['tag_thesaurus'][simplify($synonym)]) and $pubsys) exit("<p class='warning'>⚠️ The synonym '<strong><span class='copythis2' onClick='copy(this)'>$synonym</span></strong>' declared for #$tag already refers to another tag. Fix before proceeding.<p>"); // with the explosion in complexity of the tag database by 2025, there about three dozen duplicate synonyms; but they remain relatively rare, and easy to fix, with no complications in an of those; now that these warnings are in place, it should be trivial to fix new ones as they occur
+				if (isset($GLOBALS['tag_thesaurus'][simplify($synonym)]) and MODE_PUBSYS) exit("<p class='warning'>⚠️ The synonym '<strong><span class='copythis2' onClick='copy(this)'>$synonym</span></strong>' declared for #$tag already refers to another tag. Fix before proceeding.<p>"); // with the explosion in complexity of the tag database by 2025, there about three dozen duplicate synonyms; but they remain relatively rare, and easy to fix, with no complications in an of those; now that these warnings are in place, it should be trivial to fix new ones as they occur
 				$GLOBALS['tag_thesaurus'][simplify($synonym)] = $tag;
 				}
 		if (isset($td['short'])) {
-			if (isset($GLOBALS['tag_thesaurus'][simplify($td['short'])]) and $pubsys) exit("<p class='warning'>⚠️ The short tag '<strong><span class='copythis2' onClick='copy(this)'>{$td['short']}</span></strong>' declared for #$tag already refers to another tag. Fix before proceeding.<p>");
+			if (isset($GLOBALS['tag_thesaurus'][simplify($td['short'])]) and MODE_PUBSYS) exit("<p class='warning'>⚠️ The short tag '<strong><span class='copythis2' onClick='copy(this)'>{$td['short']}</span></strong>' declared for #$tag already refers to another tag. Fix before proceeding.<p>");
 			$GLOBALS['tag_thesaurus'][simplify($td['short'])] = $tag;
 			}
 		if (isset($td['abbr'])) {
-			if (isset($GLOBALS['tag_thesaurus'][simplify($td['abbr'])]) and $pubsys) exit("<p class='warning'>⚠️ The tag abbreviation '<strong><span class='copythis2' onClick='copy(this)'>{$td['abbr']}</span></strong>' declared for #$tag already refers to another tag. Fix before proceeding.<p>");
+			if (isset($GLOBALS['tag_thesaurus'][simplify($td['abbr'])]) and MODE_PUBSYS) exit("<p class='warning'>⚠️ The tag abbreviation '<strong><span class='copythis2' onClick='copy(this)'>{$td['abbr']}</span></strong>' declared for #$tag already refers to another tag. Fix before proceeding.<p>");
 			$GLOBALS['tag_thesaurus'][simplify($td['abbr'])] = $tag;
 			}
 		if (isset($td['long']))  {
-			if (isset($GLOBALS['tag_thesaurus'][simplify($td['long'])]) and $pubsys) exit("<p class='warning'>⚠️ The tag abbreviation '<strong><span class='copythis2' onClick='copy(this)'>{$td['long']}</span></strong>' declared for #$tag already refers to another tag. Fix before proceeding.<p>");
+			if (isset($GLOBALS['tag_thesaurus'][simplify($td['long'])]) and MODE_PUBSYS) exit("<p class='warning'>⚠️ The tag abbreviation '<strong><span class='copythis2' onClick='copy(this)'>{$td['long']}</span></strong>' declared for #$tag already refers to another tag. Fix before proceeding.<p>");
 			$GLOBALS['tag_thesaurus'][simplify($td['long'])] = $tag;
 			}
 		$GLOBALS['tag_thesaurus'][$tag] = $tag;
@@ -519,6 +518,8 @@ function inferTags ($post) {
 	if (inStr("vocab",$post['source_file'])) 		$inf[] = 'vocabulary';
 	// posts with a priority of 9 or 10 should be assumed to be “best of”:
 	if ($post['priority'] > 8)								$inf[] = 'best of';
+	if ($post['premium'])									$inf[] = '_post_member';
+	if ($post['post_audio'])								$inf[] = '_post_podcasted';
 	// posts are assigned a tag corresponding to their size
 	// just add the “size” prefix added to the size code set in the get_post_size function
 	// different scales for regular vs main pubsys use
@@ -578,6 +579,7 @@ function updateTags() {
 
 	// now that we have the complete tags array, including new tags, and sorted (with sort-prefixes), we do just a tiny bit of cleanup and organizing, format each record in two ways for two destination files: the main tags database file, and a QRG
 	
+	$tags_str_qrg = $tags_str_db = '';
 	foreach($tags as $tag => $td) { 
 		$td['tally#'] = isset($td['tally#']) ? $td['tally#'] : '0';		
 		$tags_str_qrg .= formatTagRecord_QRG($td); // add a tag to the tag QRG list, a compact readable alphabetical list of tags and their synonyms
@@ -737,8 +739,9 @@ function tallyTags ($tags) {
 	
 	// first we're going to count and then eliminate duplicates
 	foreach ($tagsToCount as $tagToCount) {
-		$tagToCount = trim($tagToCount); // lines collecting by file have linefeeds (I thought there was a way to prevent the linefeeds, but I can't find it)
+	$tagToCount = trim($tagToCount); // lines collecting by file have linefeeds (I thought there was a way to prevent the linefeeds, but I can't find it)
 		if ($tagToCount == "") continue; # empty items have mostly been eliminated, but sometimes they can crop up due to source data errors like a field that leads with a comma tags={,tag} or tags={tag,,tag}
+		if (!isset($tagToCounts[$tagToCount])) $tagToCounts[$tagToCount] = 0; // initialize to 0 if this is the first time counting this tag
 		$tagToCounts[$tagToCount]++; // save this tag to a new array and iterate a tally for that tag; if the tag is new to the array, it gets added with a value of 1; if the tag has already been added, then this just counts the occurrence
 		}
 	
@@ -792,9 +795,18 @@ function getBlogTags ($tags) {
 /** returns @string, html list: tag record formatted for output in the tags QRG file  */
 function formatTagRecord_QRG ($td) {
 	if (isset($td["sort_prefix"])) $prefix = $td["sort_prefix"] . " » "; // prepare sort prefix for "display" by appending » (e.g. "arthritis" becomes "arthritis » " before it is inserted before "osteoarthritis"); the actual sorting has already been done, this is just preparing to restore the sort prefix for the file
-	if (is_array($td['synonyms'])) $synonyms = implode(" ", $td['synonyms']);
-	if (is_array($td['related'])) $related = implode(" ", $td['related']);
-	return $prefix . $td['true'] . "\t{$td['tally#']}\t{$td['short']}\t{$td['abbr']}\t{$td['short']}\t{$td['long']}\t{$synonyms}\t{$related}\n";
+	if (isset($td['synonyms']) and is_array($td['synonyms'])) $synonyms = implode(" ", $td['synonyms']);
+	if (isset($td['related']) and is_array($td['related'])) $related = implode(" ", $td['related']);
+	return ($prefix ?? '')
+	 . ($td['true'] ?? '')
+	 . "\t" . ($td['tally#'] ?? '')
+	 . "\t" . ($td['short'] ?? '')
+	 . "\t" . ($td['abbr'] ?? '')
+	 . "\t" . ($td['short'] ?? '')
+	 . "\t" . ($td['long'] ?? '')
+	 . "\t" . ($synonyms ?? '')
+	 . "\t" . ($related ?? '')
+	 . "\n";
 }
 
 /** returns @string, html list: tag record formatted for output in the main tags data file  */
@@ -803,7 +815,7 @@ function formatTagRecord_DB ($td) {
 	else $prefix = "» "; // prepend the canonical tag marker, which helps with searching for the canonical instance of a tag that may appear in many other contexts in the database; because this is added at the "last second", and removed immediately upon parsing
 	$tagRecord = "\n{$prefix}{$td['true']} [{$td['tally#']}]\n";
 	 global $tag_fields; foreach ($tag_fields as $tag_field) {
-		if (is_null($td[$tag_field])) continue; // exclude this line to include empty fields
+		if (!isset($td[$tag_field])) continue; // exclude this line to include empty fields
 		$tagRecord .= "\t" . $tag_field . " = ";
 		if (is_string($td[$tag_field])) $tagRecord .= $td[$tag_field] . "\n";
 		if (is_array($td[$tag_field])) $tagRecord .= implode(", ", $td[$tag_field]) . "\n";
@@ -815,7 +827,7 @@ function formatTagRecord_DB ($td) {
 function makeThesaurusFile () {
 	if (!is_array($GLOBALS['tag_thesaurus'])) exit("\$GLOBALS['tag_thesaurus'] is not an array");
 	$tag_thesaurus_json = json_encode($GLOBALS['tag_thesaurus']);
-	$tag_thesaurus_fn = _ROOT . "/incs/tags-thesaurus.txt";
+	$tag_thesaurus_fn = _ROOT . "/incs/content--tags-thesaurus.txt";
 	if (fileExistsNoChange($tag_thesaurus_json, $tag_thesaurus_fn)) {
 		journal("tags file has not changed, <em>not</em> writing file: $tag_thesaurus_fn",2,true);
 		}

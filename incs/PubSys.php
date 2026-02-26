@@ -1,4 +1,28 @@
-<?php #pubsys > definitions of all functions
+<?php #pubsys > core code — see make-site.php or make-ps-blog.php build scripts for general info about PubSys
+
+/* 
+
+There are TWO big loops in the PubSys build script that process content for every post with eval(), a tortuous architecture:
+
+	(1) Read all the source files to build a huge array full of post data, with an eval() for the content in each post:
+	
+		foreach post found in source files, getMacroPost() or getMicroPost()
+			prepareContent()
+				renderPhpStr()
+					eval()
+	
+	2. writing all the HTML files, which another evaluate for the post-template, which then gets all the metadata and content inserted into it.
+	
+		makeWebVersions(), foreach post in post array
+				prepareTemplate()
+					eval(contents of template file, without actual content)
+					insert previously eval'd content into to eval'd template
+		
+	This results in some variable scoping problems (e.g. $memberButnId) with no tidy solution. The gist of the problem is that it is a counter like ++$memberButnId cannot be used meaningfully in both, and yet that variable is used in both.
+	
+	The general solution to this is to do only a single eval on both the template chrome and the content at the same time, a moderate difficulty project, which solves very little of importantance in the short term, but would probably make troubleshooting easier in the long-term. Maybe. Because it would require a more monolithic version of makeWebVersions that does everything — and the current architecture was, ironically, original intended to be more modular and therefore easier to troubleshoot!
+
+*/
 
 use League\HTMLToMarkdown\HtmlConverter; // use PHP Markdown, see https://github.com/michelf/php-markdown, and especially see https://michelf.ca/projects/php-markdown/configuration/
 use Michelf\MarkdownExtra; // use HTML To Markdown for PHP, to convert Markdown back to HTML! see https://github.com/thephpleague/html-to-markdown
@@ -77,7 +101,7 @@ function getPosts()
 	unset($keys[0]); // unset the bogus value
 
 	// go through the posts...
-	foreach ($posts as $key=>$post) {
+	$x=0; foreach ($posts as $key=>$post) {
 		$x++; // post counter, #1 = first in array, most recent
 
 		$new_posts[$key] = $post; // copy post to new array where it can be modified
@@ -203,11 +227,17 @@ $post = array('canonical' => null,
 				$post['post_img'] = "imgs/{$mdo}";
 			}
 
-			if (preg_match('@mp3$@', $md, $tmp)) {
+			if (preg_match('@mp3$@', $md, $tmp) and $mdo !== '<#filename#>.mp3') {			
 				$post['post_audio'] = "assets/audio/{$mdo}";
-				$post['post_audio_size_bytes'] = filesize(_ROOT . '/' . $post['post_audio']); // audio file size in bytes
-				$post['post_audio_dur'] = getDurationOfAudioInSecs(_ROOT . '/' . $post['post_audio']);
-				$post['post_audio_dur_time'] = intval($post['post_audio_dur'] / 60) . ':' . str_pad($post['post_audio_dur'] % 60, 2, '0', STR_PAD_LEFT); // The seconds may be <10secs and those need to zero-padded. Surprisingly tricky, but str_pad does the job, adding 0 only to increase 1-9 to 01-09, but leaving 10-59 alone. I think ;-)
+				$audio_path = _ROOT . '/' . $post['post_audio'];
+				if (file_exists($audio_path)) {
+					$post['post_audio_size_bytes'] = filesize($audio_path); // audio file size in bytes
+					$post['post_audio_dur'] = getDurationOfAudioInSecs($audio_path);
+					$post['post_audio_dur_time'] = intval($post['post_audio_dur'] / 60) . ':' . str_pad($post['post_audio_dur'] % 60, 2, '0', STR_PAD_LEFT); // The seconds may be <10secs and those need to zero-padded. Surprisingly tricky, but str_pad does the job, adding 0 only to increase 1-9 to 01-09, but leaving 10-59 alone. I think ;-)
+				} else {
+					journal("warning: cannot find post audio file $mdo, date", 2, true);
+					break;
+				}
 			}
 
 			if (preg_match('@psid(\d+)$@', $md, $tmp)) {
@@ -305,8 +335,9 @@ $post = array('canonical' => null,
 	$post['cites'] = getCites($post); // extracts all citations
 
 	$post['html'] = prepareContent($content); // make HTML version of content
+	// See notes at top of file: "There are TWO big loops in the PubSys build script that process content for every post with eval(), a tortuous architecture"
+	
 	// check HTML for errors and abort build when found (probably should export this to a function) #error_handling_in_posts
-
 	preg_match_all('|<!-- !!! ERROR !!! (.+?) -->|', $post['html'], $matches);
 	$errorsArr = $matches[1];
 	$errCount = count($errorsArr);
@@ -323,6 +354,7 @@ $post = array('canonical' => null,
 		echo "<h3 class='warning'>The post markup</h3><pre style='white-space: pre-wrap;'>" . htmlspecialchars($post['html']) . '</pre>';
 		exit;
 	}
+	
 	$post = get_post_size($post);
 	$len = strlen($content);
 	//	if (strpos($content, "\n\n") !== false)  $multi = true; // not sure $multi matters any more
@@ -568,12 +600,19 @@ $post = array('canonical' => null,
 				$psidsArr[] = $post['psid'] = $tmp[1]; // save it to the psids array, and the post array
 			}
 
-			if (preg_match('@mp3$@', $md, $tmp)) {
+			if (preg_match('@mp3$@', $md, $tmp) and $mdo !== '<#filename#>.mp3') {			
 				$post['post_audio'] = "assets/audio/{$mdo}";
-				$post['post_audio_size_bytes'] = filesize(_ROOT . '/' . $post['post_audio']); // audio file size in bytes
-				$post['post_audio_dur'] = getDurationOfAudioInSecs(_ROOT . '/' . $post['post_audio']);
-				$post['post_audio_dur_time'] = intval($post['post_audio_dur'] / 60) . ':' . str_pad($post['post_audio_dur'] % 60, 2, '0', STR_PAD_LEFT); // The seconds may be <10secs and those need to zero-padded. Surprisingly tricky, but str_pad does the job, adding 0 only to increase 1-9 to 01-09, but leaving 10-59 alone. I think ;-)
+				$audio_path = _ROOT . '/' . $post['post_audio'];
+				if (file_exists($audio_path)) {
+					$post['post_audio_size_bytes'] = filesize($audio_path); // audio file size in bytes
+					$post['post_audio_dur'] = getDurationOfAudioInSecs($audio_path);
+					$post['post_audio_dur_time'] = intval($post['post_audio_dur'] / 60) . ':' . str_pad($post['post_audio_dur'] % 60, 2, '0', STR_PAD_LEFT); // The seconds may be <10secs and those need to zero-padded. Surprisingly tricky, but str_pad does the job, adding 0 only to increase 1-9 to 01-09, but leaving 10-59 alone. I think ;-)
+				} else {
+					journal("warning: cannot find post audio file $mdo, date", 2, true);
+					break;
+				}
 			}
+			
 			if ($md == 'audio_desc') {
 				$post['post_audio_desc'] = $md_pt2;
 			}
@@ -682,7 +721,7 @@ function makeWebVersions()
 	$noLazyload = true;
 	journal('making post files', 1);
 
-	foreach ($posts as $post) {
+	$n=0; foreach ($posts as $post) {
 		$n++;
 		if ($prepMode and $n > 3) { // prepMode still works with the complete posts array, but does MUCH LESS with it, like making files out of only the first 3 of them (and the third generally has no changes)
 			break;
@@ -737,7 +776,7 @@ function makeWebVersions()
 			if (strlen($post['title_smpl']) > 50) {
 				$caution = " caution: that's a pretty long filename, consider using a slug?";
 			} else {
-				unset($caution);
+				$caution = '';
 			}
 			journal("making post file [$preview_link] from {$post['source_file']}{$caution}", 2, true);
 			echo 'saving regular post! ••••';
@@ -1000,7 +1039,7 @@ exit;
 	$readingTime = roundDown($wordCount / 300);  // maybe these values should be in the post data?
 
 	// make a Buttondown intro template
-	$introTemplate .=<<<introtemplate
+	$introTemplate =<<<introtemplate
 		¶¶¶¶¶==== INTRODUCTION¶¶¶¶¶
 
 		==== WORD COUNT, READ ON PAINSCI, SOCIAL MEDIA LINKS
@@ -1013,7 +1052,7 @@ exit;
 			Continue reading below, or [on PainScience.com]({$thePost['url_live']}), about {$readingTime}-minutes more ({$wordCount} words).
 			introtemplate;
 	} else { // or an audience-targeted version in member posts
-		$introTemplate .= <<<introtemplate
+		$introTemplate = <<<introtemplate
 			
 			 {% if subscriber.can_view_premium_content %}Continue reading the full members-only post below. {% if subscriber.can_view_premium_content and subscriber.stripe_subscription.product != 'pst1' %}As a full member, you can also reading [the full post on PainScience.com]({$thePost['url_live']}), about another {$readingTime}-minutes more ({$wordCount} words). (Why read there? Footnotes are better, links are more convenient, the layout is a bit richer and more polished, audio versions are embedded, and — most important — they may include updates.){% endif %}{% endif %}
 			introtemplate;
@@ -1033,13 +1072,10 @@ exit;
 	// add standard P.S. #cta_join to the intro template to non-member posts
 	if (! $thePost['premium']) {
 		$introTemplate .= <<<introtemplate
-		\n\n{% if subscriber.can_be_upsold %}
-		**P.S.** “Good” **PainSci membership** starts at <small>USD</small>
-		**[$3/month]({{ upgrade_url}}?product=pst1)** to get premium emails, the main benefit, or
-		**[$5/month]({{ upgrade_url}}?product=pst2)** to unlock a whole bunch of perks — podcast, archives, lots of members-only content on the website, more — or get serious with
-		**[$10/month]({{ upgrade_url}}?product=pst3)** to unlock… well, not many more benefits, but the occasional perk (this tier is mostly about supportive patronage). 😜 [Compare plans](https://www.painscience.com/membership.php).
-		{% endif %}
-		introtemplate;
+			\n\n{% if subscriber.can_be_upsold %}
+			> **P.S.** “Good” **PainSci membership** starts at <small>USD</small> **[$3/month]({{ upgrade_url}}?product=pst1)** to get members-only posts by email (the main benefit), or **[$5/month]({{ upgrade_url}}?product=pst2)** to unlock more (podcast, archives, lots of members-only content on the website), or get *really* serious with **[$10/month]({{ upgrade_url}}?product=pst3)** to unlock… well, honestly, nothing but good vibes (the top tier is mostly about supportive patronage, although occasionally I deliver special perks for my most awesome members). 😜 [Compare plans](https://www.painscience.com/membership.php).
+			{% endif %}
+			introtemplate;
 	}
 
 	$theContent = $introTemplate . "¶¶¶¶¶¶===== title + template ↑ ======================== post content ↓ ==============¶¶¶¶¶¶" . $theContent;
@@ -1261,7 +1297,7 @@ function prepareEasyImg($content)
 }
 
 /* <##> make the main and member #RSS feeds */
-function makeRSS($max = 25)
+function makeRSS($max = 30)
 {
 	journal('making the RSS feeds (main + member)', 1);
 	/*	if (!isset($_GET["rss"])) {
@@ -1275,20 +1311,15 @@ function makeRSS($max = 25)
 	krsort($postsWithRSS); // sort it again, and this is actually critical, because RSS only deals with recent posts and assumes dated post order!
 	global $settings;
 	extract($settings);
-	foreach ($postsWithRSS as $post) {
+	$n=0; foreach ($postsWithRSS as $post) {
 		if ($post['preview'] or $post['rss_no_post'] or $post['podcast_only']) { // exclude post previews & posts explicitly excluded from RSS
 			continue;
 		}
+		if ($n++ > $max) break; // start counting non-excluded posts
 		extract($post); // get all the data for the found post
-
 		$date_rss = date('D, d M Y H:i:s -0700', $timestamp); // get the date for the post in RSS-friendly format
-		if ($n++ == $max) {
-			break;
-		}
+		if ($n == 1) {$last_build_date = $date_rss;} // make the build date equal to date of most recent post, which should be the first in the stack
 		journal("adding a post to the RSS feeds [ $title_smpl ]", 3);
-		if ($n == 1) {
-			$last_build_date = $date_rss;
-		} // make the build date equal to date of most recent post
 		$title = numericEntities($title); // RSS will choke on named entities like &ldquo; so a special function is needed to convert special chars to numeric entities specifically
 		$content = $html; // output the post content as HTML
 
@@ -1360,13 +1391,11 @@ function makeRSS($max = 25)
 			$audio_blurb_top = $audio_blurb_bottom = null;
 			if ($post['post_audio'] and $title !== 'Podcast at last!') { //podcast_content #dated_content // had to special case the inclusion of the standard audio blurbs for the podcast announcement post because it was conspicuously redundant
 				$audio_blurb_top = "<p><em><small>There is an audio version of this post ({$post['post_audio_dur_time']}) in the PainSci Updates podcast for members only. See the end of the post for more information.</small></em></p>\n\n<hr>\n\n";
-				if (time() < 1712849686 + 90 * 24 * 60 * 60) {
-					$newstuff = 'new (!) ';
-				}
-				$audio_blurb_bottom = "<p><em><small>There is an audio version of this post ({$post['post_audio_dur_time']}) in the {$newstuff}PainSci Updates podcast for members only. You can subscribe to the podcast much like you subscribe to this feed, but with a podcast app. You just need your personal address for the podcast, available on your PainSci account page.</small> {$post['post_audio_desc']}</em></p>";
+				$audio_blurb_bottom = "<p><em><small>There is an audio version of this post ({$post['post_audio_dur_time']}) in the PainSci Updates podcast for members only. You can subscribe to the podcast much like you subscribe to this feed, but with a podcast app. You just need your personal address for the podcast, available on your PainSci account page.</small> {$post['post_audio_desc']}</em></p>";
 			}
 
 			// Generate one MEMBER RSS POST
+			$rss_posts_member ??= '';
 			$rss_posts_member .= eval('return "' . addslashes(file_get_contents("template-rss-member-post.xml", true)) . '";'); // Build the member version of the post from the member template, and append it to a string containing all member posts so far. The template contains "{$content_member}" which will be replaced with the value of $content_member for this post (along with other vars).
 
 			// Now finish the non-member version of the post by removing member content.
@@ -1382,6 +1411,7 @@ function makeRSS($max = 25)
 		ob_end_clean();
 		$rss_post = eval('return "' . addslashes($rss_post) . '";'); // substitute values in the RSS post template with values filled in
 		// if (inStr("Charles", $content)) exit(htmlspecialchars("<pre>$rss_post</pre>"));
+		$rss_posts ??= '';
 		$rss_posts .= stripslashes($rss_post); // remove the slashes we just added
 		$rss_posts = preg_replace("|\n{3,5}|", "\n\n", $rss_posts); // standardize vertical whitespace (to minimize spurious whitespaces diffs)
 		unset($ftd_url, $url_rss, $url_pretty); // cleanup some vars
@@ -1434,10 +1464,11 @@ function makePodcast($max = 500)
 	krsort($postsWithRSS); // sort it again, and this is actually critical, because RSS only deals with recent posts and assumes dated post order!
 	global $settings;
 	extract($settings);
-	foreach ($postsWithRSS as $post) {
+	$n=0; foreach ($postsWithRSS as $post) {
 		if ($post['preview'] or $post['rss_no_post']) {
 			continue;
 		} // exclude post previews & posts explicitly excluded from RSS
+		if ($n++ > $max) break; // start counting non-excluded posts
 		unset($title, $date_rss, $psid, $url_live, $post_audio, $post_audio_size_bytes, $post_audio_dur, $description, $link, $link_quoted, $ftd_url, $url_rss, $url_pretty, $post_img); // cleanup some vars
 		extract($post); // get all the data for the found post
 		if (! $post_img) {
@@ -1447,9 +1478,6 @@ function makePodcast($max = 500)
 			continue;
 		} // this is the audio feed, so skip posts without audio
 		$date_rss = date('D, d M Y H:i:s -0700', $timestamp); // get the date for the post in RSS-friendly format
-		if ($n++ == $max) {
-			break;
-		}
 		journal("adding an episode to the podcast feed [ $title_smpl ]", 3);
 		$title = numericEntities($title); // RSS will choke on named entities like &ldquo; so a special function is needed to convert special chars to numeric entities specifically
 		// if (inStr("full-fledged evidence", $content)) exit("<pre>" . htmlentities($html) . "</pre>");
@@ -1471,6 +1499,7 @@ function makePodcast($max = 500)
 
 		$rss_post = eval('return "' . addslashes($rss_post) . '";'); // substitute values in the RSS post template with values filled in
 		// if (inStr("Charles", $content)) exit(htmlspecialchars("<pre>$rss_post</pre>"));
+		$rss_posts ??= '';
 		$rss_posts .= stripslashes($rss_post); // remove the slashes we just added
 		$rss_posts = preg_replace("|\n{3,5}|", "\n\n", $rss_posts); // standardize vertical whitespace (to minimize spurious whitespaces diffs)
 	}
@@ -1512,14 +1541,15 @@ function makeSitemap()
 	$sitemap_str = str_replace('http://www.painsci', 'https://www.painsci', $sitemap_str);
 	// note, lastmod must be equal to the most recent post, and will be subbed in after
 	journal('adding posts to sitemap', 2, true);
-	foreach ($posts as $post) {
+	$n=0; foreach ($posts as $post) {
 		if ($post['preview'] or 					// do not include post previews
 			$post['indexing'] === false or		// a noindexing directive is equivalent to exclusion from the sitemap
 			$post['canonical']) { // if there's a canonical URL, do not include this one in the sitemap
 			continue;
 		}
+		$n++; // start counting non-excluded posts
 		journal('adding post '  . $post['title_smpl'], 3);
-		$loc = "\n<!--#" . ++$n . "--><url><loc>http://{$domain}/{$post['title_smpl']}.html</loc>\n" .
+		$loc = "\n<!--#" . $n . "--><url><loc>http://{$domain}/{$post['title_smpl']}.html</loc>\n" .
 		'<lastmod>' . $post['date'] . '</lastmod>';
 		$sitemap_str .= str_replace('http://www.painscience.com', 'https://www.painscience.com/blog', $loc); // #psmod: add “blog” subdir
 		// PRIORITY is .7 for macro and .5 for microposts unless otherwise stated
@@ -1536,7 +1566,7 @@ function makeSitemap()
 			$sitemap_str .= '<priority>0.' . ($default_priority - 2) . '</priority>';
 		}
 		// CHANGE FREQUENCY is "never" unless otherwise stated (really not supported here yet)
-		if ($post['changefreq']) {
+		if (isset($post['changefreq'])) {
 			$sitemap_str .= "<changefreq>{$post['changefreq']}<changefreq>";
 		} else {
 			$sitemap_str .= '<changefreq>never</changefreq>';
@@ -1565,6 +1595,7 @@ function remove_old_files($posts)
 	//	printArr($GLOBALS['filenames']);
 	//	echo "!!!!!!!!!<br><br>!!!!!!!!!!!!<br><br>";
 	//	printArr(glob(STAGE . "/*.html")); exit;
+	$x = 0;
 	foreach (glob(STAGE . '/*.html') as $fn) { // for every html file (posts and tag indexes)
 		if (inStr('index.html', $fn)) {
 			continue;
@@ -1601,7 +1632,7 @@ function remove_old_files($posts)
 
 /* PubSys miscellaneous functions.
 
-(Many of these functions could potentially be useful for BibSys, and transferred to misc-functions.php.)
+(Many of these functions could potentially be useful for BibSys, and transferred to util--core.php.)
 
 get_settings																settings			read blog settings from simple text file
 get_marked_text ($content, $marker = "`")				string			title or description parsed from content
@@ -1957,7 +1988,7 @@ function file_management()
 {
 
 	// alias to most current microposts file, a convenience
-	make_current_microposts_alias($micropost_files);
+	// make_current_microposts_alias($micropost_files);
 	journal('checking a few more critical files', 1);
 
 	// the contents of the "HTML" folder should be completely automatically managed/autogenerated; it should be possibel to wipe it clean, and then rebuilt in every detail; this requires checks for certain files
@@ -2031,7 +2062,7 @@ function make_post_index($posts = null, $type = 'table')
 		global $posts;
 	} // if a subset of posts isn’t specified, use them all
 	//	foreach ($posts as $x) echo $x['title'] . '… '; exit;
-	foreach ($posts as $post) {
+	$index_str=''; foreach ($posts as $post) {
 		$index_str .= make_post_index_item($post, $type);
 	}
 	if ($type == 'list') {
@@ -2056,8 +2087,8 @@ function list_urls($posts = null, $type = 'table')
 		global $posts;
 	} // if a subset of posts isn’t specified, use them all
 	//	foreach ($posts as $x) echo $x['title'] . '… '; exit;
-	foreach ($posts as $post) {
-		$postPageUrl = "{$optional_subdir}/{$post['title_smpl']}.html";
+	$postUrlsAndLinks = ''; foreach ($posts as $post) {
+		$postPageUrl = ($optional_subdir??'') . "/{$post['title_smpl']}.html";
 		$postUrlsAndLinks .= <<<TEMPLATE
 			PainScience.com$postPageUrl
 			https://www.painscience.com$postPageUrl
@@ -2077,7 +2108,7 @@ function make_post_index_item($post, $type = 'table')
 	} // do not process post previews
 	extract($post);
 	$index_class = $size; // assign a class indicating the size of the post
-	$postSizesIndex = ['xxs' => '1', 'xs' => '2', 's' => '3', 'm' => '4', 'l' => '5', 'xl' => '6']; // a numeric index representing post sizes, used for filtering
+	$postSizesIndex = ['xxxs' => '', 'xxs' => '1', 'xs' => '2', 's' => '3', 'm' => '4', 'l' => '5', 'xl' => '6', 'xxl' => '7']; // a numeric index representing post sizes, used for filtering
 	$date = dateClear($timestamp);
 	// now over-ride that class for certain kinds of posts which need a different icon, like image posts
 	$audioBadge = $post_audio ? "<span style='opacity:0.5'><small>&#128264;</small></span>" : null;
@@ -2143,6 +2174,7 @@ function make_sy_indexes()
 	global $settings;
 	extract($settings);
 	global $posts;
+	$wordsTotal = 0;
 	foreach ($posts as $post) {
 		if ($post['preview']) {
 			continue;
@@ -2157,6 +2189,8 @@ function make_sy_indexes()
 
 		$postIdDivider = "\n\n<!-- ==================================================== -->\n<!-- === <# {$post['date']}</a>: {$post['title']} [{$post['words_exact']}] #>]\n\n{$post['description']} -->";
 
+		$postsRecentPopupListStr ??= '';
+		$postsRecentPopupListCount ??= 0;
 		if (++$postsRecentPopupListCount <= 5):
 		$postTemplatePopupList = <<<TEMPLATE
 			$postIdDivider
@@ -2165,6 +2199,7 @@ function make_sy_indexes()
 		$postsRecentPopupListStr .= $postTemplatePopupList;
 		endif;
 
+		$postsRecentIndexLinksCount ??= 0;
 		if (++$postsRecentIndexLinksCount <= 20):
 			if (strlen($post['description']) > 80) {
 				$description = truncateToWord($post['description'], 80);
@@ -2183,6 +2218,8 @@ function make_sy_indexes()
 				<li><span class="item_update"><span class="colour_gray_blue">$date_str</span></span>: <a href="https://www.painscience.com$postPageUrl">{$post['title']}</a></li>\n
 				TEMPLATE;
 
+		$postRecentLinkList6 ??= '';
+		$postRecentLinkList20 ??= '';
 		if ($postsRecentIndexLinksCount < 6) {
 			$postRecentLinkList6 .= $postsRecentIndexLinksTemplate;
 			$postRecentLinkList20 .= $postsRecentIndexLinksTemplate;
@@ -2198,17 +2235,19 @@ function make_sy_indexes()
 		// build a matrix of blog posts for articles.php, with tags translated to class names that will be applied to each row for search, sort, filter (SSF)
 
 		// get all item tags
-$item_tags = explode(',', $post['tags']); // explode the record tags to an array of true tags
-
-foreach ($item_tags as $tag) { // make an array of tags KEYS
-	$tag_keys[] = simplify($tag);
-}
+		$item_tags = explode(',', $post['tags']); // explode the record tags to an array of true tags
+		
+		foreach ($item_tags as $tag) { // make an array of tags KEYS
+			$tag_keys[] = simplify($tag);
+		}
 
 		// add more tags inferred from metadata
 		// (note, these probably duplicate some inferred tags by the tag engine); may be substantial obsolete and result in non-identical redundant tags
 		$dateClear = dateClear($post['timestamp']);
 		$dateClearer = dateClearer($post['timestamp']);
 		// another reckoning of size to blend with main PS article index
+
+		$freshness = '';
 		if (daysSinceTstamp($post['timestamp']) < 180) {
 			$freshness = 'new';
 		}
@@ -2228,14 +2267,16 @@ foreach ($item_tags as $tag) { // make an array of tags KEYS
 		$tag_keys[] = $freshness;
 		$tag_keys[] = 'blog';
 		// sort($tag_keys); 										// sort the tags #newmatrix
-$tag_keys = implode(' ', $tag_keys); // we’re done with the array: convert to a string for insertion into class attributes
 
-if (inStr('ytemb', $summary)) {
-	unset($summary);
-} // hack to eliminate ytembs in this context
+		$tag_keys = implode(' ', $tag_keys); // we’re done with the array: convert to a string for insertion into class attributes
+		
+		if (inStr('ytemb', $summary??'')) unset($summary); // hack to eliminate ytembs in this context
 
 		$sizeSymbol = "<span class='char_bullet_compact'>$sizeSymbol</span>";
 
+
+		$summary = $summary??'';
+		$post['subtitle'] = $post['subtitle']??'';
 		$posts_matrix = <<<TEMPLATE
 			{$post['timestamp']}:::<tr class="blog" id="{$post['title_smpl']}" data-tags="$tag_keys">
 			<td class="item_title" style="min-width:50%;" data-sort-value="{$post['title_smpl']}"><a href="https://www.painscience.com$postPageUrl">{$post['title']}</a>$summary &nbsp; <span class='subtitles'>{$post['subtitle']}</span></td>
@@ -2245,7 +2286,7 @@ if (inStr('ytemb', $summary)) {
 			TEMPLATE;
 		// REMOVED <td class="item_size size" data-sort-value="$nowords">$sizeSymbol</td>
 
-		$score = $score + 100 - (daysSinceTstamp($post['timestamp']) / 2); // 200 points for a brand new post
+		$score = 100 - (daysSinceTstamp($post['timestamp']) / 2); // 200 points for a brand new post
 		if ($score < -300) {
 			$score = -300;
 		}
@@ -2295,8 +2336,6 @@ if (inStr('ytemb', $summary)) {
 		unset($postPageUrl);
 		unset($post_link);
 		unset($tags_str);
-		unset($SSFclasses);
-		unset($SSFclasses);
 		unset($warning);
 		unset($summary);
 		unset($size);
@@ -2308,7 +2347,8 @@ if (inStr('ytemb', $summary)) {
 	arsort($postsMatrixTmp); // sort by score (first value in each record)
 $postsMatrixTmp = array_slice($postsMatrixTmp, 0, 200, 'PRESERVE_KEYS'); // take just the 200 best records, but don't wreck keys, because …
 krsort($postsMatrixTmp); // re-sort by the post timestamp, which is stored in the keys
-foreach ($postsMatrixTmp as $post) {
+
+$postsMatrixStr=''; foreach ($postsMatrixTmp as $post) {
 	$postsMatrixStr .= $post[1];
 } // build the final string
 
@@ -2405,11 +2445,11 @@ function make_post_matrix($echo = true, $save = true)
 	$fields = get_post_field_names(); // #2do: this should be a globally available array
 
 	$posts_all_table = '';
-	foreach ($posts as $post) {
+	$n=0; foreach ($posts as $post) {
 		if ($prepMode and $n++ > 10) {
 			break;
 		}
-		$tsvItems = '';
+		$postTemplateTsvRows = $tsvItems = '';
 		if ($save) { // harvest nearly all post data for TSV output
 			foreach ($fields as $key=>$field) {
 				if ($field == 'html' or $field == 'content') { // skip content and html fields (the only exclusions)
@@ -2440,15 +2480,15 @@ function make_post_matrix($echo = true, $save = true)
 		// #2do, maybe someday I can figure out how to build a link for opening files again
 		// $src_file_url = "file://localhost{$stage}/posts/" . rawurlencode($src_file);
 		// $src_file = "zzz <a href=\"{$src_file_url}\">$src_file_short</a>"; // alas, safari seems to strip localhost out of these URLs, probably for security reasons
-		if ($post['ftd_url']) {
+		if (($post['ftd_url']??null)) {
 			$featured_url = "<a href='{$post['ftd_url']}'>∞</a>";
 		}
 
-		if ($post['post_img']) { // if there is a post img …
+	$postImgTiny = '';
+	if (($post['post_img']??null)) { // if there is a post img …
 			$post_img_path = "/html/{$post['post_img']}"; // create a within-root path for legacy pubsys, which includes the html dir
 			global $ps; if ($ps) $post_img_path = str_replace('/html', '', $post_img_path); // remove the html for PainSci
 			if (file_exists(_ROOT . $post_img_path)) { // if it exists, build a linked image with a relative URL
-					$postImgTiny = '';
 					$postImgTiny = "<a title='{$post['post_img']}' href='$post_img_path'><img src='$post_img_path' height='25px'></a>";
 			}
 			else { // if it doesn't exist, alert me to the missing-ness
@@ -2539,15 +2579,16 @@ Use-case: when I’m blogging, I’m often copying and pasting content back and 
 
 	global $sources;
 	$original_url = $my_url;
-
-	// 1. check for bibliography URLS
-if (strpos($my_url, 'biblio') !== false) { // if it’s a bib url, assume everything after the ? is a citekey (pretty safe assumption) … #2do, remember that I can and do use biblio URLs of the format https://www.PainScience.com/gru, which this function will probably choke on
-	$pos = strrpos($my_url, '?') + 1;
-	$candidate_ck = substr($my_url, $pos, strlen($my_url) - $pos);
-	if ($sources->safeGet($candidate_ck)->isValid()) {
-		return $candidate_ck;
+	$candidate_ck = '';
+	
+		// 1. check for bibliography URLS
+	if (strpos($my_url, 'biblio') !== false) { // if it’s a bib url, assume everything after the ? is a citekey (pretty safe assumption) … #2do, remember that I can and do use biblio URLs of the format https://www.PainScience.com/gru, which this function will probably choke on
+		$pos = strrpos($my_url, '?') + 1;
+		$candidate_ck = substr($my_url, $pos, strlen($my_url) - $pos);
+		if ($sources->safeGet($candidate_ck)->isValid()) {
+			return $candidate_ck;
+		}
 	}
-}
 
 	// 2. check for full article URLs
 	$my_url = preg_replace('@php#.*$@', '', $my_url);
@@ -2690,6 +2731,7 @@ function makeMemberPostLists()
 	extract($settings);
 	$links = [];
 	global $posts;
+	$filesList = $urlsList = '';
 	foreach ($posts as $timestamp => $post) {
 		if (! $post['premium'] or ($post['preview']??false)) { // eliminate non-member posts + posts with preview status
 			continue;
@@ -2740,6 +2782,9 @@ function prepareTemplate($post, $templateFile)
 	extract($settings);
 
 	$template_file_contents = file_get_contents($templateFile);
+
+	// See notes at top of file: "There are TWO big loops in the PubSys build script that process content for every post with eval(), a tortuous architecture"
+
 	ob_start();
 	eval("?>$template_file_contents"); // On the use of eval in the PainSci CMS: craftdocs://open?blockId=D8BB4DEF-66B7-4395-9020-1CACBE6BBFC4&spaceId=bc7d854c-3e5b-a34e-4850-a6d2f31a1a59
 	$thisTemplate = ob_get_contents();
@@ -2765,21 +2810,18 @@ function prepareTemplate($post, $templateFile)
 			}
 		}
 
-	$thisTemplate = str_replace('{$tags}', $post['tags_private'], $thisTemplate);
-	$thisTemplate = str_replace('{$words_round}', $post['words_round'], $thisTemplate);
-	$thisTemplate = str_replace('{$cites}', $post['cites'], $thisTemplate);
-	$thisTemplate = str_replace('{$source_file}', $post['source_file'], $thisTemplate);
-	$thisTemplate = str_replace('{$title_smpl}', $post['title_smpl'], $thisTemplate);
-	$thisTemplate = str_replace('{$pageimg_custom}', $post['pageimg_custom'], $thisTemplate);
-	$thisTemplate = str_replace('{$pageimg_default}', $pageimg_default, $thisTemplate);
+	$thisTemplate = str_replace('{$tags}', $post['tags_private']??'', $thisTemplate);
+	$thisTemplate = str_replace('{$words_round}', $post['words_round']??'', $thisTemplate);
+	$thisTemplate = str_replace('{$cites}', $post['cites']??'', $thisTemplate);
+	$thisTemplate = str_replace('{$source_file}', $post['source_file']??'', $thisTemplate);
+	$thisTemplate = str_replace('{$title_smpl}', $post['title_smpl']??'', $thisTemplate);
+	$thisTemplate = str_replace('{$pageimg_custom}', $post['pageimg_custom']??'', $thisTemplate);
+	$thisTemplate = str_replace('{$pageimg_default}', $pageimg_default??'', $thisTemplate);
 	$thisTemplate = str_replace('{$sitename}', $sitename, $thisTemplate);
 	$thisTemplate = str_replace('{$sidecode}', $sitecode, $thisTemplate);
 	$thisTemplate = str_replace('{$domain}', $domain, $thisTemplate);
 
 	// setting page images is a bit of a mess right now, with full fragmentation between PS and non-PS builds; #2do: refactor so that ogimg is agnostic about context and can be used for all of the following scenarios
-
-	$pubdate_iso = date('c', parseDate($pubdate));
-	$sdTitle = substr($title, 0, 109); // truncate title to max allowable for this structured data
 
 	if ($GLOBALS['ps']) { 	//schema_markup — This code block substantially similar to (but simpler than) code in head-schema-markup.php.  Bread crumb trails are missing, but ... it doesn't seem like they've ever done anything for articles, so meh.
 
@@ -2900,19 +2942,20 @@ function prepareTemplate($post, $templateFile)
 	$thisTemplate = str_replace('{$date1}', $post_date1, $thisTemplate);
 	$thisTemplate = str_replace('{$date2}', $post_date2, $thisTemplate);
 
-	if ($post['ftd_url']) {  // work with featured links
+	if (($post['ftd_url']??null)) {  // work with featured links
 		// link title to a featured link
 		$thisTemplate = preg_replace("/<h1(.*?)>(.*?)<\/h1>/uism", '<h1$1><a href="' . $post['ftd_url'] . "\">$2&nbsp;<span style='color:#DDD'>∞</span></a></h1>", $thisTemplate);
 		if (! isset($post['hidelink'])) { // stop now if the hidelink flag is set
 			// make a featured link at the bottom of the post, #psmod, now for either a regular URL or citekey
-			$link = $post['htmlFeaturedCk'] ? $post['htmlFeaturedCk'] : "<p class='widebar featured_link'><a href='{$post['ftd_url']}'>" . prettifyURL($post['ftd_url']) . '</a></p>';
+			$link = ($post['htmlFeaturedCk']??null) ? $post['htmlFeaturedCk'] : "<p class='widebar featured_link'><a href='{$post['ftd_url']}'>" . prettifyURL($post['ftd_url']) . '</a></p>';
 			$thisTemplate = str_replace('</article>', "\n{$link}\n\n</article>", $thisTemplate); // add the link to the post; 2025-12-01 fixed bug: </article> was placed after </footer> in the template for the PS blog, so this was putting the featured link in a very un-featured location; I moved </article> to before <footer> in the template which solved that problem tidily, and is probably also more structurally correct (the footer doesn't really pertain to the article, so should be a child)
 		}
 	}
 
 	// next/prev: prepare next & previous post links (#psmod, sort of: developed for PS, but these have zero effect if the post template doesn't have the variables, and they could be useful for the other blogs in the future)
 	global $posts; // we'll need the full post array for this
-	if ($post['prev_post']) {
+	$prev_link = $next_link = '';
+	if (isset($post['prev_post'])) {
 		$prev = $posts[$post['prev_post']];
 		$prev_link = "<a href='{$prev['title_smpl']}.html'>{$prev['title']}</a>";
 	}
