@@ -7,3 +7,4 @@
 * site_img  				diversions-logo-250px.jpg
 * author  					Susan Ingraham
 * email  					ingrahamsusan@mac.com
+* imgs_dir					imgs

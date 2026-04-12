@@ -184,7 +184,7 @@ $post = array('canonical' => null,
 'title_working' => null,
 'url' => null,
 'url_live' => null);
-
+	global $settings; extract($settings);
 	journal("reading micropost source file [ ln $lnno of $fn ]", 2);
 	// echo "&nbsp;&nbsp;processing $discovery_id<br>";
 	$post['post_class'] = 'micro';
@@ -224,7 +224,7 @@ $post = array('canonical' => null,
 				$post['ftd_url'] = $md . ':' . $md_pt2;
 			} // reassemble featured URL
 			if (preg_match('@(jpg|gif|png)$@', $md, $tmp)) {
-				$post['post_img'] = "imgs/{$mdo}";
+				$post['post_img'] = "{$imgs_dir}/{$mdo}";
 			}
 
 			if (preg_match('@mp3$@', $md, $tmp) and $mdo !== '<#filename#>.mp3') {			
@@ -250,6 +250,12 @@ $post = array('canonical' => null,
 					exit("Ruh roh, psid {$tmp[1]} is a dupe.");
 				}
 				$psidsArr[] = $post['psid'] = $tmp[1]; // save it to the psids array, and the post array
+
+				global $sources;
+				$sources->findRecordsThatEqual('psid', $post['psid']);
+				$record = $sources->results[0];
+				$post['citekey'] = $record->rawcitekey;				
+				// echo "{$post['psid']}, {$post['title']}, {$post['citekey']}<br><br>";
 			}
 
 			if (in_array($md, $md_syns['link'])) {
@@ -513,6 +519,7 @@ $post = array('canonical' => null,
 'url' => null,
 'url_live' => null);
 
+	global $settings; extract($settings);
 
 	journal("reading macropost source file [ $fn ]", 2);
 	$post['post_class'] = 'macro';
@@ -585,7 +592,7 @@ $post = array('canonical' => null,
 			} // reassemble featured URL
 			
 			if (preg_match('@(jpeg|jpg|gif|png)$@', $md, $tmp)) {
-				$post['post_img'] = "imgs/{$mdo}";
+				$post['post_img'] = "{$imgs_dir}/{$mdo}";
 			}
 
 			if (preg_match('@psid(\d+)$@', $md, $tmp)) {
@@ -598,6 +605,13 @@ $post = array('canonical' => null,
 					exit("Ruh roh, psid {$tmp[1]} is a dupe.");
 				}
 				$psidsArr[] = $post['psid'] = $tmp[1]; // save it to the psids array, and the post array
+				// if there's a PSID, there's probably a citekey, but PubSys is surprisingly unaware of these …	
+				
+				global $sources;
+				$sources->findRecordsThatEqual('psid', $post['psid']);
+				$record = $sources->results[0];
+				$post['citekey'] = $record->rawcitekey;				
+				// echo "{$post['psid']}, {$post['title']}, {$post['citekey']}<br><br>";
 			}
 
 			if (preg_match('@mp3$@', $md, $tmp) and $mdo !== '<#filename#>.mp3') {			
@@ -786,16 +800,6 @@ function makeWebVersions()
 		// Build a post-preview with tools. Start by creating a table of detailed metadata.
 		if ($n == 1) { // make extra useful files for the first post in the array
 			$postMetadata = $post;
-			$removeFields = [ // we're doing to display
-				'html_premium',
-				'html',
-				'post_class',
-				'words_round',
-				'tags',
-				'prev_post',
-				'timestamp',
-				'psid',
-			];
 			foreach ($postMetadata as $key=>$field) {
 				if ($field == null or in_array($key, ['html_premium', 'html', 'post_class', 'words_round', 'tags', 'prev_post', 'timestamp', 'psid']) ) { // get rid of some cluttery fields
 					unset($postMetadata[$key]);
@@ -803,9 +807,9 @@ function makeWebVersions()
 				}
 			$metadataTable = printArrTable1($postMetadata, true, 'Post metadata'); // returns a table of post metadata converted from the post array // parameters (array, true to return instead of echo, optional title, optional size class small|medium|large, label for key column th, label for value column th
 
-			$shortcuts = "<p class='smallest font_narrow' style='text-align:center; color:gray'><strong>]</strong> chrome • <strong>|</strong> VIP pass</p>"; // see span#chromeToggle in javascript-setup.php
+			$preview_shortcuts = "<p class='smallest font_narrow' style='text-align:center; color:gray'><strong>]</strong> chrome • <strong>|</strong> VIP pass</p>"; // see span#chromeToggle in javascript-setup.php
 				
-			$preview_tools = "<div id='metadata_dev' style='width: 94vw; margin-left: calc(-46vw + 50%); padding: 0 1em;border: 2px solid #c66;border-radius:1em;font-size:.8em;'>\n\n{$metadataTable}\n\n{$shortcuts}\n\n</div>";
+			$preview_tools = "<div id='metadata_dev' style='width: 94vw; margin-left: calc(-46vw + 50%); padding: 0 1em;border: 2px solid #c66;border-radius:1em;font-size:.8em;'>\n\n{$metadataTable}\n\n{$preview_shortcuts}\n\n</div>";
 
 			// insert the tools into the preview just after <body>
 			$thePost_preview = preg_replace('@<body (.+?)>@', "<body $1>\n\n{$preview_tools}", $thePost);
@@ -940,7 +944,7 @@ Given this source code:
 We get this web version output of an image:
 
 	<div class='imgbox center' style='max-width:750px'>	
-	<a href='/imgs/marijuana-1-banner--land2-1000x520-110k.jpg' target='_blank' title='Embiggen! Open larger version in new tab/window.'><img class='' src='/imgs/marijuana-1-banner--land2-760x400-70k.jpg' alt='This is the alt text for marijuana.' width='750' height='392'>
+	<a href='/assets/images/marijuana-1-banner--land2-1000x520-110k.jpg' target='_blank' title='Embiggen! Open larger version in new tab/window.'><img class='' src='/assets/images/marijuana-1-banner--land2-760x400-70k.jpg' alt='This is the alt text for marijuana.' width='750' height='392'>
 	</a>
 	<p class='img_byline'>This is the <a href="https://www.painscience.com">Byline</a> for marijuana.</p>
 	<p class='capt below'><!--caption-->This is the caption for&nbsp;marijuana.<!--/caption--></p>
@@ -977,7 +981,7 @@ Convert that to:
 	$theContent = str_replace('<!--/imgbox--></div>', '</figure>', $theContent);
 	$theContent = str_replace('<div class=\'clear\'></div>','',$theContent);
 	$theContent = preg_replace("|(<img[^>]+)alt\s*=\s*'([^']+?)\'(.+?>)|", "$1$3¶¶COPY THIS ALT ATTRIBUTE INTO THE IMG ELEMENT:¶alt='$2'>\n\n", $theContent); // this extracts any alt attribute and moves it to a line after image block; this will preserve it for convenient copy/paste in the final version
-	$theContent = preg_replace("|<img.*?src='/imgs/(.+?)'.*?>|", "=====================================¶UPLOAD THIS FILE TO BUTTONDOWN AND CONVERT TO HTML:¶$1", $theContent);
+	$theContent = preg_replace("|<img.*?src='/assets/images/(.+?)'.*?>|", "=====================================¶UPLOAD THIS FILE TO BUTTONDOWN AND CONVERT TO HTML:¶$1", $theContent);
 	// the ¶ symbols get converted to linefeeds below
 
 	// Convert paywall markup, removing most of it and replacing the starts and stops with much more spartan Buttondown template tags. As a general rule, the newsletter resembles the RSS output more than the web output, so anything excluded from RSS probably needs to be excluded here too.
@@ -1054,13 +1058,13 @@ exit;
 	} else { // or an audience-targeted version in member posts
 		$introTemplate = <<<introtemplate
 			
-			 {% if subscriber.can_view_premium_content %}Continue reading the full members-only post below. {% if subscriber.can_view_premium_content and subscriber.stripe_subscription.product != 'pst1' %}As a full member, you can also reading [the full post on PainScience.com]({$thePost['url_live']}), about another {$readingTime}-minutes more ({$wordCount} words). (Why read there? Footnotes are better, links are more convenient, the layout is a bit richer and more polished, audio versions are embedded, and — most important — they may include updates.){% endif %}{% endif %}
+			 {% if subscriber.can_view_premium_content %}Continue reading the full members-only post below. {% if subscriber.can_view_premium_content and subscriber.stripe_subscription.product != 'pst1' %}As a full member, you can also read [the full post on PainScience.com]({$thePost['url_live']}), about another {$readingTime}-minutes more ({$wordCount} words). (Why read there? Footnotes are better, links are more convenient, the layout is a bit richer and more polished, audio versions are embedded, and — most important — they may include updates.){% endif %}{% endif %}
 			introtemplate;
 	}
 
 	// finish 
 	$introTemplate .=<<<introtemplate
-		 Comment on the Facebook post or BlueSky or Threads, and you’re always welcome to reply directly to these emails.
+		 Comment on the Facebook post or Bluesky or Threads, and you’re always welcome to reply directly to these emails.
 
 		Warm regards,<br>
 
@@ -1090,6 +1094,8 @@ exit;
 
 	if ($thePost['post_audio']) { // inject audio template if there's audio, #podcast
 
+
+
 		if (! $thePost['premium']) { // for non-member posts, use the p.aside format, and use it somewhere early in the post: audio-cta for free subscribers, audio-cta-upsell for pst1 members, and links for the full members; placement varies, but the top is often best for regular posts, given that they are usually shorter and so advertise the audio option sooner rather than later
 			$audio = <<<AUDIO
 				<p class="aside top">
@@ -1106,12 +1112,12 @@ exit;
 			$audio = <<<AUDIO
 				<p class="aside top">			
 				{% comment %} AUDIO CTA UPSELL FOR PST1 {% endcomment %}
-				{% if subscriber.stripe_subscription.product == 'pst1' %}This post has an audio version for PainSci members paying $5+/month. All audio versions are available from a private podcast. To get audio versions and more <strong><a href="{{ manage_premium_subscription_url }}">Upgrade now</a></strong>.{% endif %}
+				{% if subscriber.stripe_subscription.product == 'pst1' %}This post has an audio version and a nicer web version for PainSci members paying $5+/month. To get all versions and more (like post archives) <strong><a href="{{ manage_premium_subscription_url }}">upgrade now</a></strong>.{% endif %}
 				{% comment %} AUDIO INFO FOR FULL (PST2 AND PST3) MEMBERS ONLY {% endcomment %}
 				{% if subscriber.can_view_premium_content and subscriber.stripe_subscription.product != 'pst1' %}This post has an audio version for full members like you. <a href="https://www.painscience.com/{$thePost['post_audio']}">Listen in your web browser</a> or <a href="https://www.painscience.com/login.php?{{ subscriber.email }}">login to get your personal podcast subscription link</a>.{% endif %}
 				</p>
 				AUDIO;
-			$theContent = str_replace('and welcome!**', "and welcome!**\n\n{$audio}", $theContent); // insert after "and welcome" 
+			$theContent = str_replace('Welcome!***', "Welcome!***\n\n{$audio}", $theContent); // insert after "and welcome" 
 			}
 	}
 
@@ -1135,7 +1141,7 @@ exit;
 	$theContent = "{$thePost['title']}\n\n{$theContent}<!--end-->";
 	
 	// add endmark to finish, start by assigning the markup to a var
-	$endmark = "<figure><img src='https://buttondown.s3.amazonaws.com/images/1e4c1d47-0715-4578-b5df-a4182e00d6b7.png' alt='Illustration of the blue salamander logo/mascot for PainScience.com.'></figure>";
+	$endmark = "<figure><img src='https://assets.buttondown.email/images/f49d993c-eb6e-44e9-9b97-aad97a0d53be.png' alt='Illustration of the blue salamander logo/mascot for PainScience.com.' width=50 /></figure>";
 	if (inStr("## Notes", $theContent)) { // If there is a notes section, the endmark goes above it, regardless of anything else (e.g. paywall)
 		$theContent = str_replace("## Notes", "\n\n{$endmark}\n\n## Notes", $theContent);
 	}
@@ -1331,7 +1337,7 @@ function makeRSS($max = 30)
 
 		$content = preg_replace("/.*rss_no_line.*\n/", "\n<!-- removed from RSS (one line) -->\n", $content); // remove one line from RSS
 		$content = preg_replace('|<!--\s*rss_no_block_start(.+?)rss_no_block_stop\s*-->|s', "\n<!-- removed from RSS: multiple lines -->\n", $content); // remove multiline content from RSS
-		$content = preg_replace("@src\s*=\s*(['\"])imgs@", "src=$1https://$domain/imgs", $content); // covert src URLs from relative to absolute
+		$content = preg_replace("@src\s*=\s*(['\"])assets/images@", "src=$1https://$domain/assets/images", $content); // covert src URLs from relative to absolute
 //		$content = preg_replace("@href=(['\"])/blog@", 'href=$1/blog', $content); // not sure what this was for, but removing it changes nothing
 
 // TESTING: to print the output for a given post for auditing, identify it with a distinct title substr:
@@ -1380,7 +1386,7 @@ function makeRSS($max = 30)
 			// This next bit is hack to block my responsive-image solution in RSS, which involves a pair of img elements handled with different CSS at different window sizes; the "constrained" image is marked with "<!-- constrained IMG START -->" and "…END -->". I remove the inner comment delimiters to comment-out the whole image (much easier than cooking up reliable regex pattern to remove the whole thing):
 			$content = str_replace('<!-- constrained IMG START -->', '<!-- constrained IMG START ', $content);
 			$content = str_replace('<!-- constrained IMG END -->', 'constrained IMG END -->', $content);
-			// remove inline imgs altogether, since they are doomed to render poorly, source example: <img class='inline ' src='/imgs/smiley--sq-15x15-<1k.png' width='16' height='16' alt='' style='border-width:0px; border-style:none; display:inline;'>
+			// remove inline imgs altogether, since they are doomed to render poorly, source example: <img class='inline ' src='/assets/images/smiley--sq-15x15-<1k.png' width='16' height='16' alt='' style='border-width:0px; border-style:none; display:inline;'>
 			$content = preg_replace("@<img class='inline.*?>@", null, $content);
 
 			// So far the content string for the post contains everything, both member and non-member content. Now we fork the content into $content and $content_member, removing members-only content from the free version of the post and vice versa.
@@ -1472,7 +1478,7 @@ function makePodcast($max = 500)
 		unset($title, $date_rss, $psid, $url_live, $post_audio, $post_audio_size_bytes, $post_audio_dur, $description, $link, $link_quoted, $ftd_url, $url_rss, $url_pretty, $post_img); // cleanup some vars
 		extract($post); // get all the data for the found post
 		if (! $post_img) {
-			$post_img = 'imgs/painsci-updates-badge--sq-3000x3000-300k.jpg';
+			$post_img = 'assets/images/painsci-updates-badge--sq-3000x3000-300k.jpg';
 		}
 		if (! $post['post_audio']) {
 			continue;
@@ -1904,6 +1910,7 @@ function get_post_size($post)
 	if ($GLOBALS['ps']) {
 		// a larger scale for the main site (pubsys posts are mixed with much larger content)
 		// this scale matches the scale used in harvesting sizes of articles (see BibliographyUpdater.pl)
+		$size = 'xxxl';
 		if ($words < 6000) {
 			$size = 'xxl';
 		}
@@ -2108,7 +2115,7 @@ function make_post_index_item($post, $type = 'table')
 	} // do not process post previews
 	extract($post);
 	$index_class = $size; // assign a class indicating the size of the post
-	$postSizesIndex = ['xxxs' => '', 'xxs' => '1', 'xs' => '2', 's' => '3', 'm' => '4', 'l' => '5', 'xl' => '6', 'xxl' => '7']; // a numeric index representing post sizes, used for filtering
+	$postSizesIndex = ['xxxs' => '', 'xxs' => '1', 'xs' => '2', 's' => '3', 'm' => '4', 'l' => '5', 'xl' => '6', 'xxl' => '7', 'xxxl' => '8']; // a numeric index representing post sizes, used for filtering
 	$date = dateClear($timestamp);
 	// now over-ride that class for certain kinds of posts which need a different icon, like image posts
 	$audioBadge = $post_audio ? "<span style='opacity:0.5'><small>&#128264;</small></span>" : null;
@@ -2873,12 +2880,12 @@ function prepareTemplate($post, $templateFile)
 	if ($GLOBALS['ps'] and $post['post_img']) { // declare custom image for PS
 		global $imgsBlacklistArr;
 
-		if (in_array(str_replace('imgs/', null, $post['post_img']), $imgsBlacklistArr)) { // image is blacklisted
+		if (in_array(str_replace('assets/images/', null, $post['post_img']), $imgsBlacklistArr)) { // image is blacklisted
 			//Blacklist_of_images that shouldn't be rendered due to the risk of copyright trolling. The images-blacklist.txt file is read into $imgBlacklistArr by img.php and then checked wherever images are referenced.
 			$thisTemplate = str_replace('<!-- page image -->', "<!-- '{$post['post_img']}' is a blacklisted image referenced by pubsys for featured image for blog post '{$post['title']}' -->\n<!-- page image -->", $thisTemplate);
 			unset($post['post_img']); // like it never existed, so that the default will be triggered below
 		} else { // img is not blacklisted, proceed
-			$post_img = ogimg(str_replace('imgs/', null, $post['post_img']));
+			$post_img = ogimg(str_replace('assets/images/', null, $post['post_img']));
 			$thisTemplate = str_replace('<!-- page image -->', "<!-- custom page image -->\n{$post_img}", $thisTemplate);
 		}
 	}
@@ -2891,10 +2898,10 @@ function prepareTemplate($post, $templateFile)
 	if (! $GLOBALS['ps']) {
 		if ($post['post_img']) { // if there’s a custom post img
 			$thisTemplate = str_replace('<!-- default page image -->', '<!-- custom page image -->', $thisTemplate);
-			$thisTemplate = str_replace('{$site_img}', $post['post_img'], $thisTemplate); // post_img contains the dir, either /imgs or /imgs-auto
+			$thisTemplate = str_replace('{$site_img}', $post['post_img'], $thisTemplate); // post_img contains the dir, either /assets/images or /imgs-auto
 		} else { // set default images for non-PS, no custom img
-			$thisTemplate = str_replace('{$site_img}', 'imgs/' . $site_img, $thisTemplate);
-		} // “imgs” dir must be inserted, because it isn’t in the settings value
+			$thisTemplate = str_replace('{$site_img}', "{$imgs_dir}/{$site_img}", $thisTemplate);
+		} // “assets/images” dir must be inserted, because it isn’t in the settings value
 	}
 
 	if ($post['canonical']) { //psmod, stopped short of using because I don’t grok the effect of declaring one URL for link rel and another for og:url etc)
@@ -2985,7 +2992,7 @@ function auditPsids()
 				echo "checking $candidate …";
 				$candidate = random_int(1000000, 9999999);
 			}
-			exit("<p class='warning' style='font-size:2em'>⚠️ No psid for '{$post['title']}'. Use:<br><br><strong>psid$candidate</strong></p>"); // this isn't the best spot for this, but it works just fine and it’s important (for now) to annoy myself about missing psids
+			exit("<p class='warning' style='font-size:2em'>⚠️ No psid for '{$post['source_file']}'. Use:<br><br><strong>psid$candidate</strong></p>"); // this isn't the best spot for this, but it works just fine and it’s important (for now) to annoy myself about missing psids
 		}
 	}
 }

@@ -27,9 +27,10 @@ $containerType = "div";
 $filename = trim($args[0]);
 
 /* check for citekey and make a filename from it if found (assumption: any image I try to get using a citekey will have a filename based on the citekey; in general this is the case only for book covers images in the books subdir) */
-	
-$path = STAGE . "/imgs/$filename"; // absolute `path to the images
-$src = "imgs/$filename"; // IMGS is set in location.php and is the absolute host file system path to the filename
+
+global $settings; extract($settings);
+$path = STAGE . "/{$imgs_dir}/$filename"; // absolute `path to the images
+$src = "{$imgs_dir}/$filename"; // IMGS is set in location.php and is the absolute host file system path to the filename
 
 if (!file_exists($path)) return "  !!! IMG FILE '$path' NOT FOUND !!! ";
 

@@ -523,6 +523,7 @@ function printArrTable1($arr, $return=false, $title=null, $size="large", $headKe
 		if (!isset($value)) $value = "<span style='color:#AAA'>unset</span>"; 
 		if ($value === '') $value = "<span style='color:#AAA'>empty</span>";
 		if (is_null($value)) $value = "<span style='color:#AAA'>null</span>";
+		if (filter_var($value, FILTER_VALIDATE_URL)) $value = "<a href='$value'>$value</a>"; // if the value is a URL, convert it to a link
 		//var_dump($field, $value); echo "<br><br>";
 		if (is_bool($value)) {
 			if ($value === true) $value = "true";
@@ -872,7 +873,7 @@ $yt_html= <<<HTML
 				></iframe>
 			</div>
 			
-			<p class="css_caption font_accent"><a href="//www.youtube.com/watch?v=$yt_id" title="$yt_title">$yt_title&ensp;<img class="lazyimg" data-src="/imgs/icon-youtube--land4-180x40-4k.png" width="72" height="16" style="border:0;vertical-align:-1px" alt="" border="0" loading="lazy">$yt_duration</a></p>
+			<p class="css_caption font_accent"><a href="//www.youtube.com/watch?v=$yt_id" title="$yt_title">$yt_title&ensp;<img class="lazyimg" data-src="/assets/images/icon-youtube--land4-180x40-4k.png" width="72" height="16" style="border:0;vertical-align:-1px" alt="" border="0" loading="lazy">$yt_duration</a></p>
 		</div>
 
 HTML;
@@ -1038,7 +1039,7 @@ function strToPunc ($str) {
 	
 
 function ogimg ($img_filename) {
-	$pageimg_file = _ROOT . '/imgs/' . $img_filename;
+	$pageimg_file = _ROOT . '/assets/images/' . $img_filename;
 //	exit($img_filename . " > " . $pageimg_file);
 
 	if (!file_exists($pageimg_file)) {
@@ -1054,7 +1055,7 @@ function ogimg ($img_filename) {
 	$image_mime = image_type_to_mime_type(exif_imagetype($pageimg_file));
 
 	$ogoutput = <<<OGPAGEIMG
-<meta property='og:image' 				content='https://www.painscience.com/imgs/{$img_filename}'>
+<meta property='og:image' 				content='https://www.painscience.com/assets/images/{$img_filename}'>
 	<meta property='og:image:type' 	content='{$image_mime}'>
 	<meta property='og:image:width' 	content='{$w}'>
 	<meta property='og:image:height' 	content='{$h}'>

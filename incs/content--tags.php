@@ -244,7 +244,7 @@ function getTags ($tag_fn = false) {
 			// e.g. the true tag “Walking Dead” is now stored like so:
 			// array ("walkingdead" => array ("key" => "walkingdead", "true" => "Walking Dead"))
 
-			$tags[$current_key]['tally#'] = $tagTallies[1]; // assign the bib tag tally harvested earlier from the raw line
+			$tags[$current_key]['tally#'] = $tagTallies[1]??0; // assign the bib tag tally harvested earlier from the raw line
 
 			continue; // finish (could proceed with an ‘else’)
 			} // close if untabbed line
