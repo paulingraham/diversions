@@ -43,31 +43,67 @@ define('STAGE', $stage);
 
 /* ⚠️ THIS NEXT PART ONLY HAPPENS WHEN I BUILD WRITERLY, EPHEMERAL, DIVERSIONS, VERY IDIOSYNCRATIC AND WEIRD BUILD STEP!!!
 
-The next ~20 lines copy the canonical PubSys build script and other resources to other project folders as needed. It’s mostly only needed when I build Writerly. More exactly: only do this if NOT the main (PS) blog and (importantly) *I* am the one running the build. This routine must ONLY run on MY Mac, because it’s basically just automation of a chore I need to do to keep my parents blogs’ running (plus my own). */
+The next ~50 lines manage the copies of the canonical PubSys build script and other shared resources in the other project folders. Only relevant if NOT the main (PS) blog and (importantly) *I* am the one running the build — this routine must ONLY run on MY Mac, because it’s basically just automation of a chore I need to do to keep my parents’ blogs running (plus my own).
 
+As of June 2026, copying is EXPLICIT, not automatic: a routine build uses the committed local copies as-is, and just reports drift from canonical in the page header. Add ?sync to the URL to ingest the current canonical code (copies go to ALL three blogs, change-gated to avoid churn, and each blog gets a provenance stamp in incs/shared-code-version.txt recording the painscience commit it was synced from). Rationale: publishing a blog post shouldn't be hostage to absorbing untested painscience changes — stale is safer than fresh for these sites, and integration should happen deliberately, with attention to spare. Canonical changes get validated promptly anyway by bin/canary-blog-build.command (run by make-all.command), which is itself just a ?sync build of Writerly plus failure scans. */
+
+$shared_drift = null; // null = not applicable (PS build, or not my Mac); array = local shared files that differ from canonical painscience (empty = in sync)
 if (!$ps AND stripos(ROOT_DEV, "paul") !== false) {
 
-	// special handling of THIS script, because we may be copying over it!
-	$makesite_canonical_fn = "$root_parent/painscience/bin/make-ps-blog.php"; // the canonical code
-	$makesite_target_fn = ROOT_DEV . "/make-site.php"; // this file in the current site filter (might be writerly, diversions, etc)
+	$canonical_dir = "$root_parent/painscience";
+	$makesite_canonical_fn = "$canonical_dir/bin/make-ps-blog.php"; // the canonical code
+	$makesite_target_fn = ROOT_DEV . "/make-site.php"; // this file in the current site folder (might be writerly, diversions, etc)
 
-	if (file_get_contents($makesite_canonical_fn) !== file_get_contents($makesite_target_fn)) {
-		copy ($makesite_canonical_fn, "{$root_parent}/writerly/make-site.php");
-		copy ($makesite_canonical_fn, "{$root_parent}/diversions/make-site.php");
-		copy ($makesite_canonical_fn, "{$root_parent}/ephemeral/make-site.php");
-		echo "build script updated, please to reload!";
-		exit;
-		}
-
-	// now for all the other stuff — nothing fancy, no optimization, no diffing … just always copy the canonical files to their destinations 
 	$filenames = array ("PubSys.php", "util--core.php", "util--build.php", "content--tags.php", "table-sort.js", "table-sort-setup.js", "synonyms-pubsys-shorthands.txt", "synonyms-post-metadata.txt", "synonyms-image-options.txt", "easy-img.php","css-pubsys.css","lazyload-imgs.js");
 	$target_dirs = array ("writerly", "diversions", "ephemeral");
 
-	foreach ($filenames as $filename)
-		foreach ($target_dirs as $target_dir)
-			if (!copy ("{$root_parent}/painscience/incs/{$filename}", "{$root_parent}/$target_dir/incs/{$filename}"))
-				echo "failed to copy {$root_parent}/painscience/incs/{$filename} to {$root_parent}/$target_dir/incs/{$filename}<br>";
-	} 
+	if (stripos($_SERVER['QUERY_STRING'] ?? '', 'sync') === false) {
+
+		// NOT SYNCING (the routine case): no copying at all — just measure drift for the header notice, so I know untested canonical changes exist without silently ingesting them
+		$shared_drift = array();
+		if (@md5_file($makesite_canonical_fn) !== @md5_file($makesite_target_fn)) $shared_drift[] = 'make-site.php';
+		foreach ($filenames as $filename)
+			if (@md5_file("$canonical_dir/incs/{$filename}") !== @md5_file(ROOT_DEV . "/incs/{$filename}")) $shared_drift[] = $filename;
+		}
+
+	else {
+
+		// SYNCING: special handling of THIS script first, because we may be copying over it!
+		if (file_get_contents($makesite_canonical_fn) !== file_get_contents($makesite_target_fn)) {
+			copy ($makesite_canonical_fn, "{$root_parent}/writerly/make-site.php");
+			copy ($makesite_canonical_fn, "{$root_parent}/diversions/make-site.php");
+			copy ($makesite_canonical_fn, "{$root_parent}/ephemeral/make-site.php");
+			echo "build script updated from canonical — <a href='make-site.php?sync'>reload with ?sync</a> to copy the rest of the shared files and build. (A reload within ~2 seconds may execute the stale script via opcache; wait a beat.)";
+			exit;
+			}
+
+		// provenance for the version stamp: which painscience commit is this sync from, and were there uncommitted changes to the shared files at the time?
+		$gitdir = escapeshellarg($canonical_dir);
+		$sync_sha = trim((string) @shell_exec("/usr/bin/git -C $gitdir rev-parse --short HEAD 2>/dev/null")) ?: 'unknown';
+		$dirty_files = trim((string) @shell_exec("/usr/bin/git -C $gitdir status --porcelain -- bin/make-ps-blog.php " . implode(' ', array_map(fn ($f) => escapeshellarg("incs/$f"), $filenames)) . " 2>/dev/null"));
+		$provenance = "Shared PubSys code synced from painscience @ {$sync_sha}" . ($dirty_files ? " (PLUS uncommitted changes to shared files)" : "") . " on " . date("Y-m-d H:i:s")
+			. "\nFiles: make-site.php, " . implode(", ", $filenames)
+			. "\nGenerated by the ?sync step in make-site.php (canonical: painscience/bin/make-ps-blog.php). Do not edit.\n";
+
+		// copy changed files to all three blogs; change-gated so unchanged files keep their mtimes and the version stamp below stays honest
+		foreach ($target_dirs as $target_dir) {
+			$copied = 0;
+			foreach ($filenames as $filename) {
+				$from = "$canonical_dir/incs/{$filename}";
+				$to = "{$root_parent}/$target_dir/incs/{$filename}";
+				if (@md5_file($from) === @md5_file($to)) continue;
+				if (copy ($from, $to)) $copied++;
+				else echo "failed to copy {$from} to {$to}<br>";
+				}
+			// version-stamp the blog if it received changes, has no stamp yet, or was stamped under a different canonical commit (covers the make-site.php-only sync, which lands on the run before this one)
+			$manifest_fn = "{$root_parent}/$target_dir/incs/shared-code-version.txt";
+			$stamped_sha = preg_match('/@ (\S+)/', (string) @file_get_contents($manifest_fn), $m) ? $m[1] : '';
+			if ($copied or $stamped_sha !== $sync_sha) file_put_contents($manifest_fn, $provenance);
+			}
+
+		$shared_drift = array(); // in sync by definition now; the header reports it
+		}
+	}
 
 chdir (ROOT_DEV); // execute script as if running in a specific site folder
 
@@ -132,6 +168,14 @@ function copy(obj) { /* primary #copy function, invoked by onclick of an inline 
 
 <p>View local preview: <a href="<?php echo $urlbase_stage ?>/index.html?rand=<?php echo mt_rand(1,10000) ?>" target="_blank"><?php echo $urlbase_stage ?></a><br>
 View live site: <a href="<?php echo $urlbase_prod ?>" target="_blank"><?php echo $urlbase_prod ?></a></p>
+
+<?php if (is_array($shared_drift)) { // shared-code status for the non-PS blogs: provenance stamp + drift notice (see the sync block near the top of this script)
+	$stamp_line = trim((string) (@file(ROOT_DEV . '/incs/shared-code-version.txt')[0] ?? 'No version stamp yet — run a ?sync build to create one.'));
+	if ($shared_drift) {
+		echo "<p style='border:2px solid #c66; padding:.5em'>⚠️ <strong>Shared-code drift:</strong> " . count($shared_drift) . " file(s) differ from canonical painscience (" . implode(", ", $shared_drift) . "). This build uses the local copies as-is — <a href='make-site.php?sync'>sync &amp; rebuild</a> to ingest canonical.</p>";
+		}
+	else echo "<p style='opacity:.6'>Shared code in sync with canonical painscience. {$stamp_line}</p>";
+	} ?>
 
 
 
