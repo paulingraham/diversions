@@ -141,7 +141,7 @@ A tag prefixed by an underscore is a “category.”  (The prefix is 100% non-fu
 HOW DOES TAG TALLYING WORK?
 
 * PubSys counts tag usages as it builds blog posts and saves a list of all tags. Writerly gets its tag tallies from that file.
-* PainSci ignores that file, and instead gets tag tallies from a list of tag usages harvested from srcs.bib by Make Bib, which has all tag usages from both of the two CMSes that PainSci is based on.  That includes three major types: tags on bibliographic records, tags on my own articles, and tags on blog post which are harvested from PubSys output. That is, all tag usages are logged in a file that is updated by BibliographyTagHarvester.pl, which gets updated by Make Bib (srcs.tags.txt).
+* PainSci ignores that file, and instead gets tag usages from getAllTagUsages(), which merges the three major types fresh on every build: tags on blog posts (live, from the in-memory $posts array), plus tags on bibliographic records and my own articles (queried directly from srcs.sqlite). Until June 2026 this data took a stale round trip through Make Bib and an export file, srcs.tags.txt, which required alternating builds to converge; see the getAllTagUsages() docblock for the full story.
 * Regardless of where the tag list comes from, updateTags() calls tallyTags() during a PubSys build to ingest, count, de-dupe, and add the counts to the main $tags array.
 * Tag tallies are saved to tags-ps.txt, but at this time they are NOT parsed by getTags().  That is, when the $tags array is initially created, it has no tallies, even though the number is right there. This is somewhat limiting. For instance, there would be no way to extract under-used tags from the array.  There are lines in getTags for ingesting tallies, but they are commented out for now.
 * Tags parents and ancestors are only counted if they are inferred from other tags on a blog post, or explicitly added to any item.  This is why major parents like #spinalpain have surprisingly low tallies — because a blog post about #backpain or #neckpain will automagically get the #spinalpain tag, but an @article will only get it if I explicitly add it. This is a non-trivial problem I will have to solve at some point.
@@ -384,6 +384,7 @@ function getTags ($tag_fn = false) {
 function markupTags ($arg_tags) { 
 	$arg_tags = arraynge($arg_tags,',');
 	global $tags;
+	$tags_str = '';
 	if (!$tags) {
 		foreach ($arg_tags as $arg_tag) $tags_str .= "<li class='tag'>$arg_tag</li>";
 		}
@@ -422,7 +423,7 @@ function getTag($tag_given, $version='true') {
 function extractTags ($tags_str, $post = false) { 
 	// For each post/item, extractTags generates a final list of tags from various sources (exact matches, synonyms, and parents of matches, and more in the future) by comparing the tags-as-written to the canonical tags.  In the context of PubSys, the post data is also updated with new fields for each type of tag, as well as a main tag field including all tags.
 	// 2025-04-07 Does not appear to do synonyms?
-	if ($post and $post['rss_only_post']) return $post; // Don’t extract tags for RSS-only posts, because doing so affects tag counts in the global tags array, even though RSS-only posts are supposed to be post ghosts that have no effect on anything except the RSS feed.	More words: Athough RSS-only posts are taken out of the main posts array after being created, they still get created like a normal post in every other way… and when tags are extracted by extractTags(), the main tags array is updated with tag counts; keeping RSS-only posts out of the main posts array effectively ghosts them in every other way that I know of, but there is this one thing here where an RSS only post will have an effect outside itself if it isn't deliberately excluded.
+	if ($post and !empty($post['rss_only_post'])) return $post; // Don’t extract tags for RSS-only posts, because doing so affects tag counts in the global tags array, even though RSS-only posts are supposed to be post ghosts that have no effect on anything except the RSS feed.	More words: Athough RSS-only posts are taken out of the main posts array after being created, they still get created like a normal post in every other way… and when tags are extracted by extractTags(), the main tags array is updated with tag counts; keeping RSS-only posts out of the main posts array effectively ghosts them in every other way that I know of, but there is this one thing here where an RSS only post will have an effect outside itself if it isn't deliberately excluded.
 	global $tags;
 	// initialize arrays; tags_final ends up as the "tags" field, all others as fields with matching names
 	$tags_given = arraynge($tags_str, ","); // split the list of given tags into an array, assumes no spaces
@@ -517,9 +518,9 @@ function inferTags ($post) {
 	// the “vocab” tag should be used on posts that come from micropost files containing “vocab” in the filename:
 	if (inStr("vocab",$post['source_file'])) 		$inf[] = 'vocabulary';
 	// posts with a priority of 9 or 10 should be assumed to be “best of”:
-	if ($post['priority'] > 8)								$inf[] = 'best of';
-	if ($post['premium'])									$inf[] = '_post_member';
-	if ($post['post_audio'])								$inf[] = '_post_podcasted';
+	if (($post['priority'] ?? 0) > 8)						$inf[] = 'best of';
+	if (!empty($post['premium']))							$inf[] = '_post_member';
+	if (!empty($post['post_audio']))						$inf[] = '_post_podcasted';
 	// posts are assigned a tag corresponding to their size
 	// just add the “size” prefix added to the size code set in the get_post_size function
 	// different scales for regular vs main pubsys use
@@ -630,7 +631,7 @@ function makeTagIndexes () {
 		// why count()? in theory, we should know this from the # field for the tag in the main tag_db
 		// in practice there are probably going to be discrepancies, so let's just count what we actually have
 		$ti_page = str_replace('{$ti_posts_table}', $ti_posts_table, $ti_page);
-		if ($tag['description']) { // if there's a tag description
+		if (!empty($tag['description'])) { // if there's a tag description
 			// title is  "# posts tagged '[tag]'"
 			// description is [description]
 			// append to H1
@@ -664,12 +665,13 @@ function makePreviewLink ($fn) { // #2do, use this other places preview links ar
 	global $settings; extract($settings);
 	// appending a random number to the end of the URL forces the browser not use a cached version of the page
 	$preview_url = "http://localhost/{$domain_display_lc}{$optional_subdir}/{$fn}?rand=" . mt_rand(1,10000);
-	return "<a href='$preview_url'>" . str_replace("html/", null, $fn). "</a>"; // ditch the html dir, slightly prettier
+	return "<a href='$preview_url'>" . str_replace("html/", '', $fn). "</a>"; // ditch the html dir, slightly prettier
 	}
 
 function getPostsByTag ($tag, $check_tag = true) {
 	if ($check_tag) $tag = getTag($tag); // get the true form of the tag, if possible. the check is redundant if the tag value is actually from the database, as it is in some cases
 	if ($tag == false) return false; // exit if getTag failed
+	$post_matches = []; // initialize: stays empty (and falsy, as callers expect) when no posts match
 	global $posts; foreach ($posts as $post) {
 //		if ($tag == "_Kim") echo $post['tags'] . " … ";
 		$tags_arr = arraynge($post['tags'],',');
@@ -719,7 +721,7 @@ function getTagParents ($child_tag) {
 	global $tags_arr;
 	foreach ($tags_arr as $parent_tag=>$tag_data) { // for through every tag in the tag database
 		if (!isset($tag_data["children"])) continue;
-		$children_field = str_replace(" ", null, $tag_data["children"]); // kill spaces
+		$children_field = str_replace(" ", '', $tag_data["children"]); // kill spaces
 		$child_arr = explode(",", $children_field);
 		if (in_array($child_tag, $child_arr)) // if the child_tag is listed among the children …
 			$parents[] = $parent_tag; // add it to an array of parent tags
@@ -728,10 +730,44 @@ function getTagParents ($child_tag) {
 	else return false;
 	}
 
+/** returns @array: every tag usage across PainSci — live post tags from the current PubSys build, plus bib/article tags queried directly from srcs.sqlite  */
+function getAllTagUsages() {
+/* This replaced the srcs.tags.txt round trip (PubSys → staged post headers → Make Bib → srcs.bib → BibliographyTagExporter.pl → srcs.tags.txt → PubSys) in June 2026. That cycle required alternating builds of the blog and the bibliography to converge on correct tallies — and in practice the exporter had also been silently failing for some time (its backup quota was full), so tallies were chronically stale.
+
+Now the two genuinely independent sources are merged fresh on every call. (1) Post tags are counted live from the in-memory $posts array: tags_private plus the _post marker, exactly what Make Bib's harvest would have round-tripped through srcs.bib. PubSys is itself the authority on post tags, so asking the bibliography for them was always a detour. (2) Bib-record and article tags — which only the bibliography knows — are read straight from srcs.sqlite, which is rebuilt on every BibDesk save and every few minutes, so they are always at least as fresh as the old export file ever was.
+
+Outside a PubSys build there is no $posts array (e.g. tools/tag-engine-dev.php), in which case the stored blog-post records in the bibliography are counted instead of live ones — same data, at most one harvest stale. */
+	$usages = [];
+
+	$posts = $GLOBALS['posts'] ?? null;
+	if ($posts) { // live post tags
+		foreach ($posts as $post) {
+			if (empty($post['tags_private'])) continue;
+			foreach (explode(',', $post['tags_private']) as $t) {
+				if (($t = trim($t)) !== '') $usages[] = $t;
+			}
+			$usages[] = '_post'; // Make Bib appends this marker when harvesting post tags into srcs.bib, so the live count includes it too
+		}
+	}
+
+	// bib-record and article tags, straight from srcs.sqlite; blog-post records are excluded when their tags were counted live above
+	global $sources;
+	$sql = "SELECT tags FROM records WHERE tags IS NOT NULL AND tags != ''";
+	if ($posts) $sql .= " AND (url IS NULL OR url NOT LIKE '/blog/%')";
+	foreach ($sources->pdo->query($sql, PDO::FETCH_NUM) as $row) {
+		foreach (explode(',', $row[0]) as $t) {
+			$t = trim($t);
+			if ($t === '') continue;
+			$usages[] = trim(preg_replace('/^.*»/u', '', $t)); // strip sorting prefixes like “dx»” (visual conveniences only), as the old exporter did
+		}
+	}
+	return $usages;
+}
+
 /** returns @array, tags: returns the tags array with tags from the PainSci bibliography added */
 function tallyTags ($tags) {
 	if ($GLOBALS['ps']) {
-		$tagsToCount = file($_SERVER['DOCUMENT_ROOT'] . '/srcs.tags.txt'); // get an array of all tags occurring in srcs.bib, many thousands of them; this file is produced by BibliographyTagHarvester.pl, which can be run independently with 'make bib tags only.command' or with 'make-ps-bib.command' as part of a full #makebib
+		$tagsToCount = getAllTagUsages(); // live post tags from this build + bib/article tags direct from srcs.sqlite; see that function for how this replaced the srcs.tags.txt round trip through Make Bib (2026-06)
 		}
 	else {
 		$tagsToCount = file($_SERVER['DOCUMENT_ROOT'] . '/guts/tags.used.txt'); // got this going 2025-04-15, just added a simple function to non-PS builds that saves all tags generated by the build to a file

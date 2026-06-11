@@ -15,7 +15,7 @@ function implodeAssocArr ($arr, $glue = ", ") { // implodes a simple associate a
 		if ($val===null) $val = 'null';
 		if (is_string($val) and $val==='') $val = 'empty str';
 		if (is_bool($val) and $val==='') $val = printBool($val);
-		$key = str_replace(':', NULL, $key);
+		$key = str_replace(':', '', $key);
 		$arr_tmp[] = $key . "=" . $val;
 		}
 	return implode($glue, $arr_tmp);
@@ -276,13 +276,15 @@ function arraynge ($str, $delim=" ") { // it’s simple and doesn’t do much mo
 	}
 
 /** returns @string: converts numerals <101 to words */
-function wordifyNumbers($number) { 
+function wordifyNumbers($number) {
+	if (!is_numeric($number)) return $number; // PHP 8 rejects non-numeric strings to ceil(); fall through and return unchanged
 	$number = ceil($number);
 	if ($number == "1" ) return "one";	if ($number == "2" ) return "two";	if ($number == "3" ) return "three";	if ($number == "4" ) return "four";	if ($number == "5" ) return "five";	if ($number == "6" ) return "six";	if ($number == "7" ) return "seven";	if ($number == "8" ) return "eight";	if ($number == "9" ) return "nine";	if ($number == "10" ) return "ten";	if ($number == "11" ) return "eleven";	if ($number == "12" ) return "twelve";	if ($number == "13" ) return "thirteen";	if ($number == "14" ) return "fourteen";	if ($number == "15" ) return "fifteen";	if ($number == "16" ) return "sixteen";	if ($number == "17" ) return "seventeen";	if ($number == "18" ) return "eighteen";	if ($number == "19" ) return "nineteen";	if ($number == "20" ) return "twenty";	if ($number == "21" ) return "twenty-one";	if ($number == "22" ) return "twenty-two";	if ($number == "23" ) return "twenty-three";	if ($number == "24" ) return "twenty-four";	if ($number == "25" ) return "twenty-five";	if ($number == "26" ) return "twenty-six";	if ($number == "27" ) return "twenty-seven";	if ($number == "28" ) return "twenty-eight";	if ($number == "29" ) return "twenty-nine";	if ($number == "30" ) return "thirty";	if ($number == "50" ) return "fifty";	if ($number == "51" ) return "fifty-one";	if ($number == "52" ) return "fifty-two";	if ($number == "53" ) return "fifty-three";	if ($number == "54" ) return "fifty-four";	if ($number == "55" ) return "fifty-five";	if ($number == "56" ) return "fifty-six";	if ($number == "57" ) return "fifty-seven";	if ($number == "58" ) return "fifty-eight";	if ($number == "59" ) return "fifty-nine";	if ($number == "60" ) return "sixty";	if ($number == "61" ) return "sixty-one";	if ($number == "62" ) return "sixty-two";	if ($number == "63" ) return "sixty-three";	if ($number == "64" ) return "sixty-four";	if ($number == "65" ) return "sixty-five";	if ($number == "66" ) return "sixty-six";	if ($number == "67" ) return "sixty-seven";	if ($number == "68" ) return "sixty-eight";	if ($number == "69" ) return "sixty-nine";	if ($number == "70" ) return "seventy";	if ($number == "71" ) return "seventy-one";	if ($number == "72" ) return "seventy-two";	if ($number == "73" ) return "seventy-three";	if ($number == "74" ) return "seventy-four";	if ($number == "75" ) return "seventy-five";	if ($number == "76" ) return "seventy-six";	if ($number == "77" ) return "seventy-seven";	if ($number == "78" ) return "seventy-eight";	if ($number == "79" ) return "seventy-nine";	if ($number == "80" ) return "eighty";	if ($number == "81" ) return "eighty-one";	if ($number == "82" ) return "eighty-two";	if ($number == "83" ) return "eighty-three";	if ($number == "84" ) return "eighty-four";	if ($number == "85" ) return "eighty-five";	if ($number == "86" ) return "eighty-six";	if ($number == "87" ) return "eighty-seven";	if ($number == "88" ) return "eighty-eight";	if ($number == "89" ) return "eighty-nine";	if ($number == "90" ) return "ninety";	if ($number == "91" ) return "ninety-one";	if ($number == "92" ) return "ninety-two";	if ($number == "93" ) return "ninety-three";	if ($number == "94" ) return "ninety-four";	if ($number == "95" ) return "ninety-five";	if ($number == "96" ) return "ninety-six";	if ($number == "97" ) return "ninety-seven";	if ($number == "98" ) return "ninety-eight";	if ($number == "99" ) return "ninety-nine";	if ($number == "100" ) return "one hundred";
 	return $number; // ... or return the original number
 	}
 
 function wordifyNumbersOrdinals($number) {
+    if (!is_numeric($number)) return $number; // PHP 8 rejects non-numeric strings to ceil(); fall through and return unchanged
     $number = ceil($number);
 
     $units = [
@@ -1142,21 +1144,40 @@ $title = "$rating-star ratings are for {$key[$rating]}. Ratings are a highly sub
 return "<span title='$title'>$stars</span><span class='pupb lighter-link' onClick='toglDispId(\"bibrat\")'>?</span><span class='pupw'id='bibrat'>$title<span class='pupx' onClick='toglDisp(this.parentElement)'></span></span>";
 }
 
+/** returns @array: absolute paths to all PHP error log files under $root: per-dir `error_log` files plus the unified `logs/php-errors.log`. Canonical documentation of error logging is in /incs/env-bootstrap.php. */
+function findErrorLogs(string $root): array {
+	$found = [];
+
+	/* Recursively scan for files literally named "error_log" — the conventional name PHP/Apache uses for the per-directory error log fallback. The filename is specific enough that false positives anywhere in the tree (vendor/, assets/, .git/, etc.) are essentially impossible, so no exclusion list is needed. The mild cost of traversing large gitignored trees like assets/ is invisible at the call rate of the only two callers (the cron daemon every 10 min, and view-log-errors.php interactively). */
+	$iter = new RecursiveIteratorIterator(
+		new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS)
+	);
+	foreach ($iter as $f) {
+		if ($f->isFile() && $f->getFilename() === 'error_log') {
+			$found[] = $f->getPathname();
+		}
+	}
+
+	// Append the unified log set via ini_set('error_log',…) in env-bootstrap.php; not named "error_log" so the recursive scan above won't catch it.
+	$unified = "$root/logs/php-errors.log";
+	if (is_file($unified)) $found[] = $unified;
+
+	return $found;
+}
+
 function logToFile($logfile, $msg)  {
     if (is_array($msg)) {
         $msg = json_encode($msg);
     }
 
-	// this function may be called in the context of either a server request or command line without, so it has to know how to find the file
-	// defaults to logging to logs dir
-	global $_ROOT; if (!isset($_ROOT)) $_ROOT = getenv('HOME') . '/painsci';  // in the edge case of CLI context, $_DEVROOT is empty because it's based on $_SERVER which does not exist in that context, so we get the devroot this way
-	if (file_exists("$_ROOT/logs/$logfile")) { // only do this if we can find the file
-		$fd = fopen("$_ROOT/logs/$logfile", "a");  // open file for appending to
-		$str = "[" . date("Y-m-d H:i:s", time()) . "] " . $msg;  // pre-pend date/time to message
-		fwrite($fd, $str . "\n"); // write string
-		fclose($fd); // close file
-		}
-	else echo "where?";
+	// this function may be called in the context of either a server request or on the command line
+	global $_ROOT; if (!$_ROOT) $_ROOT = dirname(__DIR__); // recreate the value if $_ROOT isn't available
+	$path = "$_ROOT/logs/$logfile";
+	$fd = fopen($path, "a"); // "a" mode creates the file if it doesn't exist
+	if ($fd === false) return; // give up silently if the logs dir is missing or unwritable — logging must never fatal
+	$str = "[" . date("Y-m-d H:i:s", time()) . "] " . $msg;
+	fwrite($fd, $str . "\n");
+	fclose($fd);
 	}
 
 function printTestimonials ($citekey, $num = 30, $max_length = 300) {
@@ -1247,6 +1268,18 @@ function arrAveDev ($values) { // avedev = average of the differences of a set o
 	return arrAverage($diffs);
 	}
 	
+/** returns @array: keys from the "head" of a frequency map, long tail trimmed. */
+function topFreqKeys(array $counts, int $minCount = 2): array { // Given an array of key => count pairs, returns the keys whose counts are at or  * above the median count — naturally the top ~half of the distribution. Useful  * for generating facet buttons from dynamic data without drowning in rare values.  * $minCount is a hard floor: keys below it are always dropped regardless of the  * median (guards against keeping singletons when the distribution is very flat).  * Returned keys are sorted ascending.
+	if (empty($counts)) return [];
+	arsort($counts);
+	$vals      = array_values($counts);
+	$median    = $vals[(int)(count($vals) / 2)];
+	$threshold = max($minCount, $median);
+	$kept      = array_keys(array_filter($counts, fn($n) => $n >= $threshold));
+	sort($kept);
+	return $kept;
+}
+
 function notifyMe($message, $app_token, $sound = "pushover") { // notify myself via Pushover API, see https://pushover.net/api
 	// echo "posting message '$message' to app '$app_token'<br>";
 // if (defined('MODE_DEV')) if (MODE_DEV) return; // no need for push notifications in dev
@@ -1394,13 +1427,14 @@ function generateDaypass ($filename) {
 /* Returns @string: Generates a trivially obfuscated string from a fragment of a filename */
 function encipherFilename($filename) {
 	$testing = false;
+	$encipheredFilename =  $encipheredFilenameReadable = '';
 	if ($testing) echo "Generating a day-pass for: $filename<br>";
 
 	$pathinfo =  pathinfo($filename);
 	$filename = $pathinfo['filename'];
 	if ($testing) echo "Remove the extension: $filename<br>";
 
-	$filename = str_replace("-", null, $filename); // hyphens are the only "special" characters found in my filenames
+	$filename = str_replace("-", '', $filename); // hyphens are the only "special" characters found in my filenames
 	if ($testing) echo "Remove hyphens: $filename<br>";
 
 	$filename = substr ($filename, 2, 8);
@@ -1410,10 +1444,10 @@ function encipherFilename($filename) {
 	$filename = str_split($filename);
 
 	foreach ($filename as $char) {
-	$mb_ord = mb_ord($char)-32; // get the codepoint for the capital letter
-	$encipheredFilename .= $mb_ord;
-	$encipheredFilenameReadable .= " $mb_ord";
-	}
+		$mb_ord = mb_ord($char)-32; // get the codepoint for the capital letter
+		$encipheredFilename .= $mb_ord;
+		$encipheredFilenameReadable .= " $mb_ord";
+		}
 
 	if ($testing) echo "Convert each character to codepoint-32: $encipheredFilenameReadable<br>";
 
@@ -1549,7 +1583,7 @@ function addPeriodWhereNeeded ($string) {
 	}
 
 function strip_tags_p ($html) {
-	return preg_replace("|<[/]*p>|", null, $html);
+	return preg_replace("|<[/]*p>|", '', $html);
 }
 
 
@@ -1562,3 +1596,43 @@ function echoDebug ($debugmessage) {
 		echo $debugmessage;
 		}
 	}
+
+/* returns @string, outputs smart table row from data in smart table schema */
+function renderSmartTableRow(array $columns, array $row, int $i, array $facets): void {
+// see demo--search-sort-filter.php for documentation
+
+	// Build the <tr>’s facet attributes from row data.
+	$attrs = '';
+	foreach ($facets as $facetKey => $_) {
+		if (isset($row[$facetKey])) {
+			$attrs .= " data-facet-{$facetKey}='" . htmlspecialchars($row[$facetKey], ENT_QUOTES) . "'";
+		}
+	}
+	// Optional invisible search keywords.
+	if (!empty($row['search'])) {
+		$attrs .= " data-search='" . htmlspecialchars($row['search'], ENT_QUOTES) . "'";
+	}
+
+	echo "<tr{$attrs}>";
+
+	foreach ($columns as $key => $col) {
+
+		// Escape hatch: a render callback owns the whole <td> and is responsible for its own escaping.
+		if (isset($col['render'])) {
+			echo $col['render']($row, $i);
+			continue;
+		}
+
+		// Generic <td>: display value comes from $row[$key]; sort value comes from a different field if 'sortKey' is set.
+		$sortAttr = '';
+		if (isset($col['sortKey']) && array_key_exists($col['sortKey'], $row)) {
+			$sortAttr = " data-sort-value='" . htmlspecialchars((string)$row[$col['sortKey']], ENT_QUOTES) . "'";
+		}
+		$classAttr = isset($col['tdClass']) ? " class='{$col['tdClass']}'" : '';
+		$value     = $row[$key] ?? '';
+
+		echo "<td{$sortAttr}{$classAttr}>" . htmlspecialchars((string)$value) . "</td>";
+	}
+
+	echo "</tr>\n";
+}

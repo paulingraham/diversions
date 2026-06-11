@@ -19,6 +19,8 @@ $caption = '';
 $foundFile = false;
 $position = '';
 $containerType = "div";
+$imgClasses = '';
+$containerClasses = '';
 
 /* FIND THE FILE */
 /* First important job is to see if we can find a file! If there's no file, there's no much point in processing the rest of the user data. The punchline will be to say that $foundFile is either true or false, and to set the value of $src if we found a file. */
@@ -61,6 +63,7 @@ $synonyms = array("left","le","l","lside");
 /* Look for compound arguments of the form “arg:data” */
 
 
+$n = 0;
 foreach ($args as $arg) {
 	if ($n++ < 1) continue; // skip the 1st arg (it's the image filename)
 

@@ -13,9 +13,6 @@ Manual (also extremely out of date):
 
 */
 
-error_reporting(0);
-// error_reporting(E_ALL ^ E_NOTICE);
-
 // ENVIRONMENT AND CONTEXT
 // Where is PubSys running?
 // the identifier `path is used whereever most key paths are defined, as a troubleshooting aid
@@ -27,6 +24,7 @@ $root_parent = substr_replace($root_true, '', strrpos($root_dev, "/")); // to ge
 // if (basename($_SERVER['PHP_SELF']) == "MAKE-SITE.php") exit("This is canonical source code that is not meant to be run directly. Only copies of it should be run, because they derive environmental variables from their location. Run /tools/make-site.php instead.");
 
 // special case the source and output directories for PS
+$ps = false; $blog_str = ""; // defaults for the non-PS blogs, overridden in the ps.test case below
 if ($_SERVER['HTTP_HOST'] == "ps.test") {
 	$ps = true;
 	$blog_str = "blog";
@@ -43,7 +41,7 @@ define('STAGE', $stage);
 
 
 
-/* ⚠️ THIS NEXT PART ONLY HAPPENS WHEN I BUILD WRITERLY, VERY IDIOSYNCRATIC AND WEIRD BUILD STEP!!!
+/* ⚠️ THIS NEXT PART ONLY HAPPENS WHEN I BUILD WRITERLY, EPHEMERAL, DIVERSIONS, VERY IDIOSYNCRATIC AND WEIRD BUILD STEP!!!
 
 The next ~20 lines copy the canonical PubSys build script and other resources to other project folders as needed. It’s mostly only needed when I build Writerly. More exactly: only do this if NOT the main (PS) blog and (importantly) *I* am the one running the build. This routine must ONLY run on MY Mac, because it’s basically just automation of a chore I need to do to keep my parents blogs’ running (plus my own). */
 
@@ -62,13 +60,13 @@ if (!$ps AND stripos(ROOT_DEV, "paul") !== false) {
 		}
 
 	// now for all the other stuff — nothing fancy, no optimization, no diffing … just always copy the canonical files to their destinations 
-	$filenames = array ("PubSys.php", "util--core.php", "content--tags.php", "table-sort.js", "table-sort-setup.js", "synonyms-pubsys-shorthands.txt", "synonyms-post-metadata.txt", "synonyms-image-options.txt", "easy-img.php","css-pubsys.css","lazyload-imgs.js");
+	$filenames = array ("PubSys.php", "util--core.php", "util--build.php", "content--tags.php", "table-sort.js", "table-sort-setup.js", "synonyms-pubsys-shorthands.txt", "synonyms-post-metadata.txt", "synonyms-image-options.txt", "easy-img.php","css-pubsys.css","lazyload-imgs.js");
 	$target_dirs = array ("writerly", "diversions", "ephemeral");
 
 	foreach ($filenames as $filename)
 		foreach ($target_dirs as $target_dir)
-			if (!copy ("{$root_parent}/painscience/incs/$filename", "{$root_parent}/$target_dir/incs/$filename"))
-				echo "failed to copy $filename :-(";
+			if (!copy ("{$root_parent}/painscience/incs/{$filename}", "{$root_parent}/$target_dir/incs/{$filename}"))
+				echo "failed to copy {$root_parent}/painscience/incs/{$filename} to {$root_parent}/$target_dir/incs/{$filename}<br>";
 	} 
 
 chdir (ROOT_DEV); // execute script as if running in a specific site folder
@@ -77,7 +75,9 @@ if ($ps) require_once($_SERVER['DOCUMENT_ROOT'] . "/incs/environment.php");
 
 if (!$ps)  { // without the PS environment, we need at least Composer installed classes (chiefly php-markdown)
 	require_once __DIR__ . '/incs/vendor/autoload.php';
+	$_qry = $_SERVER['QUERY_STRING'] ?? ''; // normally set by env-context.php, which the blogs don't load; used by the prep-mode check below
 	}
+
 
 // load code libraries
 set_include_path(".:$root_true/incs:$root_true/incs/content--library:$root_dev/guts:$root_dev/incs:$root_dev/guts/incs");
@@ -85,13 +85,15 @@ require_once('PubSys.php'); // functions for blogging, currently used by either 
 require_once('content--tags.php'); // tag management functions
 require_once('easy-img.php'); // a large function for handling image markup, so it gets its own file
 require_once('util--core.php'); // many functions originally written for PainScience.com, but most are generic
+require_once('util--build.php'); // build-error tracking/reporting (buildErrorsMark & co.); PS already has it via env-runtime.php (require_once dedupes), but the blogs get it only from this line — it is NOT loaded by anything else outside the PS environment
+
+
 
 // load site settings
 $settings = get_settings(); extract($settings); // a selection of fairly straightforward sitewide variables, parsed from a simple text file
 
 $md_syns = getArrFromFile("synonyms-post-metadata.txt",true);
-
-
+		
 // OK, that’s setup. Time for a little output.
 // !!! HEADER OUTPUT ====================
 ?>
@@ -142,7 +144,9 @@ View live site: <a href="<?php echo $urlbase_prod ?>" target="_blank"><?php echo
 // !!! PUBSYS BUILD ==========================
 // PubSys reads post files in the "posts" folder into a big array of posts, which contains ALL post metadata and content, aptly called $posts, plus a much lighter one, $index.  PubSys uses the posts array to render and save posts in the HTML folder, just the three most recent in a fast "prep mode", and all of them otherwise, plus a bunch of other stuff: homepage, RSS feed, sitemap, and more. It wraps up with a bit of file management.
 
-if ($_qry == "prep") { // #prepMode a much simpler, faster build of render initiate #postPrep mode, whihc builds just a single post
+buildErrorsMark(); // start tracking php-errors.log so buildErrorsReport() can summarize errors generated by this build, and register the fatal-culprit shutdown reporter (see util--build.php); PubSys calls buildTrackDoc() as it processes each post
+
+if ($_qry == "prep") { // #prepMode a much simpler, faster build of render initiate #postPrep mode, which builds just a single post
 	$prepMode = true;
 	echo "<h2>Make Log: Prep Mode</h2><div style='font-size:.8em'>";
 	$tags = getTags(); 			// read tags into array as usual
@@ -183,6 +187,8 @@ else {
 //	printArrTable2(array_slice($posts, 0, 50)); 			// print the first 50 posts in the post array
 //	printArrTable2($posts); 			// print entire array of post metadata /**/
 	}
+
+buildErrorsReport(); // journal a deduped summary of PHP errors logged during this build (both modes)
 
 ?>
 

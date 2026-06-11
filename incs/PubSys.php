@@ -27,7 +27,7 @@ There are TWO big loops in the PubSys build script that process content for ever
 use League\HTMLToMarkdown\HtmlConverter; // use PHP Markdown, see https://github.com/michelf/php-markdown, and especially see https://michelf.ca/projects/php-markdown/configuration/
 use Michelf\MarkdownExtra; // use HTML To Markdown for PHP, to convert Markdown back to HTML! see https://github.com/thephpleague/html-to-markdown
 
-if ($ps) $record = new XRefRecord(); // This is a bit hacky, done in my profound ignorance of OOP, so that I can access a method (parseNestedxRefs) in a function.  Probably not the best/right way to do this, but it works.
+if (!empty($ps)) $record = new XRefRecord(); // This is a bit hacky, done in my profound ignorance of OOP, so that I can access a method (parseNestedxRefs) in a function.  Probably not the best/right way to do this, but it works.
 
 $rss_only_posts = []; // initialize an array in the global scope for RSS-only posts
 
@@ -88,7 +88,7 @@ function getPosts()
 	global $rss_only_posts; // get the global array for RSS only posts
 	foreach ($posts as $key => $post) { // it’s probably redundant to loop through the array for this, but it’s conceptually tidier... we're looking RSS-only posts...
 //		if ($n++ > 100) break; echo "$n ";
-		if ($post['rss_only_post']) { // if we find an RSS-only post...
+		if (!empty($post['rss_only_post'])) { // if we find an RSS-only post...
 			$rss_only_posts[$key] = $post; // save it to its own array
 			unset($posts[$key]); // and make it a ghost!  remove it from the main posts array, so that it effectively doesn't exist for anything else: indexes, sitemap, making post files, etc... NONE of that has to be handled independently if it’s just taken out of the main post array in the first place
 		}
@@ -111,7 +111,7 @@ function getPosts()
 		while (isset($keys[$x + $lnpp]) and $stillSeekingLastNonPreviewPost) { // if there is a key for the previous post...
 			$prevKey = $keys[$x + $lnpp]; // get key (timestamp) of the PREV post (+1 in the arrays of posts and keys)
 			$prevPost = $posts[$prevKey]; // get the prev post from the main array
-			if ($posts[$prevKey]['preview']) { // if that post is a preview, we ignore it…
+			if (!empty($posts[$prevKey]['preview'])) { // if that post is a preview, we ignore it…
 				$lnpp++;  // go another level deepeer looking for a non-preview post
 			} else {
 				$new_posts[$key]['prev_post'] = $prevPost['timestamp']; // assign key (timestamp) of prev post to the prev_post field for this post
@@ -125,7 +125,7 @@ function getPosts()
 			$nextKey = $keys[$x - $nnpp]; // get key (timestamp) of the NEXT post (-1 in the arrays of posts and keys)
 			$nextPost = $posts[$nextKey]; // get the next post from the main array
 			// if ($mytemp++ < 10) echo "<p>For {$post['title']}, next post candidate #$nnpp is {$posts[$nextKey]['title']}, and it’s preview status is {$posts[$nextKey]['preview']} </p>";
-			if ($posts[$nextKey]['preview']) { // if that post is a preview, we ignore it…
+			if (!empty($posts[$nextKey]['preview'])) { // if that post is a preview, we ignore it…
 				$nnpp++; // go another level deeper looking for a non-preview post
 			} else {
 				$new_posts[$key]['next_post'] = $nextPost['timestamp']; // assign key (timestamp) of next post to the next_post field for this post
@@ -189,6 +189,9 @@ $post = array('canonical' => null,
 	// echo "&nbsp;&nbsp;processing $discovery_id<br>";
 	$post['post_class'] = 'micro';
 	$post['source_file'] = basename($fn);
+	$post['source_path'] = $fn; // full (relative) path, kept for tooling that writes back to the source, e.g. psid provisioning in auditPsids()
+	$post['source_line'] = $ln; // the raw source line for this micropost, kept so auditPsids() can find the line again to append a psid
+	if (function_exists('buildTrackDoc')) buildTrackDoc("$fn [ln $lnno]"); // so a fatal while reading/rendering this micropost gets blamed on the right line (see buildErrorsMark in util--build.php)
 	//	$ln = preg_replace("@\s+http@", '---http', $ln); // set up trailing raw URLs for autodetection as featured links: replace whitespace preceding URLswith --- (more explicit, standard delimeters for parseSloppyData function); 2025-12-01 removing this touched a couple dozen posts, but I decided it was a hacky old convention that should die, so I just manually changed all of those old ones rather than automating it
 	$data = parseSloppyData($ln);
 	$post['date'] = $data[0];  // assume the first item is a date
@@ -196,7 +199,7 @@ $post = array('canonical' => null,
 	if (strpos($data[1], '§') !== false) { // if the second item contains the tick § symbol, then it is content that contains an embedded title
 		$post['title'] = get_marked_text($data[1], '§'); // extract the title, using ticks
 		$post['title'] = massage_title($post['title']); // remove stray punctuation
-		$post['content'] = $content = str_replace('§', null, $data[1]);
+		$post['content'] = $content = str_replace('§', '', $data[1]);
 	} elseif (strlen($data[1]) < 100 and strlen($data[2]) > 50) { // otherwise, the second item SHOULD be a title in itself (but it is possible that it’s content and a title has been neglected, so we do some rudimentary checking of links, assuming that a title must be shorter than 100 chars and content must be longer than 50; this is hardly foolproof, but will cover most scenarios, and the worst-case scenario isn’t that bad
 		$post['title'] = $data[1];
 		$post['content'] = $content = $data[2]; // get the content
@@ -252,9 +255,8 @@ $post = array('canonical' => null,
 				$psidsArr[] = $post['psid'] = $tmp[1]; // save it to the psids array, and the post array
 
 				global $sources;
-				$sources->findRecordsThatEqual('psid', $post['psid']);
-				$record = $sources->results[0];
-				$post['citekey'] = $record->rawcitekey;				
+				$record = $sources->findRecordsThatEqual('psid', $post['psid'])->first();
+				$post['citekey'] = $record->rawcitekey ?? '';
 				// echo "{$post['psid']}, {$post['title']}, {$post['citekey']}<br><br>";
 			}
 
@@ -301,7 +303,7 @@ $post = array('canonical' => null,
 				$post['preview'] = true;
 			}
 			if (in_array($md, $md_syns['slug'])) {
-				$post['slug'] = $md_pt2;
+				$post['slug'] = $md_pt2 ?? '';
 			}
 			if (in_array($md, $md_syns['canonical'])) {
 				$post['canonical'] = $md_pt2;
@@ -334,7 +336,7 @@ $post = array('canonical' => null,
 	$content = preg_replace('| *••• *|', "\n* ", $content); // ••• denotes a UL list item; 1st item must be preceded by extra newlines (eg ………••• )
 	$content = preg_replace('| *111\. *|', "\n1. ", $content); // 111 denotes an OL list item; 1st item must be preceded by extra newlines (………111.)
 
-	$post['content'] = $content = str_replace('§', null, $content); // remove ticks
+	$post['content'] = $content = str_replace('§', '', $content); // remove ticks
 
 	// CONTENT FINALIZED
 
@@ -366,7 +368,7 @@ $post = array('canonical' => null,
 	//	if (strpos($content, "\n\n") !== false)  $multi = true; // not sure $multi matters any more
 	// detect metadata in the content
 	if (preg_match('@href="(.*?)">\\w+§.*?</a>@ui', $content, $matches)) {
-		$post['ftd_url'] = str_replace('§', null, $matches[1]);
+		$post['ftd_url'] = str_replace('§', '', $matches[1]);
 	} // position [1] matches the href attribute value in the post followed by anchor text containing a title-marking symbol, if any
 
 	//	$post = get_auto_tags($post);
@@ -398,30 +400,31 @@ function getImgPost($fn)
 	$post = get_timestamp_from_post_date($post); // gets a timestamp from the date, optionally modified by day-order
 	$post['title'] = $title = ucfirst($fn_parts[1]);
 	$post = get_post_urls($post);
-	$post['caption'] = ucfirst($fn_parts[2]);
-	$tags_given = $fn_parts[3];
-	$post['src_name'] = $fn_parts[4];
-	$post['src_url'] = $fn_parts[5];
+	$post['caption'] = ucfirst($fn_parts[2] ?? '');
+	$tags_given = $fn_parts[3] ?? '';
+	$post['src_name'] = $fn_parts[4] ?? '';
+	$post['src_url'] = $fn_parts[5] ?? '';
 	global $md_syns;
 	foreach ($post as $field => $data) {
-		if (in_array(strtolower($data), $md_syns['null']) or $data == '') {
+		if (in_array(strtolower($data ?? ''), $md_syns['null']) or $data == '') {
 			unset($post[$field]);
 		}
 	}
-	if ($post['caption']) {
+	if (!empty($post['caption'])) {
 		$post['description'] = html_to_description($post['caption']);
 	}
 	journal("reading img post file [ $fn ]", 2);
-	if ($post['src_url']) {
+	$source = $caption = ''; // both are interpolated into the IMGPOST heredoc below, but set only conditionally
+	if (!empty($post['src_url'])) {
 		$post['src_url'] = 'http://' . str_replace(':', '/', $post['src_url']);
 	}
-	if ($post['src_name'] and $post['src_url']) {
+	if (!empty($post['src_name']) and !empty($post['src_url'])) {
 		$source = "<a href='{$post['src_url']}'>{$post['src_name']}</a>";
 	}
-	if ($post['src_name'] and ! $post['src_url']) {
+	if (!empty($post['src_name']) and empty($post['src_url'])) {
 		$source = "{$post['src_name']}";
 	}
-	if (! $post['src_name'] and $post['src_url']) {
+	if (empty($post['src_name']) and !empty($post['src_url'])) {
 		$source = "<a href='{$post['src_name']}'>{$post['src_url']}</a>";
 	}
 	if ($source) {
@@ -453,7 +456,7 @@ function getImgPost($fn)
 	$post['mime'] = $imagedata['mime'];
 	// the content of img posts is basically just the image, with title and caption and metadata: it’s simple, but it has to be generated entirely from metadata
 	$post['post_img'] = "imgs-auto/$new_name";
-	if ($post['caption']) {
+	if (!empty($post['caption'])) {
 		$caption = "<p>{$post['caption']}</p>";
 	}
 	global $ps;
@@ -523,6 +526,8 @@ $post = array('canonical' => null,
 
 	journal("reading macropost source file [ $fn ]", 2);
 	$post['post_class'] = 'macro';
+	$post['source_path'] = $fn; // full (relative) path, kept for tooling that writes back to the source, e.g. psid provisioning in auditPsids()
+	if (function_exists('buildTrackDoc')) buildTrackDoc($fn); // so a fatal while reading/rendering this macropost gets blamed on the right doc (see buildErrorsMark in util--build.php)
 	$lines = file($fn, FILE_IGNORE_NEW_LINES);
 	// get metadata from the filename
 	$fn = basename($fn);
@@ -608,9 +613,8 @@ $post = array('canonical' => null,
 				// if there's a PSID, there's probably a citekey, but PubSys is surprisingly unaware of these …	
 				
 				global $sources;
-				$sources->findRecordsThatEqual('psid', $post['psid']);
-				$record = $sources->results[0];
-				$post['citekey'] = $record->rawcitekey;				
+				$record = $sources->findRecordsThatEqual('psid', $post['psid'])->first();
+				$post['citekey'] = $record->rawcitekey ?? '';
 				// echo "{$post['psid']}, {$post['title']}, {$post['citekey']}<br><br>";
 			}
 
@@ -677,7 +681,7 @@ $post = array('canonical' => null,
 				$post['preview'] = true;
 			}
 			if (in_array($md, $md_syns['slug'])) {
-				$post['slug'] = $md_pt2;
+				$post['slug'] = $md_pt2 ?? '';
 			}
 			if (! $post['citekey']) {
 				$post = deal_with_citekeys($mdo, $post);
@@ -740,13 +744,14 @@ function makeWebVersions()
 		if ($prepMode and $n > 3) { // prepMode still works with the complete posts array, but does MUCH LESS with it, like making files out of only the first 3 of them (and the third generally has no changes)
 			break;
 		}
+		if (function_exists('buildTrackDoc')) buildTrackDoc('web version of ' . ($post['source_file'] ?? $post['title'] ?? '?')); // so a fatal while templating this post gets blamed on the right doc (see buildErrorsMark in util--build.php)
 		if (! isset($post['title_smpl']) or $post['title_smpl'] == ' ') {
 			// if there’s no title, issue a warning and skip this post (can’t save a file with a title)
 			journal('warning: cannot make a post, date ' . $post['date']. ', file ' . $post['source_file'], 2, true);
 			printArr($post);
 			continue;
 		}
-		if ($post['lock']) {
+		if (!empty($post['lock'])) {
 			journal('skipping locked post [' . substr($post['title_smpl'], 0, 25) . ']', 2, true);
 			continue;
 		}
@@ -761,11 +766,14 @@ function makeWebVersions()
 
 		$thePost = str_replace('{$content}', $post['html'], $template); // BIG STEP! insert the prepared content, with translated custom markup/markdown and rendered PHP (thePost = template + content) — the output of prepareContent()
 
-		if ($post['preview']) {
+		if (!empty($post['preview'])) {
 			$thePost = str_replace('<article>', "<article><h2 style='font-size:3em;color:#c66'>DRAFT — NOT FOR PUBLICATION</h2>", $thePost);
 		}
 
 		$thePost = preg_replace("/.*rss_only_line.*\n\n/", "\n<!-- one line removed by flag rss_only_line -->\n", $thePost); // Remove lines from web version if when they contains the "rss_only_line" flag (this step must follow the insertion of the HTML, because it is IN the HTML). Exasperating-edge-case: the rss_only_line directive must be placed at the END of the line (<hr><!-- rss_only_line -->), not the start (<br><!-- rss_only_line -->). Even with that arbitrary convention, it still only works with a hack, see #comment_patch
+
+		$thePost = preg_replace('/<!-- rss_only_block_start -->(.+?)<!-- rss_only_block_stop -->/uism', '', $thePost); // remove all blocks excluded from RSS
+
 
 		// if we’ve gotten this far without skipping the post for any reason, then make a post file
 		$postPath = $GLOBALS['filenames'][] = STAGE . "/{$post['fn']}"; // add filename to list of confirmed html files to build (`path)
@@ -801,7 +809,7 @@ function makeWebVersions()
 		if ($n == 1) { // make extra useful files for the first post in the array
 			$postMetadata = $post;
 			foreach ($postMetadata as $key=>$field) {
-				if ($field == null or in_array($key, ['html_premium', 'html', 'post_class', 'words_round', 'tags', 'prev_post', 'timestamp', 'psid']) ) { // get rid of some cluttery fields
+				if ($field == null or in_array($key, ['html_premium', 'html', 'post_class', 'words_round', 'tags', 'prev_post', 'timestamp', 'psid', 'source_path', 'source_line']) ) { // get rid of some cluttery fields
 					unset($postMetadata[$key]);
 				}
 				}
@@ -844,15 +852,15 @@ function makeTextVersion()
 	$theContent = $thePost['html']; // this function converts a post from the fully rendered html content (and just the content, not the "chrome" from the blog post template)
 
 	// many modifications…
-	$theContent = preg_replace("|<div class=[\"']imgbox.*?<!--/imgbox--></div>|uism", null, $theContent); // remove all images completely
-//	$theContent = preg_replace('|<div x-data=\"loginForm.*?<!--/loginForm--></div>|uism', null, $theContent); // remove the #login form, refundant since it was moved out of the body and into the template
-	$theContent = preg_replace('|<ul class="member_benefits_list">.*?<!--/member_benefits_list--></ul>|uism', null, $theContent);
-	$theContent = preg_replace('/<!-- paywall markup: member start -->(.+?)<!-- paywall markup: member end -->/uism', null, $theContent); // remove member content
-	$theContent = preg_replace('/<!-- rss_no_block_start -->(.+?)<!-- rss_no_block_stop -->/uism', null, $theContent); // remove all blocks excluded from RSS
-	$theContent = preg_replace('/.*?rss_no_line.*?\n/', null, $theContent); // remove all lines w rss_no_line
-	$theContent = preg_replace('/.*?paywall markup:.*?\n/', null, $theContent); // remove all paywall markup lines
-	$theContent = preg_replace('|<style.*</style>|uism', null, $theContent); // remove all style blocks
-	$theContent = preg_replace('|<a href="#fcj\d+" title="" id="frj\d+">\d+</a> |', null, $theContent); // remove footnote reference links
+	$theContent = preg_replace("|<div class=[\"']imgbox.*?<!--/imgbox--></div>|uism", '', $theContent); // remove all images completely
+//	$theContent = preg_replace('|<div x-data=\"loginForm.*?<!--/loginForm--></div>|uism', '', $theContent); // remove the #login form, refundant since it was moved out of the body and into the template
+	$theContent = preg_replace('|<ul class="member_benefits_list">.*?<!--/member_benefits_list--></ul>|uism', '', $theContent);
+	$theContent = preg_replace('/<!-- paywall markup: member start -->(.+?)<!-- paywall markup: member end -->/uism', '', $theContent); // remove member content
+	$theContent = preg_replace('/<!-- rss_no_block_start -->(.+?)<!-- rss_no_block_stop -->/uism', '', $theContent); // remove all blocks excluded from RSS
+	$theContent = preg_replace('/.*?rss_no_line.*?\n/', '', $theContent); // remove all lines w rss_no_line
+	$theContent = preg_replace('/.*?paywall markup:.*?\n/', '', $theContent); // remove all paywall markup lines
+	$theContent = preg_replace('|<style.*</style>|uism', '', $theContent); // remove all style blocks
+	$theContent = preg_replace('|<a href="#fcj\d+" title="" id="frj\d+">\d+</a> |', '', $theContent); // remove footnote reference links
 	$theContent = preg_replace('|<li id="fcj\d+">(.+?)</li>|', '† $1', $theContent); // convert notes list
 	$theContent = preg_replace('|<li.*?>(.+?)</li>|', '👉🏻 $1', $theContent); // convert lists
 	$theContent = str_replace('&nbsp;', ' ', $theContent);
@@ -885,8 +893,8 @@ function makeTextVersion()
 	}
 	$theContent = str_replace('https://www.painscience.com', 'PainScience.com', $theContent); // replace full PainSci URLs with prettified URLs
 	
-	$theContent = preg_replace('|<.+?>|', null, $theContent);
-	$theContent = preg_replace('|<!--.*?-->|', null, $theContent); // remove all comments
+	$theContent = preg_replace('|<.+?>|', '', $theContent);
+	$theContent = preg_replace('|<!--.*?-->|', '', $theContent); // remove all comments
 	$theContent = tidyWhitespace($theContent);
 
 	// okay, done building the text version, now to save it
@@ -985,7 +993,7 @@ Convert that to:
 	// the ¶ symbols get converted to linefeeds below
 
 	// Convert paywall markup, removing most of it and replacing the starts and stops with much more spartan Buttondown template tags. As a general rule, the newsletter resembles the RSS output more than the web output, so anything excluded from RSS probably needs to be excluded here too.
-	$theContent = preg_replace("/.*rss_no_line.*\n/", null, $theContent); // remove one line from RSS
+	$theContent = preg_replace("/.*rss_no_line.*\n/", '', $theContent); // remove one line from RSS
 	$theContent = preg_replace('|<!--\s*rss_no_block_start(.+?)rss_no_block_stop\s*-->|s', "\n<!-- removed from RSS: multiple lines -->\n", $theContent); // remove multiline content from RSS
 
 	$theContent = str_replace('<!-- paywall markup: non-member start -->', '{% if subscriber.canUNDERSCOREbeUNDERSCOREupsold %}', $theContent);	// underscores in the Buttondown template tags need to be temporarily protected from HtmlConverter
@@ -994,7 +1002,7 @@ Convert that to:
 	$theContent = str_replace('<!-- paywall markup: member end -->', '{% endif %}', $theContent);
 	// replace Stripe payment links with dynamic Button upgrade links for each plan...
 
-	$theContent = preg_replace('@</*(div|template).*?>@', null, $theContent); // 2024-10-04 fixed bug, added '?' so that just tags themselves are removed, not the content between them
+	$theContent = preg_replace('@</*(div|template).*?>@', '', $theContent); // 2024-10-04 fixed bug, added '?' so that just tags themselves are removed, not the content between them
 
 	// We now have a mixture of both HTML and Markdown+Buttondown!  If we try to convert Markdown to Markdown, we get a bunch of escaping of symbols and such.  So we have to, good grief, convert the HTML to Markdown, and then immediately convert the fully Markdownified post right back to HTML! Sheesh.
 	$theContent = MarkdownExtra::defaultTransform($theContent); // convert the mixture of Markdown and HTML to pure HTML...
@@ -1094,8 +1102,6 @@ exit;
 
 	if ($thePost['post_audio']) { // inject audio template if there's audio, #podcast
 
-
-
 		if (! $thePost['premium']) { // for non-member posts, use the p.aside format, and use it somewhere early in the post: audio-cta for free subscribers, audio-cta-upsell for pst1 members, and links for the full members; placement varies, but the top is often best for regular posts, given that they are usually shorter and so advertise the audio option sooner rather than later
 			$audio = <<<AUDIO
 				<p class="aside top">
@@ -1122,7 +1128,7 @@ exit;
 	}
 
 	// minor fine tuning
-	$theContent = str_replace(' ❐', null, $theContent);
+	$theContent = str_replace(' ❐', '', $theContent);
 
 	// if ($thePost['psid'] == 3322820) {echo "<pre>" . htmlentities($theContent) . "</pre>";}
 
@@ -1318,11 +1324,12 @@ function makeRSS($max = 30)
 	global $settings;
 	extract($settings);
 	$n=0; foreach ($postsWithRSS as $post) {
-		if ($post['preview'] or $post['rss_no_post'] or $post['podcast_only']) { // exclude post previews & posts explicitly excluded from RSS
+		if (!empty($post['preview']) or !empty($post['rss_no_post']) or !empty($post['podcast_only'])) { // exclude post previews & posts explicitly excluded from RSS
 			continue;
 		}
 		if ($n++ > $max) break; // start counting non-excluded posts
 		extract($post); // get all the data for the found post
+		$ftd_url ??= ''; $url_rss ??= ''; $url_pretty ??= ''; // optional post fields referenced by the RSS templates, defaulted so the template evals don't warn; unset again at the bottom of this loop
 		$date_rss = date('D, d M Y H:i:s -0700', $timestamp); // get the date for the post in RSS-friendly format
 		if ($n == 1) {$last_build_date = $date_rss;} // make the build date equal to date of most recent post, which should be the first in the stack
 		journal("adding a post to the RSS feeds [ $title_smpl ]", 3);
@@ -1361,7 +1368,7 @@ function makeRSS($max = 30)
 		$content = preg_replace("|<aside class=[\"'].+?[\"']>|", "<br><hr>\n\n<div>", $content);
 		$content = preg_replace("|</aside>|", "</div>\n\n<hr><br>", $content);
 
-		$content = str_replace(" loading='lazy'", null, $content); // remove loading=lazy	attributes, unnecessary in feed (probably doesn’t hurt either)
+		$content = str_replace(" loading='lazy'", '', $content); // remove loading=lazy	attributes, unnecessary in feed (probably doesn’t hurt either)
 
 		/*		2025-12-01, removed at least for now, because it isn't even hooked up: these vars are never used
 		if ($ftd_url) { // if the post has a featured_link
@@ -1381,19 +1388,20 @@ function makeRSS($max = 30)
 			$content = processPullQuotes_rss($content);
 
 
-			$content = preg_replace("@<a class='zoomer.+?/a>@", null, $content); // removes zoomer buttons markup
+			$content = preg_replace("@<a class='zoomer.+?/a>@", '', $content); // removes zoomer buttons markup
 			$content = preg_replace("@<span class='pupb'.+?<span class='pupw[^<]+>(.*?)<span class='pupx'.*?</span></span>@", ' [ $1 ] ', $content); // replaces simple popup markup with just the popup content wrapped in square brackets
 			// This next bit is hack to block my responsive-image solution in RSS, which involves a pair of img elements handled with different CSS at different window sizes; the "constrained" image is marked with "<!-- constrained IMG START -->" and "…END -->". I remove the inner comment delimiters to comment-out the whole image (much easier than cooking up reliable regex pattern to remove the whole thing):
 			$content = str_replace('<!-- constrained IMG START -->', '<!-- constrained IMG START ', $content);
 			$content = str_replace('<!-- constrained IMG END -->', 'constrained IMG END -->', $content);
 			// remove inline imgs altogether, since they are doomed to render poorly, source example: <img class='inline ' src='/assets/images/smiley--sq-15x15-<1k.png' width='16' height='16' alt='' style='border-width:0px; border-style:none; display:inline;'>
-			$content = preg_replace("@<img class='inline.*?>@", null, $content);
+			$content = preg_replace("@<img class='inline.*?>@", '', $content);
 
 			// So far the content string for the post contains everything, both member and non-member content. Now we fork the content into $content and $content_member, removing members-only content from the free version of the post and vice versa.
 
 			// CREATE MEMBER VERSION OF THE POST by deleting teaser (non-member) content, which is delimited by <!-- paywall markup: non-member start/end -->. This will leave regular content intact. This does not change the $content variable — it just creates a modified copy of it in $content_member, and then saves appends it to $rss_posts_member.
-			$content_member = preg_replace('|<!-- paywall markup: non-member start -->(.+?)<!-- paywall markup: non-member end -->|s', null, $content);
-			$content_member = preg_replace('|<div.{0,100}x-show=["\']\!member["\'].{0,100}>.*?</div>|s', null, $content_member);
+			$content_member = preg_replace('|<!-- paywall markup: non-member start -->(.+?)<!-- paywall markup: non-member end -->|s', '', $content);
+			$content_member = preg_replace('|<div.{0,100}x-show=["\']\!member["\'].{0,100}>.*?</div>|s', '', $content_member);
+			$content_member = preg_replace("|<span(.+?)x-show='!member'(.*?)>(.+?)</span>|", '', $content_member);
 			$audio_blurb_top = $audio_blurb_bottom = null;
 			if ($post['post_audio'] and $title !== 'Podcast at last!') { //podcast_content #dated_content // had to special case the inclusion of the standard audio blurbs for the podcast announcement post because it was conspicuously redundant
 				$audio_blurb_top = "<p><em><small>There is an audio version of this post ({$post['post_audio_dur_time']}) in the PainSci Updates podcast for members only. See the end of the post for more information.</small></em></p>\n\n<hr>\n\n";
@@ -1405,8 +1413,8 @@ function makeRSS($max = 30)
 			$rss_posts_member .= eval('return "' . addslashes(file_get_contents("template-rss-member-post.xml", true)) . '";'); // Build the member version of the post from the member template, and append it to a string containing all member posts so far. The template contains "{$content_member}" which will be replaced with the value of $content_member for this post (along with other vars).
 
 			// Now finish the non-member version of the post by removing member content.
-			$content = preg_replace('|<!-- paywall markup: member start -->(.+?)<!-- paywall markup: member end -->|s', null, $content); // Delete member content.
-			$content = preg_replace('|<[/]*?template.*?>|', null, $content); // Remove <template> elements, which RSS reeders may not know what to do with (resulting in non-member content being invisible, which is bad). This is mostly due to the <template> element.
+			$content = preg_replace('|<!-- paywall markup: member start -->(.+?)<!-- paywall markup: member end -->|s', '', $content); // Delete member content.
+			$content = preg_replace('|<[/]*?template.*?>|', '', $content); // Remove <template> elements, which RSS reeders may not know what to do with (resulting in non-member content being invisible, which is bad). This is mostly due to the <template> element.
 		}
 
 		// Generate one REGULAR RSS POST
@@ -1528,7 +1536,7 @@ function makePodcast($max = 500)
 
 function tidyRSS($rss_str)
 {
-	$rss_str = preg_replace("|<!-- removed from RSS.+? -->\n|", null, $rss_str); // I put these in, and now I’m taking them out... so nuke this line if you want to see removal markers!
+	$rss_str = preg_replace("|<!-- removed from RSS.+? -->\n|", '', $rss_str); // I put these in, and now I’m taking them out... so nuke this line if you want to see removal markers!
 	$rss_str = tidyWhitespace($rss_str);
 	$rss_str = str_replace('<item>', "\n\n\n\n\n\n<item>", $rss_str);	// add extra space before each post
 
@@ -1548,9 +1556,9 @@ function makeSitemap()
 	// note, lastmod must be equal to the most recent post, and will be subbed in after
 	journal('adding posts to sitemap', 2, true);
 	$n=0; foreach ($posts as $post) {
-		if ($post['preview'] or 					// do not include post previews
-			$post['indexing'] === false or		// a noindexing directive is equivalent to exclusion from the sitemap
-			$post['canonical']) { // if there's a canonical URL, do not include this one in the sitemap
+		if (!empty($post['preview']) or 					// do not include post previews
+			($post['indexing'] ?? null) === false or		// a noindexing directive is equivalent to exclusion from the sitemap
+			!empty($post['canonical'])) { // if there's a canonical URL, do not include this one in the sitemap
 			continue;
 		}
 		$n++; // start counting non-excluded posts
@@ -1564,7 +1572,7 @@ function makeSitemap()
 		if ($ps) {
 			$default_priority = $default_priority - 2; // on ps, posts are relatively less important than the rest of the site
 		}
-		if ($post['priority']) {
+		if (!empty($post['priority'])) {
 			$sitemap_str .= "<priority>0.{$post['priority']}</priority>";
 		} elseif ($post['post_class'] == 'macro') {
 			$sitemap_str .= '<priority>0.' . $default_priority . '</priority>';
@@ -1680,8 +1688,10 @@ function get_settings()
 	date_default_timezone_set('America/Los_Angeles');
 	$settings['year'] = date('Y');
 
-	if ($settings['optional_subdir']) {
+	if (!empty($settings['optional_subdir'])) {
 		$settings['optional_subdir'] = '/' . $settings['optional_subdir'];
+	} else {
+		$settings['optional_subdir'] = ''; // most blogs have no optional_subdir setting, but the key must exist: it's interpolated into urlbase_prod below and extract()ed in makePreviewLink()
 	}
 
 	// add lowercase versions of the $settings array
@@ -1691,7 +1701,7 @@ function get_settings()
 
 	// now generate some settings …
 	// a sitecode if it wasn’t set
-	if (! $settings['sitecode']) {
+	if (empty($settings['sitecode'])) {
 		$settings['sitecode'] = str_replace(' ', '-', $settings['sitename_lc']);
 	}
 
@@ -1728,7 +1738,7 @@ function get_settings()
 function get_post_urls($post)
 {
 	//	#2do fix this syntax: $title = $post['slug'] ? $post['title'] : $post['slug']; // if there's slug, use the slug; otherwise, use the title
-	if ($post['slug'] == '') {
+	if (($post['slug'] ?? '') == '') {
 		$title = $post['title'];
 	} else {
 		$title = $post['slug'];
@@ -1753,7 +1763,7 @@ function get_marked_text($content, $marker = '`')
 
 	// look for `bracketed text`
 	if (preg_match("@$m(.*?)$m@", $content, $matches)) {
-		return ucfirst(str_replace($m, null, $matches[1]));
+		return ucfirst(str_replace($m, '', $matches[1]));
 	}
 
 	//	if (preg_match("@href=\"(.*?)\">\\w+$m.*?</a>@ui", $content, $matches))
@@ -1761,20 +1771,20 @@ function get_marked_text($content, $marker = '`')
 	// look for <a href='url'>Nice title</a>
 	// note, the tick can be at any location between the defining elements
 	if (preg_match("@<a href.*?>([\w\s,!]*$m.*?)</a>@", $content, $matches)) {
-		return ucfirst(str_replace($m, null, $matches[1]));
+		return ucfirst(str_replace($m, '', $matches[1]));
 	}
 
 	// look for <strong>`nice title</strong>
 	if (preg_match("@<strong.*?>(.*?$m.*?)</strong>@", $content, $matches)) {
-		return ucfirst(str_replace($m, null, $matches[1]));
+		return ucfirst(str_replace($m, '', $matches[1]));
 	}
 
 	// various other similar searches within common HTML and Markdown
 	if (preg_match("@<em.*?>(.*?$m.*?)</em>@", $content, $matches)) {
-		return ucfirst(str_replace($m, null, $matches[1]));
+		return ucfirst(str_replace($m, '', $matches[1]));
 	}
 	if (preg_match("@<cite.*?>(.*?$m.*?)</cite>@", $content, $matches)) {
-		return ucfirst(str_replace($m, null, $matches[1]));
+		return ucfirst(str_replace($m, '', $matches[1]));
 	}
 
 	// look for the first “nice `title” bracketed by single punctuation marks
@@ -1785,38 +1795,38 @@ function get_marked_text($content, $marker = '`')
 	// iow, "anything but a closure"
 
 	if (preg_match("@“([^”]*$m.*?)”@u", $content, $matches)) {
-		return ucfirst(str_replace($m, null, $matches[1]));
+		return ucfirst(str_replace($m, '', $matches[1]));
 	}
 	if (preg_match("@—\s{0,1}([^”]*$m.*?)\s{0,1}—@u", $content, $matches)) {
-		return ucfirst(str_replace($m, null, $matches[1]));
+		return ucfirst(str_replace($m, '', $matches[1]));
 	}
 	if (preg_match("@‘([^’]*$m.*?)’@u", $content, $matches)) {
-		return ucfirst(str_replace($m, null, $matches[1]));
+		return ucfirst(str_replace($m, '', $matches[1]));
 	}
 	if (preg_match("@\*([^*]*$m.*?)\*@u", $content, $matches)) {
-		return ucfirst(str_replace($m, null, $matches[1]));
+		return ucfirst(str_replace($m, '', $matches[1]));
 	}
 	if (preg_match("@\[([^]]*$m.*?)\]@u", $content, $matches)) {
-		return ucfirst(str_replace($m, null, $matches[1]));
+		return ucfirst(str_replace($m, '', $matches[1]));
 	}
 	if (preg_match("@_([^_]*$m.*?)_@u", $content, $matches)) {
-		return ucfirst(str_replace($m, null, $matches[1]));
+		return ucfirst(str_replace($m, '', $matches[1]));
 	}
 
 	// Maybe` this is the text: in a phrase followed by a colon.
 	if (preg_match("@([A-Z][^:.]+$m.*?):@u", $content, $matches)) {
-		return ucfirst(str_replace($m, null, $matches[1]));
+		return ucfirst(str_replace($m, '', $matches[1]));
 	}
 
 	// short sentences ending in exclamation points, or questions marks
 	// Like `this! Or `this?
 	if (preg_match("@([A-Z][^:]+$m.*?)[\?!]@u", $content, $matches)) {
-		return ucfirst(str_replace($m, null, $matches[1]));
+		return ucfirst(str_replace($m, '', $matches[1]));
 	}
 
 	// STILL nothing?! Well, there’s one more common scenario, especially for descriptions (∂): from the start of the content to a marker at an arbitrary “stop here” marker.
 	if (preg_match("@(.*?$m)@u", $content, $matches)) {
-		return ucfirst(str_replace($m, null, $matches[1]));
+		return ucfirst(str_replace($m, '', $matches[1]));
 	}
 
 	return false; // never found anything? report failure
@@ -1872,9 +1882,9 @@ function get_post_size($post)
 	}
 
 	// remove some stuff we don’t want to count; conveniently, this is easily achieved just with existing teaser and RSS exclusions naturally take care of most of this
-	$stripped_content = preg_replace('|<!-- paywall markup: non-member start -->(.+?)<!-- paywall markup: non-member end -->|s', null, $post['html']);
-	$stripped_content = preg_replace('|<!--\s*rss_no_block_start(.+?)rss_no_block_stop\s*-->|s', null, $stripped_content); // remove multiline content from RSS
-	$stripped_content = preg_replace("/.*rss_no_line.*\n/", null, $stripped_content); // remove one line from RSS
+	$stripped_content = preg_replace('|<!-- paywall markup: non-member start -->(.+?)<!-- paywall markup: non-member end -->|s', '', $post['html']);
+	$stripped_content = preg_replace('|<!--\s*rss_no_block_start(.+?)rss_no_block_stop\s*-->|s', '', $stripped_content); // remove multiline content from RSS
+	$stripped_content = preg_replace("/.*rss_no_line.*\n/", '', $stripped_content); // remove one line from RSS
 	$stripped_content = strip_tags($stripped_content); // get content without markup, including premium content if it exists
 
 	// if (inStr('Softer', $post['title'])) exit("<pre>" . htmlentities($stripped_content) . "</pre>");
@@ -1957,8 +1967,8 @@ function get_description($post)
 	//	if ($post_audio) echo "<pre>" . htmlentities($html) . "</pre>";
 	if (strpos($html, '∂') !== false) {
 		$description = get_marked_text($html, '∂');
-		$post['html'] = str_replace('∂', null, $html); // remove ∂s from the html
-		$post['content'] = str_replace('∂', null, $content); // remove ∂s from the content
+		$post['html'] = str_replace('∂', '', $html); // remove ∂s from the html
+		$post['content'] = str_replace('∂', '', $content); // remove ∂s from the content
 	}
 	$description = html_to_description($description); // convert to a string suitable for a metadata description
 
@@ -1973,8 +1983,8 @@ function html_to_description($description, $max = 115)
 	// assumes HTML input (that is, content after all php and markdown has been rendered)
 	// this function starts with the entire post and whittles it down to the first description-sized chunk of content
 	$description = emUpperizer($description, 20); // convert <20 char emphasized text to uppercase
-	$description = preg_replace('|<!-- paywall markup: non-member start -->(.{10,1000}?)<!-- paywall markup: non-member end -->|s', null, $description); // remove paywall-related content (in posts with audio, this appears at the top and hijacks the description
-	$description = preg_replace('|<!-- paywall markup: member start -->(.{10,1000}?)<!-- paywall markup: member end -->|s', null, $description); // remove paywall-related content (in posts with audio, this appears at the top and hijacks the description
+	$description = preg_replace('|<!-- paywall markup: non-member start -->(.{10,1000}?)<!-- paywall markup: non-member end -->|s', '', $description); // remove paywall-related content (in posts with audio, this appears at the top and hijacks the description
+	$description = preg_replace('|<!-- paywall markup: member start -->(.{10,1000}?)<!-- paywall markup: member end -->|s', '', $description); // remove paywall-related content (in posts with audio, this appears at the top and hijacks the description
 	$description = strip_tags($description); // get rid of all other HTML
 	$description = preg_replace("@[\r\n]+@", ' ', $description);
 	$description = trim($description);
@@ -2110,7 +2120,7 @@ function list_urls($posts = null, $type = 'table')
 /** returns @array, html: an index of some or all posts marked up as list items or table rows */
 function make_post_index_item($post, $type = 'table')
 {
-	if ($post['preview']) {
+	if (!empty($post['preview'])) {
 		return null;
 	} // do not process post previews
 	extract($post);
@@ -2118,8 +2128,8 @@ function make_post_index_item($post, $type = 'table')
 	$postSizesIndex = ['xxxs' => '', 'xxs' => '1', 'xs' => '2', 's' => '3', 'm' => '4', 'l' => '5', 'xl' => '6', 'xxl' => '7', 'xxxl' => '8']; // a numeric index representing post sizes, used for filtering
 	$date = dateClear($timestamp);
 	// now over-ride that class for certain kinds of posts which need a different icon, like image posts
-	$audioBadge = $post_audio ? "<span style='opacity:0.5'><small>&#128264;</small></span>" : null;
-	if ($premium) {
+	$audioBadge = !empty($post_audio) ? "<span style='opacity:0.5'><small>&#128264;</small></span>" : null;
+	if (!empty($premium)) {
 		$title = str_replace('(Member Post)', '(<strong>Member Post</strong>)', $title); // embolden the "Member Post" suffix
 	}
 	if ($post_class == 'micro-img' or strpos($tags, 'photography') !== false) {
@@ -2130,7 +2140,7 @@ function make_post_index_item($post, $type = 'table')
 		return "<li class='mbi $index_class' x-show='itemSizeShow[$postSizesIndex[$size]]' x-transition.duration.800ms><a href='$title_smpl.html'>$title</a> $audioBadge » <small>$date</small></li>\n";
 	}
 	if ($type == 'table') {
-		if (! $words_exact) {
+		if (empty($words_exact)) {
 			$words_exact = 10;
 		}
 	}
@@ -2472,7 +2482,7 @@ function make_post_matrix($echo = true, $save = true)
 
 		// fine-tuning of variables for tabular output
 		$date_str = date('M j, y', parseDate($post['date'])); // format a standard simple date string
-		$prioritySort = 0 + $post['priority'];
+		$prioritySort = 0 + ($post['priority'] ?? 0);
 		if (strlen($post['title']) > 50) { // clip long titles...
 			$title_clipped = substr($post['title'], 0, 50) . " <span class='truncation_symbol'></span>";
 		} else {
@@ -2503,9 +2513,10 @@ function make_post_matrix($echo = true, $save = true)
 			}
 		}
 
-		$draft = ($post['preview']) ? 'DRAFT' : '';
-		$index = ($post['indexing']) ? 'idx' : 'noidx';
-		$member = ($post['premium']) ? '<strong>$</strong>' : '';
+		$draft = ($post['preview'] ?? false) ? 'DRAFT' : '';
+		$index = ($post['indexing'] ?? false) ? 'idx' : 'noidx';
+		$member = ($post['premium'] ?? false) ? '<strong>$</strong>' : '';
+		$post['words_exact'] ??= ''; $post['read_time'] ??= ''; $post['psid'] ??= ''; $post['slug'] ??= ''; // optional fields, often absent outside PS, defaulted so the heredoc interpolation below doesn't warn
 
 
 
@@ -2798,22 +2809,22 @@ function prepareTemplate($post, $templateFile)
 	ob_end_clean();
 
 	//		indexing is set to false for pages that are too short or too old, unless an exception is specified with “mustindex” keyword, see get_indexing_status
-	if ($post['indexing'] === false) {
+	if (($post['indexing'] ?? null) === false) {
 		$thisTemplate = str_replace('{$robots}', "<meta name='robots' content='noindex, follow'>", $thisTemplate);
 	}
-	if ($post['indexing'] === true) {
+	if (($post['indexing'] ?? null) === true) {
 		$thisTemplate = str_replace('{$robots}', "<meta name='robots' content='index, follow'>", $thisTemplate);
 	}
 
-	$thisTemplate = str_replace('{$description}', $post['description'], $thisTemplate);
-	$thisTemplate = str_replace('{$psid}', $post['psid'], $thisTemplate);
+	$thisTemplate = str_replace('{$description}', $post['description'] ?? '', $thisTemplate);
+	$thisTemplate = str_replace('{$psid}', $post['psid'] ?? '', $thisTemplate);
 
 	if (!$GLOBALS['ps']) { // some non-ps tag handling
 		$thisTemplate = str_replace('{$tags_hashed}', markupTagsHashes($post['tags']), $thisTemplate);
 			if (isset($post['tags'])) {
 				$thisTemplate = str_replace('{$tags}', markupTags($post['tags']), $thisTemplate);
 			} else {
-				$thisTemplate = str_replace('{$tags}', null, $thisTemplate);
+				$thisTemplate = str_replace('{$tags}', '', $thisTemplate);
 			}
 		}
 
@@ -2880,12 +2891,12 @@ function prepareTemplate($post, $templateFile)
 	if ($GLOBALS['ps'] and $post['post_img']) { // declare custom image for PS
 		global $imgsBlacklistArr;
 
-		if (in_array(str_replace('assets/images/', null, $post['post_img']), $imgsBlacklistArr)) { // image is blacklisted
+		if (in_array(str_replace('assets/images/', '', $post['post_img']), $imgsBlacklistArr)) { // image is blacklisted
 			//Blacklist_of_images that shouldn't be rendered due to the risk of copyright trolling. The images-blacklist.txt file is read into $imgBlacklistArr by img.php and then checked wherever images are referenced.
 			$thisTemplate = str_replace('<!-- page image -->', "<!-- '{$post['post_img']}' is a blacklisted image referenced by pubsys for featured image for blog post '{$post['title']}' -->\n<!-- page image -->", $thisTemplate);
 			unset($post['post_img']); // like it never existed, so that the default will be triggered below
 		} else { // img is not blacklisted, proceed
-			$post_img = ogimg(str_replace('assets/images/', null, $post['post_img']));
+			$post_img = ogimg(str_replace('assets/images/', '', $post['post_img']));
 			$thisTemplate = str_replace('<!-- page image -->', "<!-- custom page image -->\n{$post_img}", $thisTemplate);
 		}
 	}
@@ -2904,7 +2915,7 @@ function prepareTemplate($post, $templateFile)
 		} // “assets/images” dir must be inserted, because it isn’t in the settings value
 	}
 
-	if ($post['canonical']) { //psmod, stopped short of using because I don’t grok the effect of declaring one URL for link rel and another for og:url etc)
+	if (!empty($post['canonical'])) { //psmod, stopped short of using because I don’t grok the effect of declaring one URL for link rel and another for og:url etc)
 		$tmp = $post['canonical'];
 
 		if (citation($post['canonical'], '[type]') == 'mine') { // if the canonical URL is for one of my own articles
@@ -2949,7 +2960,7 @@ function prepareTemplate($post, $templateFile)
 	$thisTemplate = str_replace('{$date1}', $post_date1, $thisTemplate);
 	$thisTemplate = str_replace('{$date2}', $post_date2, $thisTemplate);
 
-	if (($post['ftd_url']??null)) {  // work with featured links
+	if (($post['ftd_url']??null) and false) {  // work with featured links; 2026-04-21 temporarily ? blocked this code block, I’m sick of hard-to-solve trivial problems with it, it has been nothing but a pain in my ass for a feature I don’t even like
 		// link title to a featured link
 		$thisTemplate = preg_replace("/<h1(.*?)>(.*?)<\/h1>/uism", '<h1$1><a href="' . $post['ftd_url'] . "\">$2&nbsp;<span style='color:#DDD'>∞</span></a></h1>", $thisTemplate);
 		if (! isset($post['hidelink'])) { // stop now if the hidelink flag is set
@@ -2982,19 +2993,61 @@ function prepareTemplate($post, $templateFile)
 }
 
 function auditPsids()
-{ // After posts array is complete, checks for missing psids. If it finds one, it aborts the build and generates a new PSID to be manually added to the post source (often needed for new posts).
+{ /* After posts array is complete, checks for missing psids (routine for new posts). For each one found, generates a fresh unique PSID, writes it into the post source file via writePsidToSource(), updates the in-memory post array, and lets the build continue — so a new post builds in a single pass instead of the old abort/paste/re-run dance. If the source file can't be confidently modified, falls back to the legacy behaviour: abort and print the psid for manual pasting. Validation aborts for duplicate/malformed psids remain in the post parsers, where they belong — those are genuine errors; a missing psid is not. */
 	global $posts, $psidsArr;
-	// printArr($psidsArr);
-	foreach ($posts as $post) {
+	foreach ($posts as $key => $post) {
 		if ($post['psid'] == '') {
 			$candidate = 6518973;
 			while (in_array($candidate, $psidsArr)) {
-				echo "checking $candidate …";
 				$candidate = random_int(1000000, 9999999);
 			}
-			exit("<p class='warning' style='font-size:2em'>⚠️ No psid for '{$post['source_file']}'. Use:<br><br><strong>psid$candidate</strong></p>"); // this isn't the best spot for this, but it works just fine and it’s important (for now) to annoy myself about missing psids
+			if (writePsidToSource($post, $candidate)) {
+				$psidsArr[] = $posts[$key]['psid'] = "$candidate"; // keep the in-memory data consistent with the source file we just modified: record the new psid in the dupe-prevention array (as a string, like all parsed psids) and in the post itself, so downstream rendering (RSS GUIDs etc) uses it
+				journal("⚠️ AUTO-PROVISIONED psid$candidate for '{$post['source_file']}' and WROTE IT TO THE SOURCE FILE — if that file is open in your editor with unsaved changes, reload it before saving, or the psid will be clobbered", 3, true);
+			} else { // couldn't safely write to the source; fall back to the legacy manual procedure
+				exit("<p class='warning' style='font-size:2em'>⚠️ No psid for '{$post['source_file']}', and auto-provisioning could not safely modify the source file. Add manually and re-run:<br><br><strong>psid$candidate</strong></p>");
+			}
 		}
 	}
+}
+
+/** returns @bool: writes a freshly generated psid into a post source file (macropost: own line after the title; micropost: appended ---psid token on the post's line); true on success, false if the file can't be confidently modified  */
+function writePsidToSource($post, $candidate)
+{
+	$path = $post['source_path'] ?? '';
+	if ($path == '' or !is_writable($path)) {
+		return false;
+	}
+
+	if ($post['post_class'] == 'macro') { // macropost: insert the psid on its own line right after the title (line 1), preserving the blank line that follows the title
+		$contents = file_get_contents($path);
+		$eol_pos = strpos($contents, "\n");
+		if ($eol_pos === false) {
+			return false; // a one-line macropost file is malformed; don't touch it
+		}
+		$contents = substr($contents, 0, $eol_pos + 1) . "\npsid$candidate\n" . substr($contents, $eol_pos + 1);
+		return (bool) file_put_contents($path, $contents);
+	}
+
+	if ($post['post_class'] == 'micro') { // micropost: append a ---psid token to the post's source line, located by exact match against the raw line captured at parse time; require exactly one match or refuse
+		$lines = file($path); // line endings preserved, so the file can be reassembled byte-identically apart from the insertion
+		$hits = [];
+		foreach ($lines as $i => $line) {
+			if (rtrim($line, "\r\n") === $post['source_line']) {
+				$hits[] = $i;
+			}
+		}
+		if (count($hits) !== 1) {
+			return false;
+		}
+		$i = $hits[0];
+		$bare = rtrim($lines[$i], "\r\n");
+		$eol = substr($lines[$i], strlen($bare)); // preserve this line's original ending (or lack of one, at EOF)
+		$lines[$i] = $bare . "---psid$candidate" . $eol;
+		return (bool) file_put_contents($path, implode('', $lines));
+	}
+
+	return false; // any other post class (imgposts, etc): no auto-provisioning
 }
 
 function getdescription_audio($description_audio)
@@ -3088,7 +3141,7 @@ function makeTagUsageList ($posts) { // Save every single usage of every tag on 
 	$tag_usage_list = str_replace(",", "\n", $tag_usage_list); // bulk change every single comma to an LF
 	$fn = 'tags.used.txt';
 	$path = $_SERVER['DOCUMENT_ROOT'] . '/guts';
-	if (fileExistsNoChange($tag_usage_list, $file))
+	if (fileExistsNoChange($tag_usage_list, "$path/$fn")) // NB: this checked an undefined variable ($file) for years, so the "unchanged" branch never ran and the file was saved on every build
 		journal("not saving tag usage list: $fn unchanged", 2, true);
 	else { // save sitemap files
 		journal("saving tag usage list", 2, true);
