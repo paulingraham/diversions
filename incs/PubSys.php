@@ -40,6 +40,9 @@ function getPosts()
 		mkdir(STAGE . '/imgs-auto');
 	} // `path
 	global $micropost_files;
+	$cacheDir = _ROOT . '/.cache';
+	if (!is_dir($cacheDir)) mkdir($cacheDir, 0755, true);
+	$forceRebuild = (strpos($_SERVER['QUERY_STRING'] ?? '', 'full') !== false);
 	foreach (glob('posts/*') as $fn) {
 		if (preg_match("@posts/20\d\d-\d\d-\d\d[a-p]{0,1} .*$@", $fn) == 0) {
 			continue;
@@ -50,19 +53,44 @@ function getPosts()
 		// skip stale files
 //		if (!fileFresh($fn, 500)) continue; // only make posts from files that have been changed recently
 		// of the files that remain …
-		if (preg_match('@POSTS*@', $fn)) {			// look for filenames including “POSTS”
-			$lns = array_reverse(file($fn, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES));
+		if (preg_match('@POSTS*@', $fn)) {			// look for filenames including "POSTS"
 			$micropost_files[] = $fn;
-			$lnno = 0; foreach ($lns as $ln) {
-				if (preg_match("/^20\d\d-\d\d-\d\d[a-p]{0,1}\s.*/", $ln) == 0) {
-					continue;
-				} // ignore lines that don’t begin with a date, eg 2013-07-20. in practice this means that lines without a leading date can be drafts or comments. (preg_match returns a zero if there's no match)
-				$posts[] = getMicropost($fn, $ln, ++$lnno);
+			$cacheFile = $cacheDir . '/' . basename($fn) . '.cache';
+			if (!$forceRebuild && file_exists($cacheFile) && filemtime($cacheFile) > filemtime($fn)
+					&& ($filePosts = unserialize((string) file_get_contents($cacheFile))) !== false) {
+				journal("cache: [$fn]", 2);
+				global $timestamps;
+				$timestamps ??= [];
+				foreach ($filePosts as $cachedPost) $timestamps[] = $cachedPost['timestamp']; /* Re-register cached posts' timestamps in the global collision registry (see get_timestamp_from_post_date). Registration normally happens only during parsing, so without this, posts parsed fresh later in this build — imgposts always (they have no cache), plus any cache-missed file — can compute a timestamp identical to a cached post's and silently clobber it in the by-timestamp $posts array. This actually happened (2026-07-06): a warm-cache Writerly build lost 13 microposts to same-date imgposts, and remove_old_files() then deleted their rendered HTML. */
+			} else { // cache miss, stale, corrupt, or ?full — re-parse the whole file
+				$lns = array_reverse(file($fn, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES));
+				$filePosts = [];
+				$lnno = 0;
+				foreach ($lns as $ln) {
+					if (preg_match("/^20\d\d-\d\d-\d\d[a-p]{0,1}\s.*/", $ln) == 0) {
+						continue;
+					} // ignore lines that don't begin with a date, eg 2013-07-20
+					$post = getMicropost($fn, $ln, ++$lnno);
+					if ($post) $filePosts[] = $post;
+				}
+				file_put_contents($cacheFile, serialize($filePosts), LOCK_EX);
 			}
+			foreach ($filePosts as $post) $posts[] = $post;
 		} elseif (preg_match('@.*(jpg|gif|png)$@', $fn)) {	// look for files with common img extensions
 			$posts[] = getImgPost($fn);
 		} else { 																	// anything remaining is assumed to be a macropost file
-			$posts[] = getMacroPost($fn);
+			$cacheFile = $cacheDir . '/' . basename($fn) . '.cache';
+			if (!$forceRebuild && file_exists($cacheFile) && filemtime($cacheFile) > filemtime($fn)
+					&& ($post = unserialize((string) file_get_contents($cacheFile))) !== false) {
+				journal("cache: [$fn]", 2);
+				global $timestamps;
+				$timestamps ??= [];
+				$timestamps[] = $post['timestamp']; // re-register in the collision registry — same reason as the micropost cache branch above
+			} else { // cache miss, stale, corrupt, or ?full — re-parse
+				$post = getMacroPost($fn);
+				if ($post) file_put_contents($cacheFile, serialize($post), LOCK_EX);
+			}
+			$posts[] = $post;
 		}
 	}
 
@@ -78,6 +106,11 @@ function getPosts()
 	foreach ($posts as $key=>$post) {
 		if ($post == null) { // I’m not sure if this is a good idea, but it works; $posts[] = getMicropost() can result in an empty element in the array (and I don’t know how to make that statement result in nothing), which causes minor issues; but it’s very quick to go through and remove those empty elements
 			unset($posts[$key]);
+			continue;
+		}
+		while (isset($posts[$post['timestamp']])) { // last-ditch collision guard: two posts with the same timestamp would otherwise silently overwrite each other here, and remove_old_files() would then delete the loser's rendered HTML (this actually happened — see the cache/registry note in getPosts, 2026-07-06)
+			journal("warning: timestamp collision for post '{$post['title']}' vs '{$posts[$post['timestamp']]['title']}' — bumping by 1s to avoid losing a post", 1, true);
+			$post['timestamp']++;
 		}
 		$posts[$post['timestamp']] = $post; // duplicate the post, but now with a key equal to the timestamp
 		unset($posts[$key]); // remove the original
@@ -192,7 +225,6 @@ $post = array('canonical' => null,
 	$post['source_path'] = $fn; // full (relative) path, kept for tooling that writes back to the source, e.g. psid provisioning in auditPsids()
 	$post['source_line'] = $ln; // the raw source line for this micropost, kept so auditPsids() can find the line again to append a psid
 	if (function_exists('buildTrackDoc')) buildTrackDoc("$fn [ln $lnno]"); // so a fatal while reading/rendering this micropost gets blamed on the right line (see buildErrorsMark in util--build.php)
-	//	$ln = preg_replace("@\s+http@", '---http', $ln); // set up trailing raw URLs for autodetection as featured links: replace whitespace preceding URLswith --- (more explicit, standard delimeters for parseSloppyData function); 2025-12-01 removing this touched a couple dozen posts, but I decided it was a hacky old convention that should die, so I just manually changed all of those old ones rather than automating it
 	$data = parseSloppyData($ln);
 	$post['date'] = $data[0];  // assume the first item is a date
 	$post = get_timestamp_from_post_date($post); // gets a timestamp from the date, optionally modified by day-order
@@ -238,7 +270,7 @@ $post = array('canonical' => null,
 					$post['post_audio_dur'] = getDurationOfAudioInSecs($audio_path);
 					$post['post_audio_dur_time'] = intval($post['post_audio_dur'] / 60) . ':' . str_pad($post['post_audio_dur'] % 60, 2, '0', STR_PAD_LEFT); // The seconds may be <10secs and those need to zero-padded. Surprisingly tricky, but str_pad does the job, adding 0 only to increase 1-9 to 01-09, but leaving 10-59 alone. I think ;-)
 				} else {
-					journal("warning: cannot find post audio file $mdo, date", 2, true);
+					journal("warning: cannot find post audio file $mdo, post dated {$post['date']}", 2, true);
 					break;
 				}
 			}
@@ -262,8 +294,7 @@ $post = array('canonical' => null,
 
 			if (in_array($md, $md_syns['link'])) {
 				$post['ftd_url'] = extract1stUrl($content);
-				// $post['hidelink'] = true; // hack! by default, do not show the link
-			} 
+			}
 			if (in_array($md, $md_syns['hidelink'])) {
 				$post['ftd_url'] = extract1stUrl($content);
 				$post['hidelink'] = true;
@@ -626,11 +657,11 @@ $post = array('canonical' => null,
 					$post['post_audio_dur'] = getDurationOfAudioInSecs($audio_path);
 					$post['post_audio_dur_time'] = intval($post['post_audio_dur'] / 60) . ':' . str_pad($post['post_audio_dur'] % 60, 2, '0', STR_PAD_LEFT); // The seconds may be <10secs and those need to zero-padded. Surprisingly tricky, but str_pad does the job, adding 0 only to increase 1-9 to 01-09, but leaving 10-59 alone. I think ;-)
 				} else {
-					journal("warning: cannot find post audio file $mdo, date", 2, true);
+					journal("warning: cannot find post audio file $mdo, post dated {$post['date']}", 2, true);
 					break;
 				}
 			}
-			
+
 			if ($md == 'audio_desc') {
 				$post['post_audio_desc'] = $md_pt2;
 			}
@@ -656,8 +687,7 @@ $post = array('canonical' => null,
 			//			if ($md == "fblike")									$post["fblike"] = true;
 			if (in_array($md, $md_syns['link'])) {
 				$post['ftd_url'] = extract1stUrl($content);
-				// $post['hidelink'] = true; // hack to make hidelink automatic when a link is found; 
-			} 
+			}
 			if (in_array($md, $md_syns['hidelink'])) {
 				$post['ftd_url'] = extract1stUrl($content);
 				$post['hidelink'] = true;
@@ -911,7 +941,7 @@ function makeTextVersion()
 
 /* <##> Convert post content into a Markdown+Buttondown version relatively ready for newsletter use. */
 function makeButtondownVersion()
-{ /* There is much overlap between all of the post-converting functions: makeRSS, makeTextVersion, and makeButtondownVersion. In all cases, code is messy and the output is perpetually imperfect, and it’s probably impossible to make it perfect… but the text and Bd versions only have to be better than manual conversion a post, and that's a low bar. But makeButtondownVersion() function is particularly fugly in a variety of ways, and the order of operations is really quite tricky. As of 2023-06-27 it’s very likely that it’s a bit janky and fragile. */
+{ /* There is much overlap between all of the post-converting functions: makeRSS, makeTextVersion, and makeButtondownVersion. In all cases, code is messy and the output is perpetually imperfect, and it’s probably impossible to make it perfect… but the text and Bd versions only have to be better than manual conversion of a post, and that's a low bar. But makeButtondownVersion() function is particularly fugly in a variety of ways, and the order of operations is really quite tricky. As of 2023-06-27 it’s very likely that it’s a bit janky and fragile. */
 	global $posts, $settings;
 	if (! $GLOBALS['ps']) {
 		return;
@@ -993,8 +1023,8 @@ Convert that to:
 	// the ¶ symbols get converted to linefeeds below
 
 	// Convert paywall markup, removing most of it and replacing the starts and stops with much more spartan Buttondown template tags. As a general rule, the newsletter resembles the RSS output more than the web output, so anything excluded from RSS probably needs to be excluded here too.
-	$theContent = preg_replace("/.*rss_no_line.*\n/", '', $theContent); // remove one line from RSS
-	$theContent = preg_replace('|<!--\s*rss_no_block_start(.+?)rss_no_block_stop\s*-->|s', "\n<!-- removed from RSS: multiple lines -->\n", $theContent); // remove multiline content from RSS
+	$theContent = preg_replace("/.*rss_no_line.*\n/", '', $theContent); // remove one line from RSS/Buttondown
+	$theContent = preg_replace('|<!--\s*rss_no_block_start(.+?)rss_no_block_stop\s*-->|s', "\n<!-- removed from RSS: multiple lines -->\n", $theContent); // remove multiline content from RSS/Buttondown
 
 	$theContent = str_replace('<!-- paywall markup: non-member start -->', '{% if subscriber.canUNDERSCOREbeUNDERSCOREupsold %}', $theContent);	// underscores in the Buttondown template tags need to be temporarily protected from HtmlConverter
 	$theContent = str_replace('<!-- paywall markup: non-member end -->', '{% endif %}', $theContent);
@@ -1072,13 +1102,14 @@ exit;
 
 	// finish 
 	$introTemplate .=<<<introtemplate
-		 Comment on the Facebook post or Bluesky or Threads, and you’re always welcome to reply directly to these emails.
+		 
+		===================================== Comment on the Facebook post or Bluesky or Threads, and you’re always welcome to reply directly to these emails. 
 
 		Warm regards,<br>
 
 		_Paul Ingraham, PainScience.com Publisher_
 
-		<img src="https://buttondown.s3.amazonaws.com/images/8f329c03-70ec-4a5c-97c1-73023b5f0daf.png" alt="A type-logo for the newsletter with the words 'PainSci Updates' superimposed on the blue salamander mascot/logo for PainScience.com, and a wi-fi symbol over the ‘i’ in PainSci.">
+		<img src="https://buttondown.s3.amazonaws.com/images/8f329c03-70ec-4a5c-97c1-73023b5f0daf.png" alt="A type-logo for the newsletter with the words 'PainSci Updates' superimposed on the blue salamander mascot/logo for PainScience.com, and a wi-fi symbol over the ‘i’ in PainSci." width=250>
 		introtemplate;
 
 	// add standard P.S. #cta_join to the intro template to non-member posts
@@ -1329,21 +1360,21 @@ function makeRSS($max = 30)
 		}
 		if ($n++ > $max) break; // start counting non-excluded posts
 		extract($post); // get all the data for the found post
-		$ftd_url ??= ''; $url_rss ??= ''; $url_pretty ??= ''; // optional post fields referenced by the RSS templates, defaulted so the template evals don't warn; unset again at the bottom of this loop
 		$date_rss = date('D, d M Y H:i:s -0700', $timestamp); // get the date for the post in RSS-friendly format
 		if ($n == 1) {$last_build_date = $date_rss;} // make the build date equal to date of most recent post, which should be the first in the stack
 		journal("adding a post to the RSS feeds [ $title_smpl ]", 3);
-		$title = numericEntities($title); // RSS will choke on named entities like &ldquo; so a special function is needed to convert special chars to numeric entities specifically
+		$title = numericEntities(strip_tags($title)); // strip markup (some old micropost titles contain literal anchor tags, which corrupt RSS <title> elements), and RSS will choke on named entities like &ldquo; so a special function is needed to convert special chars to numeric entities specifically
 		$content = $html; // output the post content as HTML
 
 		// if (inStr("full-fledged evidence", $content)) exit("<pre>" . htmlentities($html) . "</pre>");
 
-		// Make some changes to content to prepare it for RSS, mostly removing or simplifying common components.  Starts with generic exclusions of content from RSS, either individual paras marked with <!-- rss_no_line --> and multiline content marked with <!-- START/rss_no_block_stop -->
+		// Make some changes to content to prepare it for RSS, mostly removing or simplifying common components.  Starts with generic exclusions of content from RSS, either individual paras marked with <!-- rss_no_line --> and multiline content marked with <!-- rss_no_block_start|stop -->
 
 		$content = preg_replace("| *<span(.+?)x-show='!member'(.+?)>LOGIN</span>|", '', $content); // remove standard login prompt from RSS
 
-		$content = preg_replace("/.*rss_no_line.*\n/", "\n<!-- removed from RSS (one line) -->\n", $content); // remove one line from RSS
-		$content = preg_replace('|<!--\s*rss_no_block_start(.+?)rss_no_block_stop\s*-->|s', "\n<!-- removed from RSS: multiple lines -->\n", $content); // remove multiline content from RSS
+		$content = preg_replace("/.*rss_no_line.*\n/", "\n<!-- removed from RSS (one line) -->\n", $content); // remove one line from RSS/Buttondown
+		$content = preg_replace('|<!--\s*rss_no_block_start(.+?)rss_no_block_stop\s*-->|s', "\n<!-- removed from RSS: multiple lines -->\n", $content); // remove multiline content from RSS/Buttondown
+		
 		$content = preg_replace("@src\s*=\s*(['\"])assets/images@", "src=$1https://$domain/assets/images", $content); // covert src URLs from relative to absolute
 //		$content = preg_replace("@href=(['\"])/blog@", 'href=$1/blog', $content); // not sure what this was for, but removing it changes nothing
 
@@ -1370,17 +1401,11 @@ function makeRSS($max = 30)
 
 		$content = str_replace(" loading='lazy'", '', $content); // remove loading=lazy	attributes, unnecessary in feed (probably doesn’t hurt either)
 
-		/*		2025-12-01, removed at least for now, because it isn't even hooked up: these vars are never used
-		if ($ftd_url) { // if the post has a featured_link
-			$url_rss = "\n\t<link>$ftd_url</link>";
-			$url_rss_link = "<p>Featured link for this post: $url_rss</p>";
-			$url_pretty = '<p><small>' . prettifyURL($ftd_url) . '</small></p>';
-			$url_pretty = "<p>[<a href='$ftd_url'>Go to the link featured in this post</a>]</p>";
-		} */
+		if (($post['ftd_url'] ?? null) and empty($post['hidelink'])) { // mirror the web version's end-of-post featured link (see prepareTemplate); added here, before the member/non-member content fork, so it appears in all feed flavours
+			$content .= "\n\n<p>Featured link: <a href='{$post['ftd_url']}'>" . featuredLinkDomain($post['ftd_url']) . '</a></p>';
+		}
 
 		if ($GLOBALS['ps']) { // #psmod: tweaks for the PainSci RSS feed, mostly simplifications, starting with explicit exclusions, and moving on to a variety of page elements that won't look good in RSS (e.g. pull quotes)
-
-			$old = ($post['timestamp'] < 1727679601) ? '-old' : ''; #dated_content Set a flag which will be used to append "-old" to the template filename to use the old template that defines the GUID with a URL, for all posts from before 2024-10-01 ("Plug your sodium channels with VX-548"). Going forward, the default template uses the posts PSID for the URL. This line + 2 usages of the $old var + the two old templates can be removed after about 2 months.  // echo $post['title'] . " — $old <br>";
 
 			$content = preg_replace('@<a href="#fcj\d+" id="frj\d+">(\d+)</a>@', ' [$1]', $content); // disable footnote reference links, which do not play nicely with RSS
 			// if (inStr("full-fledged evidence", $content)) exit("<pre>" . htmlentities($html) . "</pre>");
@@ -1428,7 +1453,6 @@ function makeRSS($max = 30)
 		$rss_posts ??= '';
 		$rss_posts .= stripslashes($rss_post); // remove the slashes we just added
 		$rss_posts = preg_replace("|\n{3,5}|", "\n\n", $rss_posts); // standardize vertical whitespace (to minimize spurious whitespaces diffs)
-		unset($ftd_url, $url_rss, $url_pretty); // cleanup some vars
 	}
 
 	// We now have a string containing all posts: $content.  For PainSci, that string has had all member content removed, leaving any teaser content.  And for PainSci, there's a second string containing all posts — $content_member — which has all teaser stuff removed.
@@ -1483,7 +1507,7 @@ function makePodcast($max = 500)
 			continue;
 		} // exclude post previews & posts explicitly excluded from RSS
 		if ($n++ > $max) break; // start counting non-excluded posts
-		unset($title, $date_rss, $psid, $url_live, $post_audio, $post_audio_size_bytes, $post_audio_dur, $description, $link, $link_quoted, $ftd_url, $url_rss, $url_pretty, $post_img); // cleanup some vars
+		unset($title, $date_rss, $psid, $url_live, $post_audio, $post_audio_size_bytes, $post_audio_dur, $description, $link, $link_quoted, $ftd_url, $post_img); // cleanup some vars
 		extract($post); // get all the data for the found post
 		if (! $post_img) {
 			$post_img = 'assets/images/painsci-updates-badge--sq-3000x3000-300k.jpg';
@@ -1493,7 +1517,7 @@ function makePodcast($max = 500)
 		} // this is the audio feed, so skip posts without audio
 		$date_rss = date('D, d M Y H:i:s -0700', $timestamp); // get the date for the post in RSS-friendly format
 		journal("adding an episode to the podcast feed [ $title_smpl ]", 3);
-		$title = numericEntities($title); // RSS will choke on named entities like &ldquo; so a special function is needed to convert special chars to numeric entities specifically
+		$title = numericEntities(strip_tags($title)); // strip markup (some old micropost titles contain literal anchor tags, which corrupt RSS <title> elements), and RSS will choke on named entities like &ldquo; so a special function is needed to convert special chars to numeric entities specifically
 		// if (inStr("full-fledged evidence", $content)) exit("<pre>" . htmlentities($html) . "</pre>");
 
 		$description = $post['description']; // Default to the default description, which always exists in some form…
@@ -2160,8 +2184,8 @@ function get_timestamp_from_post_date($post)
 	$date = $post['date'];
 	$post['day-order'] = $ord = 0;
 	if (strlen($date) == 11) {
-		$post['date'] = substr($date, 0, -1);
 		$post['day-order'] = $ord = ord(substr($date, -1)) - 96; // to convert a to 1 and b to 2 etc, get the ASCII value of the letter with ord and subtract 96 (letters start at position 96 in the ASCII index)
+		$date = $post['date'] = substr($date, 0, -1); // strip letter from both local var and post, so parseDate() receives a clean date string
 	}
 	$timestamp_candidate = parseDate($date) + $ord;
 	global $timestamps;
@@ -2794,6 +2818,27 @@ function makeMemberPostLists()
 	echo $linkList5;
 }
 
+/** returns @string: bare display domain for a featured URL, e.g. "newyorker.com" — host only, lowercased, leading www stripped */
+function featuredLinkDomain($url)
+{
+	$host = strtolower((string) parse_url($url, PHP_URL_HOST));
+
+	return preg_replace('/^www\./', '', $host);
+}
+
+/** returns @string: the end-of-post featured-link block, or '' if the post has no featured link or hides it with the hidelink flag */
+function featuredLinkHtml($post)
+{
+	if (empty($post['ftd_url']) or ! empty($post['hidelink'])) {
+		return '';
+	}
+	if (! empty($post['htmlFeaturedCk'])) {
+		return $post['htmlFeaturedCk'];
+	} // rich citation rendering, generated by deal_with_citekeys() when the featured URL resolves to a PainSci page or bib record
+
+	return "<p class='widebar featured_link'>Featured link:&nbsp; <a href='{$post['ftd_url']}'>" . featuredLinkDomain($post['ftd_url']) . '</a></p>';
+}
+
 function prepareTemplate($post, $templateFile)
 {
 	global $settings;
@@ -2960,13 +3005,15 @@ function prepareTemplate($post, $templateFile)
 	$thisTemplate = str_replace('{$date1}', $post_date1, $thisTemplate);
 	$thisTemplate = str_replace('{$date2}', $post_date2, $thisTemplate);
 
-	if (($post['ftd_url']??null) and false) {  // work with featured links; 2026-04-21 temporarily ? blocked this code block, I’m sick of hard-to-solve trivial problems with it, it has been nothing but a pain in my ass for a feature I don’t even like
-		// link title to a featured link
-		$thisTemplate = preg_replace("/<h1(.*?)>(.*?)<\/h1>/uism", '<h1$1><a href="' . $post['ftd_url'] . "\">$2&nbsp;<span style='color:#DDD'>∞</span></a></h1>", $thisTemplate);
-		if (! isset($post['hidelink'])) { // stop now if the hidelink flag is set
-			// make a featured link at the bottom of the post, #psmod, now for either a regular URL or citekey
-			$link = ($post['htmlFeaturedCk']??null) ? $post['htmlFeaturedCk'] : "<p class='widebar featured_link'><a href='{$post['ftd_url']}'>" . prettifyURL($post['ftd_url']) . '</a></p>';
-			$thisTemplate = str_replace('</article>', "\n{$link}\n\n</article>", $thisTemplate); // add the link to the post; 2025-12-01 fixed bug: </article> was placed after </footer> in the template for the PS blog, so this was putting the featured link in a very un-featured location; I moved </article> to before <footer> in the template which solved that problem tidily, and is probably also more structurally correct (the footer doesn't really pertain to the article, so should be a child)
+	if (($post['ftd_url'] ?? null)) { // work with featured links: link the title heading to the featured URL, and append a labelled link to the end of the post
+		// Wrap the title heading's content in a link to the featured URL, with a decorative ∞ marker. The heading is matched by its id (present in all blog templates) rather than any <h1>, and anchor tags already inside the title (the old embedded-title micropost convention) are stripped first to avoid nested anchors.
+		$thisTemplate = preg_replace_callback("/<h1 id='title'(.*?)>(.*?)<\/h1>/uis", function ($m) use ($post) {
+			$headContent = preg_replace('@</?a\b[^>]*>@i', '', $m[2]);
+
+			return "<h1 id='title'{$m[1]}><a href=\"{$post['ftd_url']}\">{$headContent}&nbsp;<span style='color:#DDD'>∞</span></a></h1>";
+		}, $thisTemplate, 1);
+		if ($link = featuredLinkHtml($post)) { // empty if the hidelink flag is set
+			$thisTemplate = str_replace('</article>', "\n{$link}\n\n</article>", $thisTemplate); // add the link to the end of the post; 2025-12-01 fixed bug: </article> was placed after </footer> in the template for the PS blog, so this was putting the featured link in a very un-featured location; I moved </article> to before <footer> in the template which solved that problem tidily, and is probably also more structurally correct (the footer doesn't really pertain to the article, so should be a child)
 		}
 	}
 
@@ -2995,6 +3042,7 @@ function prepareTemplate($post, $templateFile)
 function auditPsids()
 { /* After posts array is complete, checks for missing psids (routine for new posts). For each one found, generates a fresh unique PSID, writes it into the post source file via writePsidToSource(), updates the in-memory post array, and lets the build continue — so a new post builds in a single pass instead of the old abort/paste/re-run dance. If the source file can't be confidently modified, falls back to the legacy behaviour: abort and print the psid for manual pasting. Validation aborts for duplicate/malformed psids remain in the post parsers, where they belong — those are genuine errors; a missing psid is not. */
 	global $posts, $psidsArr;
+	$psidsArr = array_filter(array_column($posts, 'psid'), 'strlen'); // rebuild the dedup set from the COMPLETE posts array rather than trusting the parse-time side effect that populates $psidsArr in getMicropost()/getMacroPost(). Since the incremental build (commit 1fc83955) unserialises cached posts instead of re-parsing them, a cached post's psid is never pushed onto $psidsArr — so without this rebuild the collision check below is blind to every unchanged post, and the hardcoded seed candidate (6518973) gets "provisioned" as a duplicate of whatever real post already owns it. A full build (?full) re-parses everything and so never hit this.
 	foreach ($posts as $key => $post) {
 		if ($post['psid'] == '') {
 			$candidate = 6518973;

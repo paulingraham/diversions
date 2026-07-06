@@ -176,21 +176,7 @@ function isKeyOrVal ($key, $search, $array) {
 
 /*  LARGER FUNCTIONS */
 	
-/** returns @string, html url: formats given URL for tidy and pretty display */
-function prettifyURL($url) {
-	extract(parseURL($url));
-	if ($domain_main == "PainScience") $url_path = str_replace(".php", "", $url_path);
-	if ($domain_sub === "www" or !$domain_sub) // if it was there to begin with, or if I added www
-		$domain_sub = "<span class='subdomain'>www</span>"; // add some markup
-	if ($url_path_abbr) $url_path = str_replace("…", "<span style='color:#666'>&nbsp;—SNIP—&nbsp;<XXXspan>", $url_path_abbr);
-	$url_path = rtrim($url_path,"/");
-	$url_path = str_replace("/", "<span style='margin:0 .2em'>/</span>", $url_path);
-	$url_path = str_replace("XXX", "/", $url_path);
-	$url_str = "<span class=\"pretty_url\">{$domain_sub}.<strong>$domain_main.$domain_tld</strong>$url_path</span>";
-	return $url_str;
-}
-
-/** returns @array, url parts: returns an array of the parts of given URL, mostly for input to prettifyURL() */
+/** returns @array, url parts: returns an array of the parts of given URL */
 function parseURL($url) {
 /* testing url
 	 $url = "http://lol.cats.painscience.com/articles/yknow/whatevs/reality-checks/epsom-salts.php"; */

@@ -34,7 +34,7 @@ global $settings; extract($settings);
 $path = STAGE . "/{$imgs_dir}/$filename"; // absolute `path to the images
 $src = "{$imgs_dir}/$filename"; // IMGS is set in location.php and is the absolute host file system path to the filename
 
-if (!file_exists($path)) return "  !!! IMG FILE '$path' NOT FOUND !!! ";
+if (!file_exists($path)) return "  !!! IMG FILE '$filename' NOT FOUND !!! "; // report just the filename, not $path: the full path churns between machines (this runs on two Macs with different home dirs), producing spurious rendered-output diffs on every cross-machine build
 
 // So if we didn't find anything, that's the end of it. But if we did find a file, well then by golly we just keep on truckin' ...
 
@@ -81,8 +81,8 @@ foreach ($args as $arg) {
 	
 	if ($arg == "inline") $containerType = "span"; // the default container type is a div; change it to a span only if the image is used inline
 	
-	// if the argument is not a compound and a long string, assume it’s a caption
-	if (strpos($arg, "|") === false and strlen($arg) > 15)
+	// if the argument is not a compound and a long string, assume it’s a caption (>= not >: an arg of exactly 15 chars used to fall through BOTH this guard and the skip below, reaching the explode and triggering an undefined-key warning on $halves[1] — e.g. the 15-char caption 'William Saroyan' in an Ephemeral post)
+	if (strpos($arg, "|") === false and strlen($arg) >= 15)
 		{ $caption = $arg; continue;}
 
 	// if it’s not a compound argument and it’s very short, skip it (already dealt with above)
