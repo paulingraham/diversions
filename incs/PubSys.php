@@ -251,13 +251,11 @@ $post = array('canonical' => null,
 		if "ftd_url" is in the array of metadata synonyms for "link", then do stuff */
 		foreach ($metadata as $mdo) { // look at each piece of metadata found (mdo = metadata original)
 			$md = mb_strtolower($mdo); // work with a lowercase version, to reduce the potential for matching failures
+			$md_pt2 = null; // reset every iteration — only set below if this item has a colon; without this reset, a bare flag (no colon) would inherit $md_pt2 from a previous, unrelated colon'd item in the same post (this was a real latent bug: one Writerly post's public URL was accidentally derived from a stale tags value via a bare `slug` flag — that post now carries an explicit `slug:` value to preserve its URL)
 			if ($colonPos = strpos($mdo, ':')) { // find first occurrence of a colon in the string
 				$md = substr($mdo, 0, $colonPos); // echo "<p>md = $md</p>";
 				$md_pt2 = trim(substr($mdo, $colonPos + 1)); // echo "<p>md_pt2 = `$md_pt2`</p>";
 			}
-			if ($md == 'http' or $md == 'https') {
-				$post['ftd_url'] = $md . ':' . $md_pt2;
-			} // reassemble featured URL
 			if (preg_match('@(jpg|gif|png)$@', $md, $tmp)) {
 				$post['post_img'] = "{$imgs_dir}/{$mdo}";
 			}
@@ -292,11 +290,11 @@ $post = array('canonical' => null,
 				// echo "{$post['psid']}, {$post['title']}, {$post['citekey']}<br><br>";
 			}
 
-			if (in_array($md, $md_syns['link'])) {
-				$post['ftd_url'] = extract1stUrl($content);
+			if (in_array($md, $md_syns['link'])) { // featured links must be explicitly labelled (any synonym of "link", e.g. "featured_url: <URL>") — bare URLs pasted into post headers used to be auto-detected as featured URLs, a chronic false-positive source, removed 2026-07-06; a labelled item with no value (a bare "link" flag) falls back to the first link in the post content, for backward compatibility with old posts written that way
+				$post['ftd_url'] = $md_pt2 ?: extract1stUrl($content);
 			}
 			if (in_array($md, $md_syns['hidelink'])) {
-				$post['ftd_url'] = extract1stUrl($content);
+				$post['ftd_url'] = $md_pt2 ?: extract1stUrl($content);
 				$post['hidelink'] = true;
 			}
 			if (in_array($md, $md_syns['description'])) {
@@ -618,15 +616,12 @@ $post = array('canonical' => null,
 		// see getMicropost comments for more about metadata synonyms!
 		foreach ($metadata as $mdo) { // look at each piece of metadata found (mdo = metadata original)
 			$md = strtolower($mdo); // work with a lowercase version, to reduce the potential for matching failures
+			$md_pt2 = null; // reset every iteration — see the twin comment in getMicropost: without this, a bare flag (no colon) would inherit $md_pt2 from a previous, unrelated colon'd item in the same post
 			if ($colonPos = strpos($mdo, ':')) { // find first occurrence of a colon in the string
 				$md = substr($mdo, 0, $colonPos); // echo "<p>md = $md</p>";
 				$md_pt2 = trim(substr($mdo, $colonPos + 1)); // echo "<p>md_pt2 = `$md_pt2`</p>";
 			}
 
-			if ($md == 'http' or $md == 'https') {
-				$post['ftd_url'] = $md . ':' . $md_pt2;
-			} // reassemble featured URL
-			
 			if (preg_match('@(jpeg|jpg|gif|png)$@', $md, $tmp)) {
 				$post['post_img'] = "{$imgs_dir}/{$mdo}";
 			}
@@ -685,11 +680,11 @@ $post = array('canonical' => null,
 				$post['notpremium'] = true;
 			}
 			//			if ($md == "fblike")									$post["fblike"] = true;
-			if (in_array($md, $md_syns['link'])) {
-				$post['ftd_url'] = extract1stUrl($content);
+			if (in_array($md, $md_syns['link'])) { // featured links must be explicitly labelled (any synonym of "link", e.g. "featured_url: <URL>") — bare URLs pasted into post headers used to be auto-detected as featured URLs, a chronic false-positive source, removed 2026-07-06; a labelled item with no value (a bare "link" flag) falls back to the first link in the post content, for backward compatibility with old posts written that way
+				$post['ftd_url'] = $md_pt2 ?: extract1stUrl($content);
 			}
 			if (in_array($md, $md_syns['hidelink'])) {
-				$post['ftd_url'] = extract1stUrl($content);
+				$post['ftd_url'] = $md_pt2 ?: extract1stUrl($content);
 				$post['hidelink'] = true;
 			}
 			if (in_array($md, $md_syns['description'])) {

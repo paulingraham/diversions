@@ -2,7 +2,7 @@ Post Option Synonyms
 
 This file is a user-editable collection of synonyms for common PubSys post options.  See the PubSys manual for what these options mean, or add notes here, if you like. All lines that don’t begin with a • or * are ignored, so you can add notes anywhere you like.
 
-* link, linkpost, link post, url, lnk, href, ftd_link
+* link, linkpost, link post, url, lnk, href, ftd_link, ftd_url, featured_url, featured url, featured_link, featured link
 
 I'm an example note!  This has no effect on the synonyms whatsoever.
 
