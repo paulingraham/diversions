@@ -374,24 +374,8 @@ $post = array('canonical' => null,
 	$post['html'] = prepareContent($content); // make HTML version of content
 	// See notes at top of file: "There are TWO big loops in the PubSys build script that process content for every post with eval(), a tortuous architecture"
 	
-	// check HTML for errors and abort build when found (probably should export this to a function) #error_handling_in_posts
-	preg_match_all('|<!-- !!! ERROR !!! (.+?) -->|', $post['html'], $matches);
-	$errorsArr = $matches[1];
-	$errCount = count($errorsArr);
-	if ($errCount > 0) {
-		$errPlural = ($errCount > 1) ? 's' : '';
-		echo "<br><h2 class='warning'><em class='runin'>ABORT!</em> $errCount user error{$errPlural} in rendered content for post '{$post['title']}':</h2>";
-		echo '<ol>';
-		foreach ($errorsArr as $error) {
-			if (strlen($error) > 5) {
-				echo "<li>{$error}</li>";
-			}
-		}
-		echo '</ol>';
-		echo "<h3 class='warning'>The post markup</h3><pre style='white-space: pre-wrap;'>" . htmlspecialchars($post['html']) . '</pre>';
-		exit;
-	}
-	
+	abortIfPostHasErrorMarkers($post); // #error_handling_in_posts
+
 	$post = get_post_size($post);
 	$len = strlen($content);
 	//	if (strpos($content, "\n\n") !== false)  $multi = true; // not sure $multi matters any more
@@ -507,6 +491,26 @@ IMGPOST;
 	$post = extractTags($tags_given, $post);
 
 	return $post;
+}
+
+/** returns @void: scans a post's rendered HTML (and premium HTML, if any) for the error markers echoed by error()/psErrMarker() during rendering, and aborts the build naming the post — otherwise the marker ships silently inside the staged/published HTML. Marker format is a contract; see psErrMarker() in util--errors.php.  */
+function abortIfPostHasErrorMarkers($post) {
+	$html = ($post['html'] ?? '') . ($post['html_premium'] ?? '');
+	preg_match_all('|<!-- !!! ERROR !!! (.+?) -->|', $html, $matches);
+	$errorsArr = $matches[1];
+	$errCount = count($errorsArr);
+	if ($errCount == 0) return;
+	$errPlural = ($errCount > 1) ? 's' : '';
+	echo "<br><h2 class='warning'><em class='runin'>ABORT!</em> $errCount user error{$errPlural} in rendered content for post '{$post['title']}':</h2>";
+	echo '<ol>';
+	foreach ($errorsArr as $error) {
+		if (strlen($error) > 5) {
+			echo "<li>{$error}</li>";
+		}
+	}
+	echo '</ol>';
+	echo "<h3 class='warning'>The post markup</h3><pre style='white-space: pre-wrap;'>" . htmlspecialchars($html) . '</pre>';
+	exit;
 }
 
 /* <##> reads a macropost */
@@ -744,6 +748,8 @@ $post = array('canonical' => null,
 			$post['title'] .= " (Member Post)"; // append the Member-Post suffix to the title (it will be stripped when deriving a slug from the title)
 		}
 	}
+
+	abortIfPostHasErrorMarkers($post); /* #error_handling_in_posts — until July 2026 only microposts were scanned for error markers; errors in macroposts shipped silently into staged HTML, caught (if at all) only by check-ps-output.sh's 'error #' scan before sync */
 
 	$post = get_post_size($post); // counts html + HTML_premium
 	$post = get_indexing_status($post); // set indexing status (must be big enough, fresh enough, or an explicitly labelled exception)

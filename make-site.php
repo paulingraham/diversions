@@ -54,7 +54,7 @@ if (!$ps AND stripos(ROOT_DEV, "paul") !== false) {
 	$makesite_canonical_fn = "$canonical_dir/bin/make-ps-blog.php"; // the canonical code
 	$makesite_target_fn = ROOT_DEV . "/make-site.php"; // this file in the current site folder (might be writerly, diversions, etc)
 
-	$filenames = array ("PubSys.php", "util--core.php", "util--build.php", "content--tags.php", "table-sort.js", "table-sort-setup.js", "synonyms-pubsys-shorthands.txt", "synonyms-post-metadata.txt", "synonyms-image-options.txt", "easy-img.php","css-pubsys.css","lazyload-imgs.js");
+	$filenames = array ("PubSys.php", "util--core.php", "util--build.php", "util--errors.php", "css-errors.css", "content--tags.php", "table-sort.js", "table-sort-setup.js", "synonyms-pubsys-shorthands.txt", "synonyms-post-metadata.txt", "synonyms-image-options.txt", "easy-img.php","css-pubsys.css","lazyload-imgs.js");
 	$target_dirs = array ("writerly", "diversions", "ephemeral");
 
 	if (stripos($_SERVER['QUERY_STRING'] ?? '', 'sync') === false) {
@@ -117,6 +117,7 @@ if (!$ps)  { // without the PS environment, we need at least Composer installed 
 
 // load code libraries
 set_include_path(".:$root_true/incs:$root_true/incs/content--library:$root_dev/guts:$root_dev/incs:$root_dev/guts/incs");
+require_once('util--errors.php'); // error handlers + error(); must load before util--core.php and PubSys.php so error() exists before any shared code can call it; PS already has it via env-runtime.php (require_once dedupes); before July 2026 the blogs had NO error() at all, so shared-code error() calls fatalled
 require_once('PubSys.php'); // functions for blogging, currently used by either Writerly or PainScience.com
 require_once('content--tags.php'); // tag management functions
 require_once('easy-img.php'); // a large function for handling image markup, so it gets its own file

@@ -324,7 +324,7 @@ Tricky step 2: the php function mktime (make time) builds a Unix timestamp from 
 
 	// tricky step 1
 	
-	$tmp = date_parse_from_format ($format, $date); #date_parse_from_format__replaces__striptime, change 936491636 on 2024-06-24. This is the main place the change affects, with a handful of other files affected.  Differences are: the new function flips the parameter order, doesn't need % to mark format shorthands, and has less cryptic output that doesn't need to be modified, see details below in the $tmp array passed to mktime.
+	$tmp = date_parse_from_format ($format, $date ?? ''); // ?? '' because callers routinely pass a record's absent (null) date field; '' yields the identical cannot-parse result null did, minus the PHP 8 deprecation #date_parse_from_format__replaces__striptime, change 936491636 on 2024-06-24. This is the main place the change affects, with a handful of other files affected.  Differences are: the new function flips the parameter order, doesn't need % to mark format shorthands, and has less cryptic output that doesn't need to be modified, see details below in the $tmp array passed to mktime.
 
 	if ($tmp === false) {
 		error("Sorry, but “{$date}” cannot be parsed from the format “{$format}”.");
