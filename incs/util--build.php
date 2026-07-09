@@ -4,19 +4,11 @@
 
 This file is also the intended home for future build-related utilities, as part of the slow migration of functions out of the util--core.php grab-bag into subject files. */
 
-/** returns @void: starts build error tracking — records the php-errors.log offset for buildErrorsReport(), and registers a shutdown reporter that names the doc being built if a fatal kills the build  */
+/** returns @void: starts build error tracking — records the php-errors.log offset for buildErrorsReport(). (This function formerly also registered a shutdown reporter naming the doc a fatal killed; that job moved to psShutdown() in util--errors.php, July 2026, which sees the same $GLOBALS['_buildCurrentDoc'] and echoes the same BUILD FATAL banner.)  */
 function buildErrorsMark() {
 	$GLOBALS['_buildErrLog'] = _ROOT . '/logs/php-errors.log';
 	$GLOBALS['_buildErrLogOffset'] = (int) @filesize($GLOBALS['_buildErrLog']);
 	$GLOBALS['_buildCurrentDoc'] = '';
-	register_shutdown_function(function () {
-		$e = error_get_last();
-		if (!$e or !in_array($e['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) return;
-		$doc = $GLOBALS['_buildCurrentDoc'] ?: '(no document being tracked)';
-		$msg = "BUILD FATAL while processing: {$doc}";
-		error_log($msg); // enrich the error log, where the fatal itself typically blames only "eval()'d code"
-		echo "<h2 class='warning' style='color:red'>☠️ {$msg}</h2><p>" . htmlentities($e['message']) . " ({$e['file']}:{$e['line']})</p>"; // "FATAL" in this output also trips make-all.command's failure-marker scan, aborting the build chain
-	});
 }
 
 /** returns @void: records which source document the build is currently processing, so fatals can be blamed on it (see buildErrorsMark)  */

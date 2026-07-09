@@ -570,7 +570,13 @@ function renderPhpStr ($string) {
 	// reminder: eval processes code in the current scope; whatever is un/defined right now is what you'll get in the eval'd code
 	ob_start();
 	$memberButnId = 0; // hacky initialization of this variable that is used in some strings processed without the document context; this problem is explained in notes at the top of PubSys: "There are TWO big loops in the PubSys build script that process content for every post with eval(), a tortuous architecture"
-	eval("?>$string"); // On the use of eval in the PainSci CMS: craftdocs://open?blockId=D8BB4DEF-66B7-4395-9020-1CACBE6BBFC4&spaceId=bc7d854c-3e5b-a34e-4850-a6d2f31a1a59
+	try {
+		eval("?>$string"); // On the use of eval in the PainSci CMS: craftdocs://open?blockId=D8BB4DEF-66B7-4395-9020-1CACBE6BBFC4&spaceId=bc7d854c-3e5b-a34e-4850-a6d2f31a1a59
+	} catch (Throwable $e) { /* local responsibility: discard the half-rendered buffer (otherwise it leaks into whatever output comes next) and rethrow with context; the global exception handler (psExceptionHandler in util--errors.php) does the reporting — banner, log, panel, exit */
+		ob_end_clean();
+		$doc = $GLOBALS['_buildCurrentDoc'] ?? '';
+		throw new RuntimeException('renderPhpStr(): ' . get_class($e) . ' while rendering PHP' . ($doc ? " in $doc" : '') . ': ' . $e->getMessage(), 0, $e);
+	}
 	$string = ob_get_contents();
 	ob_end_clean();
 

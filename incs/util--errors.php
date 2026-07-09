@@ -68,7 +68,7 @@ function psErrorHandler($errno, $msg, $file, $line) {
 /** returns @void: the uncaught-exception handler. Logs a native-format fatal line (with stack trace and context suffix); renders the dev panel immediately (the request is dying); in build context echoes a visible FATAL line so the build scripts and make-all.command's failure scan see it (the exception handler pre-empts the E_ERROR that buildErrorsMark's shutdown reporter watches for).  */
 function psExceptionHandler($e) {
 	$msg = 'Uncaught ' . get_class($e) . ': ' . $e->getMessage();
-	psErrLog('PHP Fatal error:  ', $msg . "\nStack trace:\n" . $e->getTraceAsString(), $e->getFile(), $e->getLine());
+	psErrLog('PHP Fatal error:  ', $msg, $e->getFile(), $e->getLine(), "\nStack trace:\n" . $e->getTraceAsString());
 
 	$GLOBALS['_psErrCounts']['failure']++;
 	$context = psErrContext();
@@ -85,12 +85,18 @@ function psExceptionHandler($e) {
 }
 
 
-/** returns @void: shutdown hook. Supplements true fatals (which PHP already logged natively) with a context line, and renders the dev error panel if anything was collected and not yet rendered.  */
+/** returns @void: shutdown hook. Supplements true fatals (which PHP already logged natively) with a context line — and in build context, echoes the BUILD FATAL banner naming the tracked document (consolidated here from buildErrorsMark()'s former anonymous shutdown reporter, July 2026). Also renders the dev error panel if anything was collected and not yet rendered.  */
 function psShutdown() {
 	$e = error_get_last();
 	if ($e && in_array($e['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
-		/* in builds, buildErrorsMark()'s own shutdown reporter already names the doc and echoes a FATAL line — don't duplicate (Phase 2 consolidates these) */
-		if (psErrContext() !== 'build') error_log('FATAL CONTEXT:' . (psErrLogSuffix() ?: ' (no url/doc context)'));
+		if (psErrContext() === 'build') {
+			$doc = $GLOBALS['_buildCurrentDoc'] ?? '' ?: '(no document being tracked)';
+			$msg = "BUILD FATAL while processing: {$doc}";
+			error_log($msg); // enrich the log: the fatal's own native line typically blames only "eval()'d code", with no doc and no suffix (native lines don't get psErrLogSuffix)
+			echo "<h2 class='warning' style='color:red'>☠️ {$msg}</h2><p>" . htmlentities($e['message']) . " ({$e['file']}:{$e['line']})</p>"; // 'BUILD FATAL' trips make-all.command's failure-marker scan, aborting the build chain
+		} else {
+			error_log('FATAL CONTEXT:' . (psErrLogSuffix() ?: ' (no url/doc context)'));
+		}
 		psCollect('php', 'failure', $e['message'], $e['file'], $e['line']);
 	}
 
@@ -134,12 +140,12 @@ function psCollect($origin, $severity, $msg, $file, $line, $bt = [], $alreadyCou
 /** returns @void: writes one line to the unified error log (destination set by env-bootstrap.php's ini_set) in native-compatible format plus the [doc:|url:] context suffix. Paths are logged project-relative (the _ROOT prefix stripped) so the same error produces the same line in dev and prod; the native-format contract lives in the prefix and the "in FILE on line N" shape, not the path text. Native-authored lines (true fatals, pre-runtime) still carry absolute paths.
 
 FLOOD GUARD: a diagnostic that fires once per iteration of a big loop (e.g. a null-field deprecation while iterating ~7000 bib records) can write thousands of near-identical lines per request — a real incident, July 2026: make-article-index.php generated 3975 log lines from three deprecations. So each unique line (keyed WITHOUT the context suffix, so per-doc build repeats group) is logged at most 3 times per request; further repeats are counted silently and summarized in one line at shutdown by psShutdown(). Only the log I/O is throttled — panel counters and collection are unaffected, so the badge still shows true totals. Quirk: the shutdown summary line lands after buildErrorsReport() has already read the log, so during builds it shows up in the NEXT build's delta instead — harmless, but don't be confused by it.  */
-function psErrLog($prefix, $msg, $file, $line) {
+function psErrLog($prefix, $msg, $file, $line, $trailer = '') {
 	if (defined('_ROOT') && strpos($file, _ROOT) === 0) $file = substr($file, strlen(_ROOT));
 	$line_str = "{$prefix}{$msg} in {$file} on line {$line}";
 	$n = $GLOBALS['_psErrLogTally'][$line_str] = ($GLOBALS['_psErrLogTally'][$line_str] ?? 0) + 1;
 	if ($n > 3) return; // suppressed; psShutdown logs the final tally
-	error_log($line_str . psErrLogSuffix());
+	error_log($line_str . psErrLogSuffix() . $trailer); /* $trailer carries multi-line extras (stack traces) AFTER the location and context suffix, so the first physical line is complete and parseable on its own — view-log-errors.php reads type, message, location, and [url|doc:] all from line one, and the trace lines below are recognizably continuation (no [date] prefix) */
 }
 
 
@@ -293,9 +299,14 @@ function error($user_input = false, $php_err_data = false) {
 }
 
 
-/** returns @void: initializes error handling — full error reporting, the three hooks, and the collection state. Called at include time, below.  */
+/* PS_TIMEZONE — the canonical timezone for ALL PainSci log timestamps (and everything else date-related). Log times should match Paul's wall clock. 'US/Pacific' is the official IANA backward-compatibility link to America/Los_Angeles — identical zone rules, chosen because PHP stamps every file-log line with the zone NAME and the long form is irritatingly verbose. This file is the constant's home because it is the one file every PainSci context loads — env chain, family-blog loader, and standalone/CLI use. Contexts that run BEFORE or WITHOUT this file must hardcode the same value and are tagged for discovery: grep '#timezone' finds every site (env-bootstrap.php, checkout/session.php, bin/build-srcs-sqlite.php). Before July 2026, standalone contexts (CLI scripts, family-blog builds) inherited php.ini's date.timezone = UTC, producing mixed-timezone logs. #timezone */
+if (!defined('PS_TIMEZONE')) define('PS_TIMEZONE', 'US/Pacific');
+
+
+/** returns @void: initializes error handling — full error reporting, the three hooks, the canonical timezone, and the collection state. Called at include time, below.  */
 function errorsInit() {
 	error_reporting(E_ALL);
+	date_default_timezone_set(PS_TIMEZONE); // #timezone — idempotent re-set for the main path (env-bootstrap already did it), the FIX for blog/CLI contexts that never set one and stamped logs in UTC
 	$GLOBALS['_psErrors'] = [];
 	$GLOBALS['_psErrCounts'] = ['failure' => 0, 'warning' => 0, 'notice' => 0];
 	$GLOBALS['_psErrLogTally'] = []; // per-unique-line log counts, for psErrLog()'s flood guard

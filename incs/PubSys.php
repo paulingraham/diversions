@@ -1361,6 +1361,7 @@ function makeRSS($max = 30)
 		}
 		if ($n++ > $max) break; // start counting non-excluded posts
 		extract($post); // get all the data for the found post
+		if (function_exists('buildTrackDoc')) buildTrackDoc('RSS generation for ' . ($post['source_file'] ?? $post['title'] ?? '?')); // so a fatal during this post's RSS eval gets blamed here, not on whatever the write loop tracked last
 		$date_rss = date('D, d M Y H:i:s -0700', $timestamp); // get the date for the post in RSS-friendly format
 		if ($n == 1) {$last_build_date = $date_rss;} // make the build date equal to date of most recent post, which should be the first in the stack
 		journal("adding a post to the RSS feeds [ $title_smpl ]", 3);
@@ -1446,7 +1447,12 @@ function makeRSS($max = 30)
 		// Generate one REGULAR RSS POST
 		$template_file_contents = file_get_contents("template-rss-main-post.xml", true);
 		ob_start();
-		eval("?>$template_file_contents"); // On the use of eval in the PainSci CMS: craftdocs://open?blockId=D8BB4DEF-66B7-4395-9020-1CACBE6BBFC4&spaceId=bc7d854c-3e5b-a34e-4850-a6d2f31a1a59
+		try {
+			eval("?>$template_file_contents"); // On the use of eval in the PainSci CMS: craftdocs://open?blockId=D8BB4DEF-66B7-4395-9020-1CACBE6BBFC4&spaceId=bc7d854c-3e5b-a34e-4850-a6d2f31a1a59
+		} catch (Throwable $e) { // discard the half-rendered buffer and rethrow with context; psExceptionHandler does the reporting (buildTrackDoc above supplies the post attribution)
+			ob_end_clean();
+			throw new RuntimeException('RSS post eval: ' . get_class($e) . ': ' . $e->getMessage(), 0, $e);
+		}
 		$rss_post = ob_get_contents();
 		ob_end_clean();
 		$rss_post = eval('return "' . addslashes($rss_post) . '";'); // substitute values in the RSS post template with values filled in
@@ -1710,7 +1716,7 @@ function get_settings()
 	$fnarr = glob('guts/settings-*'); // find the settings file
 //	include($fnarr[0]);
 	$settings = getArrFromFile($fnarr[0], false, true); // $synonyms = false, $simple = true;
-	date_default_timezone_set('America/Los_Angeles');
+	date_default_timezone_set(defined('PS_TIMEZONE') ? PS_TIMEZONE : 'US/Pacific'); // #timezone — canonical constant from util--errors.php (always loaded before PubSys in both the PS env and the blog loader; ternary is just belt-and-braces)
 	$settings['year'] = date('Y');
 
 	if (!empty($settings['optional_subdir'])) {
@@ -2850,7 +2856,12 @@ function prepareTemplate($post, $templateFile)
 	// See notes at top of file: "There are TWO big loops in the PubSys build script that process content for every post with eval(), a tortuous architecture"
 
 	ob_start();
-	eval("?>$template_file_contents"); // On the use of eval in the PainSci CMS: craftdocs://open?blockId=D8BB4DEF-66B7-4395-9020-1CACBE6BBFC4&spaceId=bc7d854c-3e5b-a34e-4850-a6d2f31a1a59
+	try {
+		eval("?>$template_file_contents"); // On the use of eval in the PainSci CMS: craftdocs://open?blockId=D8BB4DEF-66B7-4395-9020-1CACBE6BBFC4&spaceId=bc7d854c-3e5b-a34e-4850-a6d2f31a1a59
+	} catch (Throwable $e) { // discard the half-rendered buffer and rethrow with context; psExceptionHandler (util--errors.php) does the reporting
+		ob_end_clean();
+		throw new RuntimeException('prepareTemplate(): ' . get_class($e) . " while evaling template '$templateFile' for " . ($post['source_file'] ?? $post['title'] ?? '?') . ': ' . $e->getMessage(), 0, $e);
+	}
 	$thisTemplate = ob_get_contents();
 	ob_end_clean();
 
