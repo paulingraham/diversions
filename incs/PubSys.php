@@ -369,6 +369,8 @@ $post = array('canonical' => null,
 
 	// CONTENT FINALIZED
 
+	warnIfUnbalancedHtml($content, $post['date'] . ' "' . mb_substr($post['title'], 0, 40) . '" in ' . basename($fn), $fn, $ln); // heads-up only, never aborts; labelled by date + title because "the Nth parsed line" identifies nothing for a human
+
 	$post['cites'] = getCites($post); // extracts all citations
 
 	$post['html'] = prepareContent($content); // make HTML version of content
@@ -511,6 +513,43 @@ function abortIfPostHasErrorMarkers($post) {
 	echo '</ol>';
 	echo "<h3 class='warning'>The post markup</h3><pre style='white-space: pre-wrap;'>" . htmlspecialchars($html) . '</pre>';
 	exit;
+}
+
+/** returns @void: gentle heads-up journal warning when a post's source content has unbalanced block-level HTML (unclosed <p>, missing </ul>, etc.). $srcFile is the source document path as known to the caller (used for the log line and the panel edit link); $srcLabel is the human-readable version; $rawLine is the micropost's raw source line, used to locate its true line number in the POSTS file for the edit link. */
+function warnIfUnbalancedHtml($content, $srcLabel, $srcFile = null, $rawLine = null) {
+	/* Why this matters: MarkdownExtra's HTML-block hashing needs balanced block-level tags. Browsers silently auto-close bad nesting, so hand-written HTML that "looks fine" on an article page can explode when the same markup goes through a PubSys build — mildly (stray litter like "</ul></p>") or spectacularly (tags escaped to visible text: "<p>&lt;</p>"). Real incident: the 2026-07-10 pillow post, with markup copied from §crick where the imbalance had been invisible for who knows how long.
+
+	Deliberately gentle and cheap: warn and continue, never abort — the family blogs (especially ephemeral) contain plenty of imperfect hand-written HTML that renders fine in browsers, and a build must tolerate it. Count-based only, so crossed nesting with matching counts (e.g. a stray </p> compensating for an unclosed <p> elsewhere) slips through; in practice crossed pairs almost always travel with a count imbalance somewhere in the same post. */
+	/* Strip comment-only PHP blocks FIRST — the house format for private/AI draft content (see CLAUDE.md), and they routinely wrap draft HTML that carries its own inner PHP tags. The general strip below is non-greedy, so it would pair such a block's opening delimiter with an INNER closing delimiter and leave the rest of the commented block (e.g. a dangling closing blockquote tag) exposed to the counter — a real false positive (2023-03-10 "can the mind create pain?"). Matching through to the comment's closing star-slash is safe because PHP block comments do not nest, so the first one is always the true end of the block. */
+	$content = preg_replace('|<\?php\s*/\*.*?\*/\s*\?>|s', '', $content);
+	$content = preg_replace('|<\?php.*?\?>|s', '', $content); // ignore remaining (non-comment) PHP blocks — tags inside code aren't part of the source HTML structure
+	$content = preg_replace('|<!--.*?-->|s', '', $content); // ignore HTML comments, which can legitimately contain commented-out markup
+	$content = preg_replace('|```.*?```|s', '', $content); // ignore fenced code blocks and backtick code spans, where example tags are content, not structure
+	$content = preg_replace('|`[^`' . "\n" . ']*`|', '', $content);
+	$unbalanced = [];
+	foreach (['p', 'ul', 'ol', 'li', 'blockquote', 'div'] as $tag) {
+		$opens = preg_match_all('|<' . $tag . '[\s>]|i', $content); // opening pattern allows attributes; [\s>] keeps <p from matching <pre or <pq
+		$closes = preg_match_all('|</' . $tag . '>|i', $content);
+		if ($opens != $closes) {
+			$unbalanced[] = "$tag {$opens}:{$closes}";
+		}
+	}
+	if ($unbalanced) {
+		$msg = "unbalanced HTML in [$srcLabel] (open:close counts — " . implode(', ', $unbalanced) . ') … Markdown may mangle this post';
+		journal("warning: $msg", 2, true); // inline on the build page, at the point in the flow where it happened
+		/* Also on the permanent record via the unified error pipeline: log line + panel + severity counter — but deliberately NOT error(), which in build context emits the psErrMarker() abort contract (see psReport()); these warnings must never abort. Direct psErrLog+psCollect is the blessed pattern for "handled locally but still on the record" (see psCollect docblock). If Phase 3 ever makes markers failure-only, this pair can collapse to error("warning---$msg"). */
+		/* Attribute the report to the post source document, not to this detector — that's what the panel's edit link should open. (The panel's own doc-substitution only rescues eval pseudo-paths, correctly; a real file passed here is linked as-is.) psDocPath resolves against both possible roots (painscience /blog and the family-blog roots); the posts/ prefix candidate matters because getMacroPost basenames $fn early (line ~597), so the caller may pass either form. Line 1 because the check is whole-post — a known limitation. */
+		$file = __FILE__; $line = __LINE__;
+		foreach ($srcFile ? [$srcFile, 'posts/' . basename($srcFile)] : [] as $cand) {
+			if ($abs = psDocPath($cand)) { $file = $abs; $line = 1; break; }
+		}
+		if ($rawLine !== null && $line === 1) { // micropost: find the post's true line number in the POSTS file, so the edit link jumps straight to it. Lazy — one file read, only when a warning actually fires. array_search needs the raw line verbatim; two byte-identical posts in one file would fool it, which is no realistic loss.
+			$idx = array_search($rawLine, file($file, FILE_IGNORE_NEW_LINES));
+			if ($idx !== false) $line = $idx + 1;
+		}
+		psErrLog('PainSci warning: ', $msg, $file, $line);
+		psCollect('app', 'warning', $msg, $file, $line);
+	}
 }
 
 /* <##> reads a macropost */
@@ -733,6 +772,8 @@ $post = array('canonical' => null,
 		}
 
 	$post['content'] = $content . $content_premium; // the content is always ALL content, including premium!  the post is the post!
+
+	warnIfUnbalancedHtml($post['content'], $fn, $fn); // heads-up only, never aborts
 
 	$post['cites'] = getCites($post); // extracts all citations
 
