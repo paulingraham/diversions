@@ -327,7 +327,7 @@ Tricky step 2: the php function mktime (make time) builds a Unix timestamp from 
 	$tmp = date_parse_from_format ($format, $date ?? ''); // ?? '' because callers routinely pass a record's absent (null) date field; '' yields the identical cannot-parse result null did, minus the PHP 8 deprecation #date_parse_from_format__replaces__striptime, change 936491636 on 2024-06-24. This is the main place the change affects, with a handful of other files affected.  Differences are: the new function flips the parameter order, doesn't need % to mark format shorthands, and has less cryptic output that doesn't need to be modified, see details below in the $tmp array passed to mktime.
 
 	if ($tmp === false) {
-		error("Sorry, but “{$date}” cannot be parsed from the format “{$format}”.");
+		psErrFail("Sorry, but “{$date}” cannot be parsed from the format “{$format}”.");
 		return false;
 		}
 		
@@ -350,8 +350,8 @@ function flexibleDate($timestamp) {
 	}
 
 function printUpd ($date) {
-	if ($date === "") error("empty \$pubdate string");
-	if ($date === false) error("\$pubdate string is boolean false");	
+	if ($date === "") psErrFail("empty \$pubdate string");
+	if ($date === false) psErrFail("\$pubdate string is boolean false");	
 	global $updated, $paid;
 	$updatedStamp = parseDate($updated);
 	if ($paid or MODE_DEV) // for non-G-indexable document states
@@ -638,8 +638,8 @@ function parseSloppyData($user_input) {
 /*	// are there any hyphens left?
 	if (strpos($user_input,"--") !== false) {
 			$user_input = preg_replace("/--/","***",$user_input);
-			$warning = "notice---There is a double-hypen in the user input. This is probably intended to be a triple-hyphen, and the user input parser went ahead with that assumption. However, if you wanted to use an actual dash, then use it.";
-			if (function_exists("error")) error($warning); // checking for the error function before using it is helpful when running PubSys, which does not use it
+			$warning = "There is a double-hypen in the user input. This is probably intended to be a triple-hyphen, and the user input parser went ahead with that assumption. However, if you wanted to use an actual dash, then use it.";
+			if (function_exists("psErrNotice")) psErrNotice($warning); // guarded for standalone contexts without util--errors.php loaded
 			}	*/
 
 	// are there any spaces?
@@ -1508,7 +1508,7 @@ function echoDev ($string) {
 function embed_audio ($filename, $paywalled = false, $figcaption = "Audio version of this section:") {
 // 2023-12-22 — Just got a start on using this function, but it’s still too simple to use for all my audio embedding needs.  Audio embeds can be featured (audio for a whole post/article) vs. minor (just a sub-section), and they can be independently paywalled or not.  This function so far only puts out an unpaywalled minor audio embed, and I need to figure out a solution for the others before I can start using it more widely.
 $url = "/assets/audio/$filename";
-if (!file_exists($_SERVER['DOCUMENT_ROOT'] . $url)) error("Audio file does not exist: '$filename'");
+if (!file_exists($_SERVER['DOCUMENT_ROOT'] . $url)) psErrFail("Audio file does not exist: '$filename'");
 //$url = "https://www.painscience.com" . $url;
 
 $embed = <<<embed

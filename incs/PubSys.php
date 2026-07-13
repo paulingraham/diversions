@@ -495,7 +495,7 @@ IMGPOST;
 	return $post;
 }
 
-/** returns @void: scans a post's rendered HTML (and premium HTML, if any) for the error markers echoed by error()/psErrMarker() during rendering, and aborts the build naming the post — otherwise the marker ships silently inside the staged/published HTML. Marker format is a contract; see psErrMarker() in util--errors.php.  */
+/** returns @void: scans a post's rendered HTML (and premium HTML, if any) for the error markers echoed by the psErr* reporters (via psErrMarker()) during rendering, and aborts the build naming the post — otherwise the marker ships silently inside the staged/published HTML. Marker format is a contract; see psErrMarker() in util--errors.php.  */
 function abortIfPostHasErrorMarkers($post) {
 	$html = ($post['html'] ?? '') . ($post['html_premium'] ?? '');
 	preg_match_all('|<!-- !!! ERROR !!! (.+?) -->|', $html, $matches);
@@ -537,7 +537,7 @@ function warnIfUnbalancedHtml($content, $srcLabel, $srcFile = null, $rawLine = n
 	if ($unbalanced) {
 		$msg = "unbalanced HTML in [$srcLabel] (open:close counts — " . implode(', ', $unbalanced) . ') … Markdown may mangle this post';
 		journal("warning: $msg", 2, true); // inline on the build page, at the point in the flow where it happened
-		/* Also on the permanent record via the unified error pipeline: log line + panel + severity counter — but deliberately NOT error(), which in build context emits the psErrMarker() abort contract (see psReport()); these warnings must never abort. Direct psErrLog+psCollect is the blessed pattern for "handled locally but still on the record" (see psCollect docblock). If Phase 3 ever makes markers failure-only, this pair can collapse to error("warning---$msg"). */
+		/* Also on the permanent record via the unified error pipeline: log line + panel + severity counter. Markers became failure-only in July 2026 (this detector was one of the two cases that forced that policy), so psErrWarn($msg) would no longer abort and COULD replace this pair — but the hand-rolled psErrLog+psCollect stays deliberately, for the attribution finesse below: it points the panel's edit link at the post source file, where generic psErrWarn would attribute to this detector's own call site. */
 		/* Attribute the report to the post source document, not to this detector — that's what the panel's edit link should open. (The panel's own doc-substitution only rescues eval pseudo-paths, correctly; a real file passed here is linked as-is.) psDocPath resolves against both possible roots (painscience /blog and the family-blog roots); the posts/ prefix candidate matters because getMacroPost basenames $fn early (line ~597), so the caller may pass either form. Line 1 because the check is whole-post — a known limitation. */
 		$file = __FILE__; $line = __LINE__;
 		foreach ($srcFile ? [$srcFile, 'posts/' . basename($srcFile)] : [] as $cand) {

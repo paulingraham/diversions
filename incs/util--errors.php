@@ -12,11 +12,55 @@ WHAT THIS FILE DOES:
 
 4. Echoes the legacy HTML-comment error markers in build contexts, at error time, so they land inside the per-document output buffers that the build scripts scan and abort on. The marker format is a three-consumer contract — make-ps-site.php (preg for "!!! ERROR !!! (.+?)-->"), PubSys.php (same, requires the space before -->), and check-ps-output.sh (ack for "error #") — do not change it without changing all three.
 
-5. Provides error(), the legacy app-level reporting function, as a thin shim over the same core, preserving its "sloppy args" signature for the ~54 existing callers. New code should still call error() for now; a cleaner API (psFail/psWarn + exceptions) is planned (Phase 3 of the July 2026 error-handling plan).
+5. Provides the psErr* family — the app-level error-reporting API (see its doc block below): psErrFail/psErrWarn/psErrNotice report and continue; psErrThrow throws a PsError. This replaced the legacy error() function entirely in Phase 3 (July 2026).
 
 CONTEXTS: behaviour branches on a three-way context — see psErrContext(). 'dev' collects and displays; 'build' logs and marks; 'live' only logs (the error-logs-daemon is the sole production notification channel — email/Pushover on log changes, every 10 min). The default when no MODE constants exist is 'build', which is correct for the family blogs (writerly/ephemeral/diversions): this file is on the shared-code list in make-ps-blog.php and must run standalone, without the PainSci environment — no dependencies outside this file except function_exists-guarded courtesy calls.
 
-Canonical documentation of WHERE ERRORS GO is in env-bootstrap.php, above its ini_set block. This file changes none of that plumbing; it adds detection, context, and display on top. */
+Canonical documentation of WHERE ERRORS GO is in env-bootstrap.php, above its ini_set block. This file changes none of that plumbing; it adds detection, context, and display on top.
+
+THE BEHAVIOUR MATRIX — what every kind of error does, by severity, origin, and context (July 2026). Each row reads: LOG → BUILD → PANEL → RENDER, i.e. is it logged; does it abort builds; does it appear in the floating error panel; does it abort the render. "Panel" gates apply on top of everything below: the panel never renders on live, on CLI, on checkout endpoints, or into non-HTML responses. A nicely formatted HTML rendering of this same matrix is in tools/error-behaviour-matrix.php (displayed by test-error.php and view-log-errors.php) — KEEP THE TWO IN SYNC when policy changes.
+
+DEV (page views and builds — builds only happen dev-side):
+
+	engine notice/deprecation → logged [1] → no build abort → panel → render continues
+	
+	engine warning → logged [1] → no build abort → panel → render continues
+	
+	engine E_USER_ERROR (unused here) → logged [1] → no build abort [2] → panel → render continues
+	
+	psErrNotice → logged [1] → no build abort → panel → render continues
+	
+	psErrWarn → logged [1] → no build abort → panel → render continues
+	
+	psErrFail → logged [1] → ABORTS BUILDS (marker) → panel → render continues
+	
+	uncaught Throwable (incl psErrThrow) → logged with trace → ABORTS BUILDS → panel → KILLS THE RENDER
+	
+	true fatal (parse error, OOM…) → logged [3] → ABORTS BUILDS → panel [4] → KILLS THE RENDER
+
+PROD (dynamic renders; builds and panels don't happen here — the log and its daemon are everything):
+
+	engine notice/deprecation → logged [1] → render continues
+	
+	engine warning → logged [1] → render continues
+	
+	psErrNotice → UNLOGGED [5] → render continues
+	
+	psErrWarn → logged [1] → render continues
+	
+	psErrFail → logged [1] → render continues
+	
+	uncaught Throwable (incl psErrThrow) → logged with trace → KILLS THE RENDER, HTTP 500 (if headers unsent)
+	
+	true fatal (parse error, OOM…) → logged [3] → KILLS THE RENDER
+
+	[1] subject to the flood guard: max 3 identical lines per request, remainder tallied in one line at shutdown
+	[2] build markers are origin-gated as well as severity-gated: only psErrFail aborts builds; an engine-origin "failure" is tallied in the end-of-build delta like other engine noise
+	[3] logged natively by PHP (absolute path, no context suffix) plus our shutdown supplement (FATAL CONTEXT on pages, BUILD FATAL banner in builds)
+	[4] collected via error_get_last() at shutdown: message/file/line only — the stack died with the script, so no backtrace
+	[5] app-level notices are dev/build-only by policy: production never hears them at all, which is what makes the notes-to-self pattern safe in dynamically-rendered content (see psReport)
+
+	And one row that appears in neither table: a CAUGHT PsError does nothing anywhere — no log, no panel, no count. The verdict belongs to the catcher (see psErrThrow's docs). */
 
 
 
@@ -68,17 +112,22 @@ function psErrorHandler($errno, $msg, $file, $line) {
 /** returns @void: the uncaught-exception handler. Logs a native-format fatal line (with stack trace and context suffix); renders the dev panel immediately (the request is dying); in build context echoes a visible FATAL line so the build scripts and make-all.command's failure scan see it (the exception handler pre-empts the E_ERROR that buildErrorsMark's shutdown reporter watches for).  */
 function psExceptionHandler($e) {
 	$msg = 'Uncaught ' . get_class($e) . ': ' . $e->getMessage();
-	psErrLog('PHP Fatal error:  ', $msg, $e->getFile(), $e->getLine(), "\nStack trace:\n" . $e->getTraceAsString());
+
+	/* Attribution remap for psErrThrow: an exception's getFile/getLine point at where the OBJECT WAS CONSTRUCTED, so a PsError born inside psErrThrow blames this file instead of the call site. When (and only when) the construction site is this file, the first trace frame is the psErrThrow call — the location the report should name. A PsError thrown directly (throw new PsError) already carries the right location and is left alone. */
+	$file = $e->getFile(); $line = $e->getLine();
+	if ($e instanceof PsError && $file === __FILE__ && ($t = $e->getTrace()) && isset($t[0]['file'])) { $file = $t[0]['file']; $line = $t[0]['line'] ?? 0; }
+
+	psErrLog('PHP Fatal error:  ', $msg, $file, $line, "\nStack trace:\n" . $e->getTraceAsString());
 
 	$GLOBALS['_psErrCounts']['failure']++;
 	$context = psErrContext();
 
 	if ($context === 'build') {
 		$doc = $GLOBALS['_buildCurrentDoc'] ?? '';
-		echo "<h2 class='warning' style='color:red'>☠️ BUILD FATAL (uncaught " . get_class($e) . ")" . ($doc ? " while processing: " . htmlentities($doc) : "") . "</h2><p>" . htmlentities($e->getMessage()) . " ({$e->getFile()}:{$e->getLine()})</p>";
+		echo "<h2 class='warning' style='color:red'>☠️ BUILD FATAL (uncaught " . get_class($e) . ")" . ($doc ? " while processing: " . htmlentities($doc) : "") . "</h2><p>" . htmlentities($e->getMessage()) . " ({$file}:{$line})</p>"; // $file/$line, not the exception's own — the psErrThrow attribution remap above applies here too
 	}
 
-	psCollect('exception', 'failure', $msg, $e->getFile(), $e->getLine(), $e->getTrace(), true);
+	psCollect('exception', 'failure', $msg, $file, $line, $e->getTrace(), true);
 	if ($context === 'dev') psRenderErrorPanel(); // render now; shutdown will still run but the rendered flag prevents a double panel (in build context, shutdown does the rendering, after the FATAL banner above)
 
 	if ($context === 'live' && !headers_sent()) http_response_code(500);
@@ -108,21 +157,24 @@ function psShutdown() {
 }
 
 
-/** returns @void: the shared reporting core used by the PHP handler and the error() shim — logs, counts, collects for the dev panel, and echoes the build marker for app-level errors.  */
+/** returns @void: the shared reporting core used by the PHP handler and the psErr* family — logs, counts, collects for the dev panel, and echoes the build marker for app-level errors.  */
 function psReport($origin, $severity, $msg, $file, $line, $logPrefix) {
+	$context = psErrContext();
+
+	/* App-level notices are dev/build-only by policy (Paul's, July 2026): a psErrNotice is an author's note-to-self — "advertise this to me while I'm working" — and production is not where Paul works, so on live it does nothing at all, not even a log line. This is what makes the notes-to-self pattern safe in dynamically-rendered content (member books, bibliography.php), where a logged notice would otherwise churn the log — and the error-daemon's notifications — on every page view. The origin check matters: ENGINE notices/deprecations (origin 'php') also classify as severity 'notice' and must keep logging on prod, because prod deprecation lines are how PHP-upgrade readiness gets spotted. The contract in one line: if you need to hear about it from production, it's at least a psErrWarn. */
+	if ($origin === 'app' && $severity === 'notice' && $context === 'live') return;
+
 	$GLOBALS['_psErrCounts'][$severity]++;
 	$n = array_sum($GLOBALS['_psErrCounts']);
 
 	psErrLog($logPrefix, $msg, $file, $line);
 
-	$context = psErrContext();
-
-	/* Markers: app-level errors only. Engine warnings/notices/deprecations are common enough during builds that marking them would abort every build; they're tallied by buildErrorsReport()'s log delta instead. But every error() call is a deliberate app-level signal (bad pubdate, missing audio file…), rare and worth stopping a build for — this is the "no more silent build errors" behaviour change: previously error() during a site build was invisible (the old marker echo was gated on $GLOBALS['ps'], i.e. PubSys only). */
-	if ($context === 'build' && $origin === 'app') psErrMarker($origin, $severity, $n, $msg);
+	/* Markers: app-level FAILURES only (policy set with Paul, July 2026). Engine diagnostics never mark (they'd abort every build; the log delta tallies them). App-level warnings/notices don't mark either — severity is an honest author declaration now, and "warning" means suboptimal-but-publishable: the build should trust it, finish, and surface the orange in the build-page panel + delta instead of stopping the line. (Two real cases forced this line: the unbalanced-HTML detector in PubSys and sql.php's no-DB-connection warning, both of which must never abort — under an any-severity policy they'd have to mislabel themselves to keep builds alive.) But every psErrFail IS worth stopping a build for — broken content must not ship. If something orange turns out to be publication-blocking, the fix is promotion to psErrFail, not a policy change. */
+	if ($context === 'build' && $origin === 'app' && $severity === 'failure') psErrMarker($origin, $severity, $n, $msg);
 
 	if ($context !== 'live') {
 		$bt = debug_backtrace(0, 25);
-		while (!empty($bt) && ($bt[0]['file'] ?? '') === __FILE__) array_shift($bt); // drop this file's own frames (psReport, the handler, error()) so the trace starts at the call site
+		while (!empty($bt) && ($bt[0]['file'] ?? '') === __FILE__) array_shift($bt); // drop this file's own frames (psReport, the handler, the psErr* wrappers) so the trace starts at the call site
 		psCollect($origin, $severity, $msg, $file, $line, $bt, true);
 	}
 }
@@ -218,6 +270,21 @@ function psRenderErrorPanel() {
 		echo "</div>\n";
 	}
 	echo "</div>\n";
+
+	/* ESC / off-click dismissal, mirroring the house popup-banishing conventions (see keyboard-shortcuts-dev-js.php): same guards — never intercept keys while an INPUT has focus; clicks inside the panel or on the badge don't banish. Deliberately self-contained rather than joining the .pupw class system: the shortcuts plumbing doesn't load on tools pages or the family blogs (where this panel does), and the banisher's inline display:none would fight the panel's class-based toggle. */
+	echo "<script>
+(function () {
+	var panel = document.getElementById('ps-err-reports');
+	document.addEventListener('keydown', function (e) {
+		if (document.activeElement && document.activeElement.nodeName === 'INPUT') return;
+		if (e.key === 'Escape') panel.classList.remove('ps-err-open');
+	});
+	document.addEventListener('click', function (e) {
+		if (e.target.closest('#ps-err-reports') || e.target.closest('.ps-err-badge')) return;
+		panel.classList.remove('ps-err-open');
+	});
+})();
+</script>\n";
 }
 
 
@@ -269,27 +336,27 @@ function psStubArg($arg) {
 }
 
 
-/** returns @void: legacy app-level error reporting — a shim over psReport() preserving the 2010 "sloppy args" signature for ~54 callers, e.g. error('msg'), error('warning---msg'), error('msg---notice'). $php_err_data is dead legacy (its feeder, phpErrs, was never registered) and is accepted and ignored. The legacy 'email' token is also accepted and ignored: per-request error email is retired; the error-logs-daemon is the production notification channel.  */
-function error($user_input = false, $php_err_data = false) {
-	$severity = 'failure';
-	$msg = '';
+/* ============================================================================
+THE psErr* FAMILY — the app-level error-reporting API (July 2026, error-handling Phase 3), replacing the legacy error() function. Four verbs, one rule: THREE REPORT, ONE THROWS, AND THE ONE THAT THROWS SAYS SO.
 
-	if (function_exists('parseSloppyData')) $items = parseSloppyData($user_input);
-	else $items = (is_string($user_input) && $user_input !== '') ? [$user_input] : false; // util--core.php not loaded (shouldn't happen — it's on both load paths — but degrade gracefully)
+	psErrFail($msg)     report a FAILURE (red) and continue — content is broken but execution isn't (missing audio file, unrenderable citation)
+	psErrWarn($msg)     report a WARNING (orange) and continue — quality problems, questionable usage
+	psErrNotice($msg)   report a NOTICE (blue) and continue — FYI-grade observations and deliberate notes-to-self; DEV/BUILD-ONLY: on live it does nothing at all (not even a log line), so it's safe in dynamically-rendered content. If you need to hear about it from production, use psErrWarn.
+	psErrThrow($msg)    throw a PsError — for genuinely abortive conditions; catch it at a boundary or let psExceptionHandler() present it (log + panel + 500 on live)
 
-	if (is_array($items)) {
-		foreach ($items as $item) {
-			if ($item === 'warning' || $item === 'notice') $severity = $item;
-			elseif ($item === 'email') continue;
-			else $msg = trim($msg . ' ' . $item); // anything that isn't a keyword is message text; multiple segments concatenate
-		}
+All three reporters share psAppReport(): call-site attribution, the checkout order-details mirror, and psReport() with 'app' origin. Build-abort policy: only psErrFail emits the build marker, so only FAILURES abort builds (naming the document); warnings and notices flow to the log, the end-of-build delta, and the build-page panel — visible but not blocking. Severity is display-and-gate taxonomy, not control flow; the reporters never alter execution. psErrThrow deliberately does NOT pre-report — presentation belongs to whoever catches it, or to the exception handler if nobody does.
+
+Historical note: the naming is Paul's, chosen so autocomplete surfaces the whole family from 'psErr', and so throwing is visible in the name at every call site — the legacy error() defaulted everything to failure severity and could never alter control flow, two dishonesties this API retires. */
+
+class PsError extends RuntimeException {}
+
+
+/** returns @void: shared core for the psErr* reporting family — attributes the report to the nearest call site outside this file, mirrors checkout errors into the order-details log, and routes into psReport() with app origin (log line, panel, counters, build marker).  */
+function psAppReport($severity, $msg) {
+	$file = '(unknown file)'; $line = 0;
+	foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5) as $frame) {
+		if (($frame['file'] ?? '') !== __FILE__) { $file = $frame['file'] ?? '(unknown file)'; $line = $frame['line'] ?? 0; break; }
 	}
-	if ($msg === '') $msg = 'error() called without a message';
-
-	// attribute to the call site, not this file
-	$bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
-	$file = $bt[0]['file'] ?? '(unknown file)';
-	$line = $bt[0]['line'] ?? 0;
 
 	// legacy special case: errors during checkout also land in the order-details log (guarded: ecom--core.php isn't loaded in all contexts)
 	global $_doc;
@@ -297,6 +364,25 @@ function error($user_input = false, $php_err_data = false) {
 
 	psReport('app', $severity, $msg, $file, $line, "PainSci $severity: ");
 }
+
+
+/** returns @void: reports a failure-severity (red) problem and continues — see the psErr* family doc above  */
+function psErrFail($msg) { psAppReport('failure', $msg); }
+
+
+/** returns @void: reports a warning-severity (orange) problem and continues — see the psErr* family doc above  */
+function psErrWarn($msg) { psAppReport('warning', $msg); }
+
+
+/** returns @void: reports a notice-severity (blue) observation and continues — see the psErr* family doc above  */
+function psErrNotice($msg) { psAppReport('notice', $msg); }
+
+
+/** returns @never: throws a PsError — the only psErr* verb that alters control flow, and it says so in its name  */
+function psErrThrow($msg) { throw new PsError($msg); }
+
+
+/* The legacy error() function is GONE (deleted at the end of Phase 3, July 2026, after all ~40 call sites migrated to the psErr* family above). It dated to ~2010 and had two structural dishonesties: everything defaulted to failure severity unless a "sloppy args" token said otherwise, and it could never alter control flow. Its severity tokens rode inside the message string via parseSloppyData(), which meant a message that legitimately contained '---' would be silently split into phantom arguments — a latent bug the psErr* family retires along with the function. */
 
 
 /* PS_TIMEZONE — the canonical timezone for ALL PainSci log timestamps (and everything else date-related). Log times should match Paul's wall clock. 'US/Pacific' is the official IANA backward-compatibility link to America/Los_Angeles — identical zone rules, chosen because PHP stamps every file-log line with the zone NAME and the long form is irritatingly verbose. This file is the constant's home because it is the one file every PainSci context loads — env chain, family-blog loader, and standalone/CLI use. Contexts that run BEFORE or WITHOUT this file must hardcode the same value and are tagged for discovery: grep '#timezone' finds every site (env-bootstrap.php, checkout/session.php, bin/build-srcs-sqlite.php). Before July 2026, standalone contexts (CLI scripts, family-blog builds) inherited php.ini's date.timezone = UTC, producing mixed-timezone logs. #timezone */

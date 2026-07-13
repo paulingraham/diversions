@@ -119,7 +119,7 @@ if (!$ps)  { // without the PS environment, we need at least Composer installed 
 
 // load code libraries
 set_include_path(".:$root_true/incs:$root_true/incs/content--library:$root_dev/guts:$root_dev/incs:$root_dev/guts/incs");
-require_once('util--errors.php'); // error handlers + error(); must load before util--core.php and PubSys.php so error() exists before any shared code can call it; PS already has it via env-runtime.php (require_once dedupes); before July 2026 the blogs had NO error() at all, so shared-code error() calls fatalled
+require_once('util--errors.php'); // error handlers + the psErr* reporting family; must load before util--core.php and PubSys.php so the reporters exist before any shared code can call them; PS already has it via env-runtime.php (require_once dedupes); before July 2026 the blogs had NO app-level error reporting at all, so shared-code error() calls fatalled
 require_once('PubSys.php'); // functions for blogging, currently used by either Writerly or PainScience.com
 require_once('content--tags.php'); // tag management functions
 require_once('easy-img.php'); // a large function for handling image markup, so it gets its own file
