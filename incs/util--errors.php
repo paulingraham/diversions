@@ -14,7 +14,7 @@ WHAT THIS FILE DOES:
 
 5. Provides the psErr* family — the app-level error-reporting API (see its doc block below): psErrFail/psErrWarn/psErrNotice report and continue; psErrThrow throws a PsError. This replaced the legacy error() function entirely in Phase 3 (July 2026).
 
-CONTEXTS: behaviour branches on a three-way context — see psErrContext(). 'dev' collects and displays; 'build' logs and marks; 'live' only logs (the error-logs-daemon is the sole production notification channel — email/Pushover on log changes, every 10 min). The default when no MODE constants exist is 'build', which is correct for the family blogs (writerly/ephemeral/diversions): this file is on the shared-code list in make-ps-blog.php and must run standalone, without the PainSci environment — no dependencies outside this file except function_exists-guarded courtesy calls.
+CONTEXTS: behaviour branches on a three-way context — see psErrContext(). 'dev' collects and displays; 'build' logs and marks; 'live' only logs (the error-logs-daemon is the sole production notification channel — two-tier since July 2026: page-worthy lines email+Pushover immediately, minor lines roll into a daily digest; see the daemon column in the PROD matrix below). The default when no MODE constants exist is 'build', which is correct for the family blogs (writerly/ephemeral/diversions): this file is on the shared-code list in make-ps-blog.php and must run standalone, without the PainSci environment — no dependencies outside this file except function_exists-guarded courtesy calls.
 
 Canonical documentation of WHERE ERRORS GO is in env-bootstrap.php, above its ini_set block. This file changes none of that plumbing; it adds detection, context, and display on top.
 
@@ -38,21 +38,21 @@ DEV (page views and builds — builds only happen dev-side):
 	
 	true fatal (parse error, OOM…) → logged [3] → ABORTS BUILDS → panel [4] → KILLS THE RENDER
 
-PROD (dynamic renders; builds and panels don't happen here — the log and its daemon are everything):
+PROD (dynamic renders; builds and panels don't happen here — the log and its daemon are everything). Rows here read LOG → DAEMON → RENDER; the daemon column is the two-tier notification policy of tools/error-logs-daemon.php (July 2026): "pages" = email + Pushover at the next 10-min cron tick, "digest" = rolled into a daily minor-activity email, no Pushover:
 
-	engine notice/deprecation → logged [1] → render continues
-	
-	engine warning → logged [1] → render continues
-	
-	psErrNotice → UNLOGGED [5] → render continues
-	
-	psErrWarn → logged [1] → render continues
-	
-	psErrFail → logged [1] → render continues
-	
-	uncaught Throwable (incl psErrThrow) → logged with trace → KILLS THE RENDER, HTTP 500 (if headers unsent)
-	
-	true fatal (parse error, OOM…) → logged [3] → KILLS THE RENDER
+	engine notice/deprecation → logged [1] → daemon: digest → render continues
+
+	engine warning → logged [1] → daemon: PAGES → render continues
+
+	psErrNotice → UNLOGGED [5] → daemon: (nothing to see) → render continues
+
+	psErrWarn → logged [1] → daemon: PAGES → render continues
+
+	psErrFail → logged [1] → daemon: PAGES → render continues
+
+	uncaught Throwable (incl psErrThrow) → logged with trace → daemon: PAGES → KILLS THE RENDER, HTTP 500 (if headers unsent)
+
+	true fatal (parse error, OOM…) → logged [3] → daemon: PAGES → KILLS THE RENDER
 
 	[1] subject to the flood guard: max 3 identical lines per request, remainder tallied in one line at shutdown
 	[2] build markers are origin-gated as well as severity-gated: only psErrFail aborts builds; an engine-origin "failure" is tallied in the end-of-build delta like other engine noise
@@ -347,6 +347,31 @@ THE psErr* FAMILY — the app-level error-reporting API (July 2026, error-handli
 All three reporters share psAppReport(): call-site attribution, the checkout order-details mirror, and psReport() with 'app' origin. Build-abort policy: only psErrFail emits the build marker, so only FAILURES abort builds (naming the document); warnings and notices flow to the log, the end-of-build delta, and the build-page panel — visible but not blocking. Severity is display-and-gate taxonomy, not control flow; the reporters never alter execution. psErrThrow deliberately does NOT pre-report — presentation belongs to whoever catches it, or to the exception handler if nobody does.
 
 Historical note: the naming is Paul's, chosen so autocomplete surfaces the whole family from 'psErr', and so throwing is visible in the name at every call site — the legacy error() defaulted everything to failure severity and could never alter control flow, two dishonesties this API retires. */
+
+
+/* ============================================================================
+THE THREE SYSTEMS — ERROR REPORTS vs TELEMETRY vs NOTIFICATIONS (policy settled July 18 2026, psErr* adoption pass)
+
+The psErr* family is one of THREE deliberately separate systems, and choosing the right system matters more than choosing a severity:
+
+1. PROBLEM REPORTS — the psErr* family (this file). For DEFECTS only: something wrong with the code or the content. Audience: the author. The severity ladder says how bad the problem is; context decides presentation (panel, build marker, log line).
+
+2. EVENT RECORDS (telemetry) — quiet purpose-specific log files, never the error log. For events that are NOT defects: visitor behaviour (bots and curious customers probing CIDs and order numbers), external-service hiccups the code absorbed (stale-cache fallbacks), procedural narratives (orders, emails sent). Audience: the operator, later — investigating a complaint, or scanning for aggregate patterns. Tools: logOrderDetails() (ecom--core.php) appends to /logs/order-details.txt, the per-customer ecommerce/login narrative — prefer it when the event belongs in a customer's story; logToFile('whatever-log.txt', $msg) (util--core.php) appends timestamped lines to any file in /logs/ — the generic channel-maker (email-log.txt, api-hiccups-log.txt). Append psErrLogSuffix() to the message manually when the [url:|doc:] attribution is worth having.
+
+3. NOTIFICATIONS — deliberate interruptions, used sparingly: myReport($msg) (email--functions.php) emails Paul a note-to-self; notifyMe($msg, $appToken) (util--core.php) sends a Pushover push. Most notification traffic should come from the AUTOMATIC layer instead: tools/error-logs-daemon.php (prod cron, 10 min) watches the error logs and decides what is worth an interruption — fatal/failure/warning/unrecognized lines page immediately, deprecations and notices roll into a daily digest email. "Too minor to page about, too real to ignore" is therefore a DAEMON property, not a severity — there is deliberately no psErrTrivial, and the paging threshold lives in the notification layer where it can change without touching any call site.
+
+The sorting rules in practice:
+
+- Something is wrong with my code or content → psErr*, severity by how bad it is. If you need to hear about it from production, it's at least psErrWarn (notices are unlogged on live). The bar for the error log is CONSEQUENCE-BEARING OR ACTIONABLE, because the daemon makes that log a paging channel.
+
+- Nothing is wrong, but the event deserves a record → telemetry: logOrderDetails() if it's part of a customer's story, a logToFile() channel otherwise. NOT a psErr* at any severity, no matter how minor.
+
+- Paul must be interrupted directly, even though nothing landed in the error log → myReport()/notifyMe(), rare and deliberate (see checkoutError() in ecom--core.php for the canonical log+email combo).
+
+WHY psErrNotice STAYS A NO-OP ON LIVE (the question that settled this policy): the ladder's audience is the author, and notice is its "only matters while I'm working" rung — production is the one context where that audience is guaranteed absent. Logging live notices anywhere would also let authoring FYIs on dynamically-rendered pages (member books, bibliography.php) churn a file by the thousands, and would end the fearless-sprinkling property: today a note-to-self can be dropped into any content with zero thought about production consequences. Telemetry superficially resembles "notices in production" (quiet, informational), but differs in audience and purpose — which is why it lives in system 2, and why logToFile/myReport/notifyMe keep their plain descriptive names rather than being dressed up as psErr-anything.
+
+Precedents from the adoption pass (July 2026): account-login.php, fetch-code.php, and checkout/lookup.php — visitor telemetry demoted from psErr* to logOrderDetails(), each with a commented-out myReport() beside it as a resume-the-emails escape hatch; ecom--subscriptions.php — absorbed API hiccups to api-hiccups-log.txt while customer-degrading failures stay psErrWarn (split by consequence, and a sustained outage self-escalates through the no-fallback path). */
+
 
 class PsError extends RuntimeException {}
 

@@ -75,6 +75,7 @@ foreach ($args as $arg) {
 
 	if (substr($arg,-2) == 'px') { // if an arbitrary pixel width is declared ("300px"), the actual image width will be replaced, and browser image scaling is used to render the image at that width (generally great quality these days)
 		$resizeToWidth = str_replace("px", '', $arg);
+		if ($w > 0) $h = (int) round($h * ($resizeToWidth / $w)); // scale the height to preserve the aspect ratio (same fix as img() in content--images.php); must happen before $w is overwritten ($w > 0 guards against a failed getimagesize)
 		$w = $resizeToWidth;
 //		exit("{$w}px");
 	}

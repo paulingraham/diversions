@@ -1489,7 +1489,7 @@ function getInternalCites ($citekey) {
 	$allcites = $record->get("cites"); // get the list of harvested citekeys, e.g. "epsom, lbp, ways_to_hurt"
 	$allcites_arr = arraynge($allcites, ", "); // make an array from the list
 	foreach ($allcites_arr as $ck) {  // go through the list
-		$record = $sources->safeGet($ck); // get the record for e.g. §gru or §epsom
+		$record = $sources->safeGet($ck); // get the record for e.g. §grundy1984 or §epsom
 		// printArr($allcites_arr); echo "$citekey cites $ck which is type==" . $record->get('type'); exit;
 		if ($record->get('type') == 'mine') { // if it’s an @mine record…
 			$citekeys_arr[] = $ck; // save it
