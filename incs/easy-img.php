@@ -34,7 +34,10 @@ global $settings; extract($settings);
 $path = STAGE . "/{$imgs_dir}/$filename"; // absolute `path to the images
 $src = "{$imgs_dir}/$filename"; // IMGS is set in location.php and is the absolute host file system path to the filename
 
-if (!file_exists($path)) return "  !!! IMG FILE '$filename' NOT FOUND !!! "; // report just the filename, not $path: the full path churns between machines (this runs on two Macs with different home dirs), producing spurious rendered-output diffs on every cross-machine build
+if (!file_exists($path)) { // missing image: failure-severity by the visible-gibberish rule (the placeholder below ships to readers), so builds abort rather than publish it — this was the last unreported placeholder path after img() got its reporter in July 2026 (psErr* audit item 7); blog-safe: make-ps-blog.php loads util--errors.php before any shared code
+	psErrFail("easy-img: image file '$filename' not found — the '!!! IMG FILE NOT FOUND !!!' placeholder would ship");
+	return "  !!! IMG FILE '$filename' NOT FOUND !!! "; // report just the filename, not $path: the full path churns between machines (this runs on two Macs with different home dirs), producing spurious rendered-output diffs on every cross-machine build
+	}
 
 // So if we didn't find anything, that's the end of it. But if we did find a file, well then by golly we just keep on truckin' ...
 

@@ -161,7 +161,7 @@ function getTags ($tag_fn = false) {
 	if (file_exists($tag_fn))
 		$lines = file($tag_fn); // we want to preserve LFs as entered in the header, so instead of FILE_SKIP_EMPTY_LINES here, it’ll be some trimming below
 	else {
-		echo "tag data file '$tag_fn' not found";
+		psErrWarn("tag data file '$tag_fn' not found — getTags() returns false and the whole tag subsystem no-ops for this run"); // was a bare echo (invisible to every build scan) until the psErr* audit (batch 2); precedent for the danger: getAllTagUsages' docblock records the tag exporter silently failing for months
 		return false;
 		}
 
@@ -170,6 +170,8 @@ function getTags ($tag_fn = false) {
 	if ($journalling) journal("reading tags from file: $tag_fn",1,true);
 
 	$tags_header = "";
+	$tags = []; // initialize (psErr* audit batch 3): a tag file whose body yields ZERO tags previously left $tags undefined and fatalled at the ksort() below; now it returns an empty array, and the downstream updateTags()/makeTagIndexes() guards report the skip
+	$GLOBALS['tag_thesaurus'] = []; // same fix for the second ksort victim, discovered when the first fix exposed it
 	foreach ($lines as $line) { // loop through all lines
 	if (!isset($finished_header)) { // if we’re not yet finished reading the header …
 		$tags_header .= $line; // build a duplicate of the header
@@ -263,7 +265,10 @@ function getTags ($tag_fn = false) {
 			if ($tag_field == "par") 	$tag_field = "parents"; // expand shorthand for parents
 			if ($tag_field == "pars") 	$tag_field = "parents"; // expand shorthand for parents
 			if ($tag_field == "desc") 	$tag_field = "description"; // expand shorthand for description
-			if (!in_array($tag_field, $tag_fields)) continue; // #2do: error for incorrect fields
+			if (!in_array($tag_field, $tag_fields)) { // unknown field name (the long-standing '#2do: error for incorrect fields', finally done — psErr* audit batch 2)
+				psErrWarn("unrecognized tag field '$tag_field' on tag '$current_key' in the tag data file — its data is ignored, and the next updateTags() canonicalizing rewrite will DELETE it permanently (probably a typo; known fields: " . implode(', ', $tag_fields) . ")");
+				continue;
+				}
 
 			if ($tag_field == "synonyms") {
 				$tag_data = arraynge($tag_data, ','); // get an array of CSVs
@@ -569,7 +574,7 @@ function getTagParentsNew ($tag_given, $tags_parents = array()) {
 /** returns @multi: builds the tags data file from PubSys posts and srcs.tags.bib and makes tag QRGs  */
 function updateTags() {
 	journal("looking for new tags in posts",1,true);
-	global $tags; if (!$tags) return;
+	global $tags; if (!$tags) { psErrWarn('updateTags() called with no tag data — the entire tag update (tallies, new-tag harvest, QRGs, canonicalized file) is being skipped this run'); return; } // silent skip until the psErr* audit (batch 2): downstream half of the missing-tag-file cascade reported by getTags()
 	global $sitecode; $tag_fn = "guts/tags-{$sitecode}.txt";
 	$tags = tallyTags($tags); // add ALL tags from srcs.bib, major step
 	$tags = getBlogTags($tags); // add NEW tags from PubSys posts
@@ -617,7 +622,7 @@ echo "</span></pre>"; /* */
 function makeTagIndexes () {
 	if ($GLOBALS['ps']) return; // exit ƒ if this is PS
 	journal("making tag index pages",2, true);
-	global $tags; if (!$tags) return;
+	global $tags; if (!$tags) { psErrWarn('makeTagIndexes() called with no tag data — tag index pages are not being rebuilt this run'); return; } // same cascade as updateTags(), family-blog side
 	foreach ($tags as $tag) {
 		if ($tag['tally#'] < 6) continue; // exclude rare tags
 		$tagged_posts = getPostsByTag($tag['true'], false); // get an array of posts with this tag; false param tells function not to bother find the true form of the tag via getTag, because we know we already have a true tag

@@ -142,12 +142,18 @@ function saveAs($str, $fn, $mode='w') {
 	if ($str == NULL) $str = '';
 	$fp = @fopen($fn, $mode);
 	if (!$fp) {
-		echo "<br><strong>warning</strong>: could not write file '$fn'<br>";	
+		/* failure-severity by doctrine: every build artifact funnels through this function, and intended-output-not-produced is broken content — the old bare echo here matched none of make-all.command's failure scans, so a failed write shipped stale files under a green build (psErr* adoption audit, July 2026). Guarded because this file is family-blog shared code and also runs in standalone contexts (CLI scripts) without util--errors.php — same guard pattern as sql.php's no-connection reporter. */
+		if (function_exists('psErrFail')) psErrFail("saveAs() could not open '$fn' for writing (mode '$mode')");
+		else echo "<br><strong>warning</strong>: could not write file '$fn'<br>";
 		return;
 		}
 	// default w mode: open for writing only; truncate file to zero; create if needed
-	fwrite($fp, $str);
+	$written = fwrite($fp, $str);
 	fclose($fp);
+	if ($written !== strlen($str)) { // partial write (disk full, quota): sneakier than a failed open — the file exists but is truncated
+		if (function_exists('psErrFail')) psErrFail("saveAs() wrote only " . var_export($written, true) . " of " . strlen($str) . " bytes to '$fn'");
+		else echo "<br><strong>warning</strong>: incomplete write to file '$fn'<br>";
+		}
 	}
 
 /** returns @file: checks string against file, saves only if different */
@@ -599,13 +605,15 @@ function renderPhpStr ($string) {
 	Note: renderPhpStr(file_get_contents(file)) === renderPhpFile(file,true) */
 function renderPhpFile ($file, $new_name = false, $return = false) {
 	$file_contents = file_get_contents($file);
+	if ($file_contents === false) { /* missing/unreadable source file: before the July 2026 psErr* audit (item 9), the false quietly became renderPhpStr('') and an EMPTY .html was still written, destructively replacing the previous good output (callers include the blog home page and tag-index templates). Now: report and refuse — the previous rendered file, if any, stays in place. Guarded like saveAs() for standalone contexts. */
+		if (function_exists('psErrFail')) psErrFail("renderPhpFile() could not read '$file' — nothing rendered, no output written");
+		return $return ? '' : null;
+		}
 	$rendered_contents = renderPhpStr($file_contents);
 	if ($return) return $rendered_contents;
 	if (!$new_name) $html_fn = str_replace("php", "html", $file);
 		else $html_fn = $new_name . ".html";
-	$fp = fopen($html_fn, "w"); // w = create a new file
-	fwrite($fp, $rendered_contents);
-	fclose($fp);
+	saveAs($rendered_contents, $html_fn); // via saveAs since July 2026 (was a raw unchecked fopen/fwrite): inherits its write-failure and partial-write reporting
 	}
 
 /** returns @array, arguments: converts "sloppy" strings of entered data into tidy array of arguments
@@ -681,6 +689,11 @@ returns an array with this structure
 what about synonyms? 	for synonyms, it's convenient and nice to do a single check off the values with in_array, which requires the date to look like this:
 	fruit => array(fruit, apples, oranges, pears) */
 	$lns = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES | FILE_USE_INCLUDE_PATH);
+	if ($lns === false) { /* missing/unreadable data file: before the July 2026 psErr* audit (item 10), the false limped through foreach warnings and callers proceeded with NO data at all — e.g. a missing synonyms file (shared-copied to the family blogs, a plausible drift casualty) silently disabled every shorthand expansion corpus-wide while the build finished green. Failure severity: config-data loss corrupts rendered content wholesale. Guarded like saveAs() for standalone contexts. */
+		if (function_exists('psErrFail')) psErrFail("getArrFromFile() could not read '$filename' — returning an empty array, so callers run with NO data (synonyms, shorthands, config)");
+		return [];
+		}
+	$array = []; // initialize: a file with no marker lines previously returned an undefined variable
 	foreach($lns as $ln) {
 		$pattern = "/^\s*[\*•—]\s*(\w)/u";
 		if (preg_replace($pattern, "$1", $ln) === $ln) continue; // if no data marker is found (line is unchanged by replacing it), skip this line
@@ -931,11 +944,7 @@ function checkCitekey($citekey) {
 	}
 
 /** returns @null: unsets each variable previously extracted from an array */
-function unsetExtractions($array) {
-	if (!is_array($array)) return false;
-	if (count($array) == count($myarray, COUNT_RECURSIVE)) return false; // returns the array if it’s not mult-dimensional
-	foreach ($array as $key=>$value) unset($GLOBALS[$key]); // unset will not work directly on global vars, must use $globals
-	}
+/* unsetExtractions() was deleted here in the psErr* audit (batch 3): zero callers anywhere, and it referenced an undefined $myarray that would have thrown a TypeError if it were ever called — a latent fatal in a shared file. */
 
 /** returns @array, record data: an array of field and pseudofield data, converted from a record object */
 function recordObjToArr($record_obj) {
@@ -1037,7 +1046,10 @@ function ogimg ($img_filename) {
 //	exit($img_filename . " > " . $pageimg_file);
 
 	if (!file_exists($pageimg_file)) {
-	echo "<!-- missing featured image: $img_filename -->"; return; }
+		psErrNotice("featured image '$img_filename' does not exist — no og:image from it (an authoring FYI: fix the filename or the file; callers may substitute the default image)"); // was only an HTML comment until the psErr* audit (batch 2), and worse, the set-but-missing case silently defeated head.php's default-image fallback, shipping pages with NO og:image at all
+		echo "<!-- missing featured image: $img_filename -->";
+		return false; // distinguishable from the void success path so printOgImg/head.php can fall back
+		}
 
 	$imagedata = getimagesize($pageimg_file);
 	$w = $imagedata[0];
@@ -1061,11 +1073,17 @@ return $ogoutput;
 }
 
 function printOgImg ($img_filename) {
-echo ogimg($img_filename);
+$out = ogimg($img_filename);
+echo $out;
+return $out !== false; // false = the image file was missing (see ogimg); head.php uses this to fall back to the default share image
 }
 
 function minifyCSS ($filename) {
-$css = file_get_contents($filename, true); // Remove comments; true = USE_INCLUDE_PATH
+$css = file_get_contents($filename, true); // true = USE_INCLUDE_PATH
+if ($css === false) { /* audit batch 3: head.php inlines this into literally every page — an unreadable CSS file previously yielded empty critical CSS (unstyled above-the-fold) under a native warning that didn't stop the build. An empty return is never acceptable output, so failure-severity: builds abort. Guarded like saveAs (shared/standalone contexts). */
+	if (function_exists('psErrFail')) psErrFail("minifyCSS could not read '$filename' — pages would ship with EMPTY inlined CSS");
+	return '';
+	}
 $css = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $css); // Remove space after colons
 $css = str_replace(array("\r\n", "\r", "\n", "\t", '  ', '    ', '    '), '', $css);
 $css = str_replace(', ', ',', $css); // Remove whitespace
@@ -1116,7 +1134,10 @@ function getLastUpd ($updated) {
 		else $file = $_pathdoc;
 	$file_str = file_get_contents($file);
 	if (!inStr("upd_item",$file_str)) return $updated; // no upd_items? no point! use the deprecated php var $updated after all; these are now used only in documents that haven’t been updated since mid-2016
-	preg_match('|<p class="upd_item" data-scope=".*?"><\?php echo printUpd\("(.+?)"|', $file_str, $match); // this matches only the first occurrence, and we are trusting that the first upd_item to be the most recent
+	if (!preg_match('|<p class="upd_item" data-scope=".*?"><\?php echo printUpd\("(.+?)"|', $file_str, $match)) { // this matches only the first occurrence, and we are trusting that the first upd_item to be the most recent
+		psErrWarn("getLastUpd: the document contains 'upd_item' but none matched the expected markup pattern — update-date markup has drifted, falling back to the deprecated \$updated variable ('" . ($updated ?: 'empty') . "')"); // audit batch 3: previously an undefined-index warning and a null return, making update dates render wrong with no connected diagnosis
+		return $updated;
+		}
 	return $match[1];
 	}
 
@@ -1287,8 +1308,12 @@ function notifyMe($message, $app_token, $sound = "pushover") { // notify myself 
 	  CURLOPT_SAFE_UPLOAD => true,
 	  CURLOPT_RETURNTRANSFER => true,
 	));
-	curl_exec($ch);
+	$response = curl_exec($ch);
+	$httpCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+	$curlErr = curl_error($ch);
 	curl_close($ch);
+	if ($response === false or $httpCode !== 200) /* the alarm channel itself failing is the worst possible place for silence — a dead alarm looks identical to a quiet day (psErr* audit batch 2). Telemetry by doctrine, not a psErr*: an external-service hiccup, recorded quietly where a "why didn't I get pinged?" investigation will look. */
+		logToFile('notify-failures-log.txt', "Pushover send FAILED (HTTP {$httpCode}" . ($curlErr ? "; {$curlErr}" : '') . ') — undelivered message: ' . mb_substr($message, 0, 120));
 	}
 
 function linky($citekey, $anchor) { // echo text with a link to a citekey only if the current page is different
@@ -1320,7 +1345,11 @@ function makeTOCpreview($content, $default_heading = true) {
 	$toc = '';
 	// warning: multiple member areas (e.g. if there's also an audio embed) have the potential to make it very difficult to accurately detect the start and end position of the main member area
 	$startPos = mb_strpos($content, 'makeTOC');
-	$endPos = mb_strpos($content, '#memberContent-end'); 
+	$endPos = mb_strpos($content, '#memberContent-end');
+	if ($startPos === false or $endPos === false or $endPos < $startPos) { /* unguarded until the psErr* audit (batch 2): a missing marker coerced false to position 0 or produced a negative length, rendering an empty or garbled preview under the "PREVIEW: Headings…" sales-pitch heading (~8 published articles use this, and the function's own comment warns detection is fragile). Report and render nothing — no heading over emptiness. */
+		psErrWarn('makeTOCpreview could not find its extraction markers (' . ($startPos === false ? "'makeTOC' missing" : "'#memberContent-end' missing or before 'makeTOC'") . ') — the members-only TOC preview was omitted');
+		return;
+		}
 	// var_dump($startPos, $endPos);
 	$membersOnlyContent = mb_substr($content, $startPos, $endPos-$startPos);
 	//	var_dump(htmlspecialchars($membersOnlyContent));
@@ -1328,6 +1357,7 @@ function makeTOCpreview($content, $default_heading = true) {
 		preg_match_all('|"head" =>\s*"(.+?)",|', $membersOnlyContent, $matches);
 	 else
 		preg_match_all('|<h[234].*?>(.+?)</h\d>|', $membersOnlyContent, $matches);
+	if (empty($matches[1])) { psErrWarn('makeTOCpreview found its markers but ZERO headings between them — the members-only TOC preview was omitted'); return; } // audit batch 2: same reader-visible-emptiness rationale as the marker guard above
 	foreach ($matches[1] as $heading) $toc .= "<li>$heading</li>";
 	$toc = "<ul id='tighter'>$toc</ul>";
 	if ($default_heading == true) echo "<h3>PREVIEW: Headings in the members-only area…</h3>\n\n";

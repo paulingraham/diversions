@@ -268,8 +268,10 @@ $post = array('canonical' => null,
 					$post['post_audio_dur'] = getDurationOfAudioInSecs($audio_path);
 					$post['post_audio_dur_time'] = intval($post['post_audio_dur'] / 60) . ':' . str_pad($post['post_audio_dur'] % 60, 2, '0', STR_PAD_LEFT); // The seconds may be <10secs and those need to zero-padded. Surprisingly tricky, but str_pad does the job, adding 0 only to increase 1-9 to 01-09, but leaving 10-59 alone. I think ;-)
 				} else {
-					journal("warning: cannot find post audio file $mdo, post dated {$post['date']}", 2, true);
-					break;
+					journal("warning: cannot find post audio file $mdo, post dated {$post['date']}", 2, true); // journal = the live build narrative (and make-all's warning scan); psErrWarn = the permanent record (log, panel, delta)
+					psErrWarn("cannot find post audio file $mdo, post dated {$post['date']} — publishing the post without audio");
+					unset($post['post_audio']); // already assigned above; left set, it would render a player/enclosure pointing at a dead URL
+					continue; /* was `break` until the July 2026 psErr* adoption audit: breaking exited the whole metadata loop, silently discarding every metadata item AFTER the audio line (tags, noindex, preview, canonical…) — the reported symptom (missing mp3) masked the much worse unreported one (post published with wrong flags) */
 				}
 			}
 
@@ -695,8 +697,10 @@ $post = array('canonical' => null,
 					$post['post_audio_dur'] = getDurationOfAudioInSecs($audio_path);
 					$post['post_audio_dur_time'] = intval($post['post_audio_dur'] / 60) . ':' . str_pad($post['post_audio_dur'] % 60, 2, '0', STR_PAD_LEFT); // The seconds may be <10secs and those need to zero-padded. Surprisingly tricky, but str_pad does the job, adding 0 only to increase 1-9 to 01-09, but leaving 10-59 alone. I think ;-)
 				} else {
-					journal("warning: cannot find post audio file $mdo, post dated {$post['date']}", 2, true);
-					break;
+					journal("warning: cannot find post audio file $mdo, post dated {$post['date']}", 2, true); // journal = the live build narrative (and make-all's warning scan); psErrWarn = the permanent record (log, panel, delta)
+					psErrWarn("cannot find post audio file $mdo, post dated {$post['date']} — publishing the post without audio");
+					unset($post['post_audio']); // already assigned above; left set, it would render a player/enclosure pointing at a dead URL
+					continue; /* was `break` until the July 2026 psErr* adoption audit: breaking exited the whole metadata loop, silently discarding every metadata item AFTER the audio line (tags, noindex, preview, canonical…) — the reported symptom (missing mp3) masked the much worse unreported one (post published with wrong flags) */
 				}
 			}
 
@@ -824,7 +828,7 @@ function makeWebVersions()
 			continue;
 		}
 		if (!empty($post['lock'])) {
-			journal('skipping locked post [' . substr($post['title_smpl'], 0, 25) . ']', 2, true);
+			journal('skipping locked post [' . mb_substr($post['title_smpl'], 0, 25) . ']', 2, true);
 			continue;
 		}
 
@@ -1306,21 +1310,28 @@ function prepareContent($content)
 			// 1. check to see if it is a known synonym
 			// 2. look for and capture both the shorthand and
 			//	 then white-space, then replace sh with content
+			$sh_known = false; // psErr* audit batch 3: track category membership so an unmatched shorthand can be reported instead of shipping literally
 			if (in_array($sh, $sh_syns['clear'])) {
 				$content = preg_replace("@({$crs})!{$sh}({$crs})@", "$1<br style='clear:both'>$2", $content);
+				$sh_known = true;
 			}
 
 			if (in_array($sh, $sh_syns['break'])) {
 				$content = preg_replace("@({$crs})!{$sh}({$crs})@", '$1<br>$2', $content);
+				$sh_known = true;
 			}
 
 			if (in_array($sh, $sh_syns['stars'])) {
 				$content = preg_replace("@({$crs})!{$sh}({$crs})@", "$1<div class='separator stars'>&#9733; &#9733; &#9733;</div>$2", $content);
+				$sh_known = true;
 			}
 
 			if (in_array($sh, $sh_syns['sidebar'])) {
 				$content = preg_replace("@({$crs})!{$sh}{$crs}(.*?)({$crs})@", "$1<p class='sidebar'>$2</p>$3", $content);
+				$sh_known = true;
 			}
+
+			if (!$sh_known) psErrWarn("shorthand '!{$sh}' matches no category in synonyms-pubsys-shorthands.txt (probably a typo) — the literal '!{$sh}' will ship in rendered output"); // audit batch 3: a one-character authoring slip previously shipped reader-visible junk silently
 		}
 	}
 
@@ -1470,6 +1481,7 @@ function makeRSS($max = 30)
 			$content_member = preg_replace('|<!-- paywall markup: non-member start -->(.+?)<!-- paywall markup: non-member end -->|s', '', $content);
 			$content_member = preg_replace('|<div.{0,100}x-show=["\']\!member["\'].{0,100}>.*?</div>|s', '', $content_member);
 			$content_member = preg_replace("|<span(.+?)x-show='!member'(.*?)>(.+?)</span>|", '', $content_member);
+			if (strpos($content_member, 'paywall markup: non-member') !== false) psErrWarn("RSS member version of '{$title}' still contains a 'paywall markup: non-member' marker after stripping — an unpaired/malformed delimiter left teaser content in the member feed (cosmetic, but the markup needs fixing)");
 			$audio_blurb_top = $audio_blurb_bottom = null;
 			if ($post['post_audio'] and $title !== 'Podcast at last!') { //podcast_content #dated_content // had to special case the inclusion of the standard audio blurbs for the podcast announcement post because it was conspicuously redundant
 				$audio_blurb_top = "<p><em><small>There is an audio version of this post ({$post['post_audio_dur_time']}) in the PainSci Updates podcast for members only. See the end of the post for more information.</small></em></p>\n\n<hr>\n\n";
@@ -1482,6 +1494,11 @@ function makeRSS($max = 30)
 
 			// Now finish the non-member version of the post by removing member content.
 			$content = preg_replace('|<!-- paywall markup: member start -->(.+?)<!-- paywall markup: member end -->|s', '', $content); // Delete member content.
+			/* Post-strip verification (July 2026 psErr* audit item 8): the strip above is delimiter-regex-based with no other safety net — one unpaired or malformed marker (start without end) and MEMBER CONTENT SHIPS IN THE FREE PUBLIC FEED, silently. Any surviving 'paywall markup: member' string is proof of exactly that. (The needle cannot false-match the legitimately-remaining 'paywall markup: non-member' comment delimiters.) Report AND refuse: makeRSS runs outside the per-post marker-scan loop, so psErrFail alone does not stop the feed files from being written (verified during the audit — the leak reached stage/rss.xml); with an unpaired marker there is no way to know where member content begins or ends, so the only safe free version is no content at all. */
+			if (strpos($content, 'paywall markup: member') !== false) {
+				psErrFail("RSS free version of '{$title}' still contains a 'paywall markup: member' marker after stripping — an unpaired/malformed delimiter would LEAK MEMBER CONTENT INTO THE FREE PUBLIC FEED; free content replaced with a placeholder");
+				$content = '<p><em>The free version of this post could not be generated safely. Please read it on the website.</em></p>';
+			}
 			$content = preg_replace('|<[/]*?template.*?>|', '', $content); // Remove <template> elements, which RSS reeders may not know what to do with (resulting in non-member content being invisible, which is bad). This is mostly due to the <template> element.
 		}
 
@@ -2038,7 +2055,9 @@ function get_description($post)
 	// or it could be marked up with the ∂ symbol
 	//	if ($post_audio) echo "<pre>" . htmlentities($html) . "</pre>";
 	if (strpos($html, '∂') !== false) {
-		$description = get_marked_text($html, '∂');
+		$marked = get_marked_text($html, '∂');
+		if ($marked) $description = $marked;
+		else psErrNotice('get_description: this post contains a ∂ description marker but extraction returned nothing (unpaired ∂?) — the author-marked description was discarded, falling back to the whole-content whittle'); // audit batch 3: author intent was previously discarded with no report at all
 		$post['html'] = str_replace('∂', '', $html); // remove ∂s from the html
 		$post['content'] = str_replace('∂', '', $content); // remove ∂s from the content
 	}
@@ -2467,7 +2486,7 @@ function deal_with_citekeys($md, $post)
 		return $post;
 	} // exit ƒ if this isn’t PS
 //	if ($post["date"] == "2013-10-30") echo "!";
-	if ($md < 60 and ! inStr(' ', $md)) { // if it's a short string with no spaces, look for a valid citekey …
+	if (strlen($md) < 60 and ! inStr(' ', $md)) { // if it's a short string with no spaces, look for a valid citekey … (strlen since July 2026: the original bare `$md < 60` was PHP-7 type juggling — under PHP 8's string/number comparison rules 'epsom26' < 60 is FALSE, so this branch had been silently dead for all alphabetic citekeys since the PHP 8 migration, stripping legacy posts of their citekey enrichment on every full rebuild; psErr* audit item 11)
 		global $sources;
 		if ($sources->safeGet($md)->isValid()) {
 			$post['citekey'] = $ck = $md;
@@ -2555,16 +2574,16 @@ function make_post_matrix($echo = true, $save = true)
 		// fine-tuning of variables for tabular output
 		$date_str = date('M j, y', parseDate($post['date'])); // format a standard simple date string
 		$prioritySort = 0 + ($post['priority'] ?? 0);
-		if (strlen($post['title']) > 50) { // clip long titles...
-			$title_clipped = substr($post['title'], 0, 50) . " <span class='truncation_symbol'></span>";
+		if (mb_strlen($post['title']) > 50) { // clip long titles... (mb_* because titles are prose and routinely contain curly quotes/dashes; byte-based substr() splits a multi-byte character in half and emits invalid UTF-8)
+			$title_clipped = mb_substr($post['title'], 0, 50) . " <span class='truncation_symbol'></span>";
 		} else {
 			$title_clipped = $post['title'];
 		}
 		$linked_title = "<a href='{$post['url_stage']}' title='{$post['title']}'>$title_clipped</a>";
 		$tags = str_replace(',', ', ', $post['tags']);
 		$src_file = $post['source_file'];
-		if (strlen($src_file) > 40) { // clip long source_file names
-			$src_file = substr($post['source_file'], 0, 40);
+		if (mb_strlen($src_file) > 40) { // clip long source_file names
+			$src_file = mb_substr($post['source_file'], 0, 40);
 		}
 		// #2do, maybe someday I can figure out how to build a link for opening files again
 		// $src_file_url = "file://localhost{$stage}/posts/" . rawurlencode($src_file);
