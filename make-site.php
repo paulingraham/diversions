@@ -113,7 +113,15 @@ if ($ps) require_once($_SERVER['DOCUMENT_ROOT'] . "/incs/environment.php");
 
 if (!$ps)  { // without the PS environment, we need at least Composer installed classes (chiefly php-markdown)
 	require_once __DIR__ . '/incs/vendor/autoload.php';
-	require_once "$root_parent/painscience/incs/performance-timing.php"; // #timing_code — stubs when off; no-ops for non-PS blogs that don't have their own .env timing flag
+
+	/* #timing_code — no-op stubs for this script's own tstart/tstop/tRenderInline instrumentation calls. On PS the real functions arrive via environment.php; the blogs get these stubs, mirroring the stub branch of painscience's performance-timing.php. Declared inline rather than required from the painscience folder because blog code may not reference ANYTHING outside its own folder — the family Macs have no /painscience/, and the old cross-folder require fataled their builds (July 2026). Declarations inside this if-block are registered at runtime only, so they can't collide with the real definitions on the PS path. */
+	function tstart(string $label): void {}         // #timing_code
+	function tstop(string $label): void {}          // #timing_code
+	function tmark(string $label): void {}          // #timing_code
+	function tastart(string $label): void {}        // #timing_code
+	function tastop(string $label): void {}         // #timing_code
+	function tflush(): void {}                      // #timing_code
+	function tRenderInline(): string { return ''; } // #timing_code
 	}
 
 
