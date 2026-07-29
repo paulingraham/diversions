@@ -1267,6 +1267,7 @@ function makeHomepage()
 
 	// renders the home page template file (which includes the index-post-list)
 	$home_page_str = renderPhpFile('guts/template-home-page.php', false, true);
+	if ($home_page_str === '') return; // read failure (renderPhpFile already fired psErrFail): refuse to overwrite the previous good index.html with an empty page — completes the July 2026 audit item-9 protection on this $return=true path
 
 	$fn = STAGE . '/index.html'; // `path
 	if (fileExistsNoChange($home_page_str, $fn)) {

@@ -630,6 +630,7 @@ function makeTagIndexes () {
 		if (!$tagged_posts) continue;
 		$ti_posts_table = make_post_index($tagged_posts); // generate a table of post links (make_post_index defaults to a table)
 		$ti_page = renderPhpFile("guts/template-tag-index.php",false,true); // get the RENDERED contents of the template
+		if ($ti_page === '') return; // read failure (renderPhpFile already fired psErrFail): the same template serves every tag, so abort the whole index build rather than repeat the failure per tag — and never write blank tag-index pages (completes the July 2026 audit item-9 protection on this $return=true path)
 		// #2do probably should use the short version of the tag, if available; easy but not super important
 		$ti_page = str_replace('{$ti_tag}', $tag['true'], $ti_page); 
 		$ti_page = str_replace('{$ti_tag_count}', $tag['tally#'], $ti_page);
