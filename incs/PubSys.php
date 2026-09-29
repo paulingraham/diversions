@@ -1109,7 +1109,7 @@ Convert that to:
 	// first strip out zoom links; this doesn't remove the </a>, but that will get stripped out later
 	$theContent = preg_replace("|<a href='.+?' target='_blank' title='Embiggen! Open larger version in new tab/window.'>\n*|", '', $theContent);
 
-	// Run-in caption headings (the `cap:Lead-in*rest` source form) render as a caphead <p> immediately followed by a body <p>; the generic caption pattern below would swallow the pair whole, and the interior </p><p…> tags get dropped downstream, welding the lead-in to the caption text ("Where it all beganThe first page…" — defect confirmed Aug 2026, reverse-referral post). Convert the pair to one caption with the lead-in bolded plus an em dash, the established hand-fix form.
+	// Run-in caption headings (the `caphead:Lead-in---cap:rest` source form) render as a caphead <p> immediately followed by a body <p>; the generic caption pattern below would swallow the pair whole, and the interior </p><p…> tags get dropped downstream, welding the lead-in to the caption text ("Where it all beganThe first page…" — defect confirmed Aug 2026, reverse-referral post). Convert the pair to one caption with the lead-in bolded plus an em dash, the established hand-fix form.
 	$theContent = preg_replace("|<p class='capt caphead[^']*'><!--caption-->(.+?)</p><p class='capt[^']*'>(.+?)<!--/caption--></p>|", ' <CAPTION><strong>$1</strong> — $2</CAPTION> ', $theContent);
 
 	// Managing captions and bylines is tricky because they are in the wrong order for the Buttondown format, and there may be one, the other, both, or neither.

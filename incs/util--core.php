@@ -634,30 +634,26 @@ function parseSloppyData($user_input) {
 	$user_input = preg_replace_callback("/<<.*?>>/uis", 'maskNestedDelims', $user_input);
 
 	if (strpos($user_input,"\n") > 0 || strpos($user_input,"\r") > 0 || strpos($user_input,"\t") > 0) {
-		// If there are any CRs or tabs, convert them to triple-hyphens.
-		$user_input = preg_replace("/[\n\r\t]+/","---",$user_input);  
-		}		
-		
-	// convert 3 or more hyphens to triple-asterisks
-	$user_input = preg_replace("/-{3,}/","***",$user_input);
-	
+		// If there are any CRs or tabs, convert them to triple-hyphens (first, so that a mixed run like ---⇥--- still collapses into ONE delimiter below)
+		$user_input = preg_replace("/[\n\r\t]+/","---",$user_input);
+		}
+
+	/* Convert every run of 3+ hyphens to the internal delimiter: ASCII unit separator, a control character that cannot occur in typed content. Until Sept 2026 the internal delimiter was "***", which collided with Markdown emphasis at field edges: a field ending in *emphasis* lost its closing asterisk, either to an edge trim (last field) or to explode() splitting at the FIRST three of four consecutive asterisks (any other field — where the stray asterisk also leaked into the NEXT field, e.g. "*right" or "*tags:…", silently breaking it). */
+	$delim = "\x1F";
+	$user_input = preg_replace("/-{3,}/",$delim,$user_input);
+
 	$user_input = str_replace("Phone=--", "Phone=",$user_input);
 	
 /*	// are there any hyphens left?
 	if (strpos($user_input,"--") !== false) {
-			$user_input = preg_replace("/--/","***",$user_input);
+			$user_input = preg_replace("/--/",$delim,$user_input);
 			$warning = "There is a double-hypen in the user input. This is probably intended to be a triple-hyphen, and the user input parser went ahead with that assumption. However, if you wanted to use an actual dash, then use it.";
 			if (function_exists("psErrNotice")) psErrNotice($warning); // guarded for standalone contexts without util--errors.php loaded
 			}	*/
 
-	// are there any spaces?
-	if (strpos($user_input," *") !== false or strpos($user_input,"* ") !== false) {
-			$user_input = preg_replace("/\h+\*\*\*\h+/","***",$user_input);
-			}	
+	$user_input = trim($user_input,$delim); // a stray delimiter at either end would otherwise make an empty first/last argument (whitespace around delimiters needs no handling here: mopParsedUserInput trims every argument)
 
-	$user_input = trim($user_input,"*");
-			
-	$parsedInput = explode("***",$user_input);
+	$parsedInput = explode($delim,$user_input);
 
 	$parsedInput=array_map("mopParsedUserInput",$parsedInput);
 
