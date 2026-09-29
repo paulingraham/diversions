@@ -9,6 +9,8 @@ use \Michelf\Markdown;
 
 function easyImg($user_input = false) {
 
+if ($GLOBALS['ps']) return; // easyImg() is a no-op for PainSci. The easyImg delimiters for an <<image>> are not only not used on the PainSci blog, they are reserved for the much more important purpose of denoting xrefs e.g. <<smith etal>>. 
+
 $args = parseSloppyData($user_input);
 
 $img_opt_syns = getArrFromFile("synonyms-image-options.txt",true);

@@ -17,7 +17,7 @@ Manual (also extremely out of date):
 // Where is PubSys running?
 // the identifier `path is used whereever most key paths are defined, as a troubleshooting aid
 
-date_default_timezone_set('US/Pacific'); // #timezone — keep in sync with the canonical PS_TIMEZONE constant in util--errors.php (hardcoded: this runs BEFORE the loader block requires util--errors.php, and the sync block below writes provenance stamps that were coming out in UTC)
+date_default_timezone_set('America/Los_Angeles'); // #timezone — keep in sync with the canonical PS_TIMEZONE constant in util--errors.php (hardcoded: this runs BEFORE the loader block requires util--errors.php, and the sync block below writes provenance stamps that were coming out in UTC)
 
 $root_dev = $root_true = $_SERVER['DOCUMENT_ROOT'];
 $stage = $root_true 	. "/html";

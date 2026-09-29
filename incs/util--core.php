@@ -753,7 +753,7 @@ function journal($msg, $depth, $echo = false) {
 //	if (!MODE_DEV) return; // journalling is for dev only
 	$x = 0; $msg_class = '';
 	global $jrnl, $a, $b, $c;
-	$msg = str_replace("posts/","",$msg);
+	if (stripos($msg, 'href=') === false) $msg = str_replace('posts/', '', $msg); // cosmetic: shorten "posts/2026-… " source paths in the journal — but never inside a link, where it silently mangled x-bbedit:// URLs into ../blog/<file> (found Aug 2026)
 	if (strpos($msg, "warning") === 0) { $warning = true; $msg_class = "warning"; }
 		else $warning = false;
 	$msg = ucfirst($msg);
@@ -1129,14 +1129,18 @@ echo printArrXML($arr); */
 
 
 function getLastUpd ($updated) {
-	global $build_fn, $_pathdoc;
+	global $build_fn, $_pathdoc, $pubdate;
 	if (MODE_BUILD) $file = $build_fn; // $build_fn is the path+filename set by make-ps in build mode
 		else $file = $_pathdoc;
 	$file_str = file_get_contents($file);
-	if (!inStr("upd_item",$file_str)) return $updated; // no upd_items? no point! use the deprecated php var $updated after all; these are now used only in documents that haven’t been updated since mid-2016
+	if (!inStr("upd_item",$file_str)) { // no update log at all. Since 2026-09-21 every managed document carries at least its "— Publication." item (and the per-document header literal $updated was retired the same day), so the only legitimate way here is a page that assigns $updated dynamically before head.php (blog.php: date of the last post; bibliography.php: now) — honour that. Otherwise it's a brand-new article missing its Publication item: the observed failure (2026-09-20) was an empty $updated rendering as schema dateModified 1999-11-30, so fall back to $pubdate and say so.
+		if ($updated) return $updated;
+		if ($pubdate) psErrWarn("getLastUpd: no upd_item in " . basename($file) . " and no \$updated assigned — falling back to \$pubdate ('$pubdate'); add the '— Publication.' update item"); // a page that declares no $pubdate (account.php, login.php) has opted out of dates altogether: nothing to derive, nothing to warn about — and those two render dynamically on every request, so an unconditional warning here would page on every login (2026-09-21)
+		return $pubdate;
+		}
 	if (!preg_match('|<p class="upd_item" data-scope=".*?"><\?php echo printUpd\("(.+?)"|', $file_str, $match)) { // this matches only the first occurrence, and we are trusting that the first upd_item to be the most recent
-		psErrWarn("getLastUpd: the document contains 'upd_item' but none matched the expected markup pattern — update-date markup has drifted, falling back to the deprecated \$updated variable ('" . ($updated ?: 'empty') . "')"); // audit batch 3: previously an undefined-index warning and a null return, making update dates render wrong with no connected diagnosis
-		return $updated;
+		psErrWarn("getLastUpd: the document contains 'upd_item' but none matched the expected markup pattern — update-date markup has drifted, falling back to \$updated/\$pubdate ('" . ($updated ?: $pubdate) . "')"); // audit batch 3: previously an undefined-index warning and a null return, making update dates render wrong with no connected diagnosis
+		return $updated ?: $pubdate;
 		}
 	return $match[1];
 	}
@@ -1295,6 +1299,8 @@ function topFreqKeys(array $counts, int $minCount = 2): array { // Given an arra
 
 function notifyMe($message, $app_token, $sound = "pushover") { // notify myself via Pushover API, see https://pushover.net/api
 	// echo "posting message '$message' to app '$app_token'<br>";
+	$host = explode('.', gethostname())[0]; // which SERVER is talking: with an old host and a standby running in parallel (Sept 2026 migration) an unlabelled page is ambiguous, and Pushover shows no sender. Every notifyMe() caller gets it here, once; callers that already put "[host]" in the message (the error-logs daemon's subject) aren't doubled. function-tooManyRequests.php has its own curl (minimal bootstrap) and labels itself.
+	if (!str_contains($message, "[$host]")) $message = "[$host] " . $message;
 // if (defined('MODE_DEV')) if (MODE_DEV) return; // no need for push notifications in dev
 	curl_setopt_array($ch = curl_init(), array(
 	  CURLOPT_URL => "https://api.pushover.net/1/messages.json",

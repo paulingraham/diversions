@@ -1,0 +1,1980 @@
+{
+    "simplify": "lowercase; strip spaces and the punctuation list in simplify() (util--core.php); plural/singular variants are pre-expanded in thesaurus",
+    "thesaurus": {
+        "aachen": "Aachen",
+        "aachens": "Aachen",
+        "ab": "abdominals",
+        "abdominal": "abdominals",
+        "abdominalmuscle": "abdominals",
+        "abdominalmuscles": "abdominals",
+        "abdominals": "abdominals",
+        "abductor": "abductors",
+        "abductors": "abductors",
+        "abs": "abdominals",
+        "activitie": "activity",
+        "activities": "activity",
+        "activity": "activity",
+        "activitys": "activity",
+        "adaptingexercise": "adapting exercise",
+        "adaptingexercises": "adapting exercise",
+        "adductor": "adductors",
+        "adductorbrevi": "adductors",
+        "adductorbrevis": "adductors",
+        "adductorlongu": "adductors",
+        "adductorlongus": "adductors",
+        "adductormagnu": "adductors",
+        "adductormagnus": "adductors",
+        "adductors": "adductors",
+        "aerobic": "aerobic",
+        "aerobics": "aerobic",
+        "aging": "aging",
+        "agings": "aging",
+        "airpollution": "air pollution",
+        "airpollutions": "air pollution",
+        "airquality": "air quality",
+        "airqualitys": "air quality",
+        "allen": "Allen",
+        "allens": "Allen",
+        "allergie": "allergies",
+        "allergies": "allergies",
+        "allison": "Allison",
+        "allisons": "Allison",
+        "americancivilwar": "American Civil War",
+        "americancivilwars": "American Civil War",
+        "americanrevolution": "American Revolution",
+        "americanrevolutions": "American Revolution",
+        "anaerobic": "aerobic",
+        "anaerobics": "aerobic",
+        "ankle": "ankle",
+        "ankles": "ankle",
+        "armbone": "arm bones",
+        "armbones": "arm bones",
+        "arthriti": "osteoarthritis",
+        "arthritis": "osteoarthritis",
+        "asthma": "asthma",
+        "asthmas": "asthma",
+        "autobiography": "autobiography",
+        "autobiographys": "autobiography",
+        "av": "av",
+        "avs": "av",
+        "back": "back",
+        "backbone": "backbone",
+        "backbones": "backbone",
+        "backs": "back",
+        "balance": "balance",
+        "balances": "balance",
+        "ball": "ball",
+        "ballandsocketjoint": "ball-and-socket joint",
+        "ballandsocketjoints": "ball-and-socket joint",
+        "balls": "ball",
+        "barometricpressure": "barometric pressure",
+        "barometricpressures": "barometric pressure",
+        "basketball": "basketball",
+        "basketballs": "basketball",
+        "bcrpa": "BCRPA",
+        "bcrpas": "BCRPA",
+        "beaver": "Beaver",
+        "beavers": "Beaver",
+        "bestof": "best of",
+        "bestofs": "best of",
+        "bicep": "biceps",
+        "biceps": "biceps",
+        "bodysystem": "body systems",
+        "bodysystems": "body systems",
+        "bodytemperature": "body temperature",
+        "bodytemperatures": "body temperature",
+        "bone": "bones",
+        "bones": "bones",
+        "boone": "Boone",
+        "boones": "Boone",
+        "bootcamp": "boot camp",
+        "bootcamps": "boot camp",
+        "brain": "brain",
+        "brains": "brain",
+        "brand": "Brand",
+        "brands": "Brand",
+        "breathing": "breathing",
+        "breathings": "breathing",
+        "burn": "burn",
+        "burns": "burn",
+        "calf": "calf",
+        "calfmuscle": "calf muscles",
+        "calfmuscles": "calf muscles",
+        "calfs": "calf",
+        "canadasfoodguide": "Canada's Food Guide",
+        "canadasfoodguides": "Canada's Food Guide",
+        "cancer": "cancer",
+        "cancers": "cancer",
+        "canoe": "canoe",
+        "canoes": "canoe",
+        "cardio": "cardio",
+        "cardios": "cardio",
+        "cardiovascular": "cardiovascular",
+        "cardiovasculars": "cardiovascular",
+        "cartilagenousjoint": "joints",
+        "cartilagenousjoints": "joints",
+        "cherbourg": "Cherbourg",
+        "cherbourgs": "Cherbourg",
+        "cholesterol": "cholesterol",
+        "cholesterols": "cholesterol",
+        "choosinganactivity": "activity",
+        "choosinganactivitys": "activity",
+        "chronicpain": "chronic pain",
+        "chronicpains": "chronic pain",
+        "cold": "cold",
+        "colds": "cold",
+        "computer": "computers",
+        "computers": "computers",
+        "copd": "emphysema",
+        "copds": "emphysema",
+        "corbin": "Corbin",
+        "corbins": "Corbin",
+        "core": "core",
+        "cores": "core",
+        "debolt": "DeBolt",
+        "debolts": "DeBolt",
+        "deltoid": "deltoids",
+        "deltoids": "deltoids",
+        "dementia": "dementia",
+        "dementias": "dementia",
+        "depression": "depression",
+        "depressions": "depression",
+        "diabete": "diabetes",
+        "diabetes": "diabetes",
+        "diet": "diet",
+        "dieting": "diet",
+        "dietings": "diet",
+        "diets": "diet",
+        "digestivesystem": "digestive system",
+        "digestivesystems": "digestive system",
+        "eddy": "Eddy",
+        "eddys": "Eddy",
+        "elbow": "elbow",
+        "elbows": "elbow",
+        "elementaryschool": "elementary school",
+        "elementaryschools": "elementary school",
+        "emergencie": "emergencies",
+        "emergencies": "emergencies",
+        "emphysema": "emphysema",
+        "emphysemas": "emphysema",
+        "endocrinesystem": "endocrine system",
+        "endocrinesystems": "endocrine system",
+        "erectorspinae": "erector spinae",
+        "erectorspinaes": "erector spinae",
+        "exercise": "exercise",
+        "exerciseinjurie": "injuries",
+        "exerciseinjuries": "injuries",
+        "exerciseresearch": "exercise research",
+        "exerciseresearchs": "exercise research",
+        "exercises": "exercise",
+        "exocrinesystem": "exocrine system",
+        "exocrinesystems": "exocrine system",
+        "eye": "eyes",
+        "eyehealth": "eye health",
+        "eyehealths": "eye health",
+        "eyes": "eyes",
+        "fairbury": "Fairbury",
+        "fairburys": "Fairbury",
+        "falaisepocket": "Falaise Pocket",
+        "falaisepockets": "Falaise Pocket",
+        "fall": "fall prevention",
+        "falling": "fall prevention",
+        "fallings": "fall prevention",
+        "fallprevention": "fall prevention",
+        "fallpreventions": "fall prevention",
+        "falls": "fall prevention",
+        "familysecret": "family secrets",
+        "familysecrets": "family secrets",
+        "fascia": "fascia",
+        "fascialsystem": "fascial system",
+        "fascialsystems": "fascial system",
+        "fascias": "fascia",
+        "feet": "feet",
+        "feets": "feet",
+        "femur": "femur",
+        "femurs": "femur",
+        "fibula": "fibula",
+        "fibulas": "fibula",
+        "fiction": "fiction",
+        "fictions": "fiction",
+        "fierro": "Fierro",
+        "fierros": "Fierro",
+        "fitne": "fitness class",
+        "fitness": "fitness class",
+        "fitnesscla": "fitness class",
+        "fitnessclass": "fitness class",
+        "fitnessequipment": "fitness equipment",
+        "fitnessequipments": "fitness equipment",
+        "fitnessinstructor": "fitness instructors",
+        "fitnessinstructors": "fitness instructors",
+        "fitnessprinciple": "fitness principles",
+        "fitnessprinciples": "fitness principles",
+        "fitnessresearch": "fitness research",
+        "fitnessresearchs": "fitness research",
+        "fitnessterm": "fitness terms",
+        "fitnessterms": "fitness terms",
+        "floatingrib": "ribs",
+        "floatingribs": "ribs",
+        "food": "diet",
+        "foods": "diet",
+        "forearm": "forearm",
+        "forearms": "forearm",
+        "freeweight": "free weights",
+        "freeweights": "free weights",
+        "frenchandindian": "French and Indian War",
+        "frenchandindians": "French and Indian War",
+        "frenchandindianwar": "French and Indian War",
+        "frenchandindianwars": "French and Indian War",
+        "gastrocnemiu": "gastrocnemius",
+        "gastrocnemius": "gastrocnemius",
+        "genetic": "genetics",
+        "genetics": "genetics",
+        "glute": "glutes",
+        "glutes": "glutes",
+        "grandcanyon": "Grand Canyon",
+        "grandcanyons": "Grand Canyon",
+        "grizzlyden": "Grizzly Den",
+        "grizzlydens": "Grizzly Den",
+        "groupfitne": "group fitness",
+        "groupfitness": "group fitness",
+        "hamstring": "hamstrings",
+        "hamstrings": "hamstrings",
+        "hand": "hand",
+        "hands": "hand",
+        "hansen": "Hansen",
+        "hansens": "Hansen",
+        "harne": "Harness",
+        "harness": "Harness",
+        "hasting": "Hastings",
+        "hastings": "Hastings",
+        "hastingscollege": "Hastings College",
+        "hastingscolleges": "Hastings College",
+        "hastingshighschool": "Hastings High School",
+        "hastingshighschools": "Hastings High School",
+        "hatch": "Hatch",
+        "hatchs": "Hatch",
+        "head": "head",
+        "heads": "head",
+        "health": "health",
+        "healths": "health",
+        "healthy": "healthy",
+        "healthys": "healthy",
+        "heartdisease": "heart disease",
+        "heartdiseases": "heart disease",
+        "heartwell": "Heartwell Nebraska",
+        "heartwellnebraska": "Heartwell Nebraska",
+        "heartwellnebraskas": "Heartwell Nebraska",
+        "heartwells": "Heartwell Nebraska",
+        "heatcramp": "heat injuries",
+        "heatcramps": "heat injuries",
+        "heatexhaustion": "heat injuries",
+        "heatexhaustions": "heat injuries",
+        "heatinjurie": "heat injuries",
+        "heatinjuries": "heat injuries",
+        "heatstroke": "heat injuries",
+        "heatstrokes": "heat injuries",
+        "herrick": "Herrick",
+        "herricks": "Herrick",
+        "higby": "Higby",
+        "higbys": "Higby",
+        "highbloodpressure": "high blood pressure",
+        "highbloodpressures": "high blood pressure",
+        "hike": "hike",
+        "hikes": "hike",
+        "hip": "hip",
+        "hipflexor": "hip",
+        "hipflexors": "hip",
+        "hipjoint": "hip",
+        "hipjoints": "hip",
+        "hips": "hip",
+        "holiday": "holiday",
+        "holidays": "holiday",
+        "homesafety": "home safety",
+        "homesafetys": "home safety",
+        "hormone": "hormones",
+        "hormones": "hormones",
+        "hornback": "Hornback",
+        "hornbacks": "Hornback",
+        "humeru": "humerus",
+        "humerus": "humerus",
+        "hurtgenforest": "Hurtgen Forest",
+        "hurtgenforests": "Hurtgen Forest",
+        "hypertension": "hypertension",
+        "hypertensions": "hypertension",
+        "iliotibialband": "iliotibial band",
+        "iliotibialbands": "iliotibial band",
+        "illinoi": "Illinois",
+        "illinois": "Illinois",
+        "immunesystem": "immune system",
+        "immunesystems": "immune system",
+        "impingementsyndrome": "impingement syndrome",
+        "impingementsyndromes": "impingement syndrome",
+        "individuality": "individuality",
+        "individualitys": "individuality",
+        "ingraham": "Ingraham",
+        "ingrahams": "Ingraham",
+        "inheritance": "inheritance",
+        "inheritances": "inheritance",
+        "injurie": "injuries",
+        "injuries": "injuries",
+        "insomnia": "insomnia",
+        "insomnias": "insomnia",
+        "instructor": "instructors",
+        "instructors": "instructors",
+        "jasper": "Jasper",
+        "jaspers": "Jasper",
+        "jensen": "Jensen",
+        "jensens": "Jensen",
+        "joint": "joints",
+        "jointclassification": "joints",
+        "jointclassifications": "joints",
+        "joints": "joints",
+        "judo": "judo",
+        "judos": "judo",
+        "kansascity": "Kansas City",
+        "kansascitys": "Kansas City",
+        "knee": "knee",
+        "kneeinjury": "knee",
+        "kneeinjurys": "knee",
+        "kneejoint": "knee",
+        "kneejoints": "knee",
+        "kneereplacement": "knee",
+        "kneereplacements": "knee",
+        "knees": "knee",
+        "labschool": "lab school",
+        "labschools": "lab school",
+        "lake": "Lake",
+        "lakes": "Lake",
+        "lat": "latissimus dorsi",
+        "latissimusdorsi": "latissimus dorsi",
+        "latissimusdorsis": "latissimus dorsi",
+        "lats": "latissimus dorsi",
+        "lee": "Lee",
+        "lees": "Lee",
+        "leg": "leg",
+        "legs": "leg",
+        "lewiscounty": "Lewis County",
+        "lewiscountys": "Lewis County",
+        "lifestyle": "lifestyle",
+        "lifestyles": "lifestyle",
+        "lightfit": "Light Fit",
+        "lightfits": "Light Fit",
+        "longevity": "longevity",
+        "longevitys": "longevity",
+        "lowerleg": "lower leg",
+        "lowerlegs": "lower leg",
+        "lunarlanding": "lunar landing",
+        "lunarlandings": "lunar landing",
+        "mahoney": "Mahoney",
+        "mahoneys": "Mahoney",
+        "marriage": "marriage",
+        "marriages": "marriage",
+        "mcdonald": "McDonald",
+        "mcdonalds": "McDonald",
+        "medication": "medications",
+        "medications": "medications",
+        "memory": "memory",
+        "memorys": "memory",
+        "metabolism": "metabolism",
+        "metabolisms": "metabolism",
+        "mexicanwar": "Mexican War",
+        "mexicanwars": "Mexican War",
+        "minden": "Minden",
+        "mindens": "Minden",
+        "minnestoa": "Minnestoa",
+        "minnestoas": "Minnestoa",
+        "mood": "mood",
+        "moods": "mood",
+        "mortain": "Mortain",
+        "mortains": "Mortain",
+        "mosher": "Mosher",
+        "moshers": "Mosher",
+        "motherhood": "motherhood",
+        "motherhoods": "motherhood",
+        "motivation": "motivation",
+        "motivations": "motivation",
+        "motivationtoexercise": "motivation",
+        "motivationtoexercises": "motivation",
+        "movement": "movement",
+        "movements": "movement",
+        "muscle": "muscles",
+        "muscles": "muscles",
+        "muscularsystem": "muscular system",
+        "muscularsystems": "muscular system",
+        "museum": "museum",
+        "museums": "museum",
+        "music": "music",
+        "musics": "music",
+        "musing": "musings",
+        "musings": "musings",
+        "mystery": "mystery",
+        "mysterys": "mystery",
+        "nebraska": "Nebraska",
+        "nebraskas": "Nebraska",
+        "nervoussystem": "nervous system",
+        "nervoussystems": "nervous system",
+        "newmexico": "New Mexico",
+        "newmexicos": "New Mexico",
+        "nissen": "Nissen",
+        "nissens": "Nissen",
+        "normandy": "Normandy",
+        "normandys": "Normandy",
+        "novel": "novel",
+        "novels": "novel",
+        "nutrition": "nutrition",
+        "nutritions": "nutrition",
+        "oberdorf": "Overturf",
+        "oberdorfs": "Overturf",
+        "oblique": "obliques",
+        "obliques": "obliques",
+        "olderadult": "older adults",
+        "olderadults": "older adults",
+        "oldwivestale": "old wives tales",
+        "oldwivestales": "old wives tales",
+        "opposingmuscle": "opposing muscles",
+        "opposingmuscles": "opposing muscles",
+        "osteoarthriti": "osteoarthritis",
+        "osteoarthritis": "osteoarthritis",
+        "osteopenia": "osteopenia",
+        "osteopenias": "osteopenia",
+        "osteoporosi": "osteoporosis",
+        "osteoporosis": "osteoporosis",
+        "overtraining": "over-training",
+        "overtrainings": "over-training",
+        "overturf": "Overturf",
+        "overturfs": "Overturf",
+        "pain": "pain",
+        "pains": "pain",
+        "pandemic": "pandemic",
+        "pandemics": "pandemic",
+        "pec": "pecs",
+        "pecs": "pecs",
+        "pectoralismajor": "pectoralis major",
+        "pectoralismajors": "pectoralis major",
+        "perceivedexertionscale": "perceived exertion scale",
+        "perceivedexertionscales": "perceived exertion scale",
+        "perfume": "perfume",
+        "perfumes": "perfume",
+        "porter": "Porter",
+        "porters": "Porter",
+        "power": "Power",
+        "powers": "Power",
+        "princegeorge": "Prince George",
+        "princegeorges": "Prince George",
+        "quad": "quadriceps",
+        "quadricep": "quadriceps",
+        "quadriceps": "quadriceps",
+        "quads": "quadriceps",
+        "quebec": "Quebec",
+        "quebecs": "Quebec",
+        "quotation": "quotations",
+        "quotations": "quotations",
+        "radiu": "radius",
+        "radius": "radius",
+        "research": "research",
+        "researchs": "research",
+        "respiratorysystem": "respiratory system",
+        "respiratorysystems": "respiratory system",
+        "review": "review",
+        "reviews": "review",
+        "rheumatoidarthriti": "rheumatoid arthritis",
+        "rheumatoidarthritis": "rheumatoid arthritis",
+        "rhomboid": "rhomboids",
+        "rhomboids": "rhomboids",
+        "rib": "ribs",
+        "ribinjurie": "ribs",
+        "ribinjuries": "ribs",
+        "ribs": "ribs",
+        "safety": "safety",
+        "safetys": "safety",
+        "salemwitchtrial": "Salem Witch Trials",
+        "salemwitchtrials": "Salem Witch Trials",
+        "scientificstudie": "scientific studies",
+        "scientificstudies": "scientific studies",
+        "sheldon": "Sheldon",
+        "sheldons": "Sheldon",
+        "shin": "shins",
+        "shins": "shins",
+        "shoulder": "shoulder",
+        "shoulders": "shoulder",
+        "silvercity": "Silver City",
+        "silvercitys": "Silver City",
+        "singing": "singing",
+        "singings": "singing",
+        "size": "size S",
+        "sizel": "size L",
+        "sizels": "size L",
+        "sizem": "size M",
+        "sizems": "size M",
+        "sizes": "size S",
+        "sizexl": "size XL",
+        "sizexls": "size XL",
+        "skeleton": "skeleton",
+        "skeletons": "skeleton",
+        "sleep": "sleep",
+        "sleeps": "sleep",
+        "smalltown": "small town",
+        "smalltowns": "small town",
+        "solart": "Solart",
+        "solarts": "Solart",
+        "spine": "spine",
+        "spines": "spine",
+        "sport": "sports",
+        "sports": "sports",
+        "stayingactive": "activity",
+        "stayingactives": "activity",
+        "steel": "Steel",
+        "steels": "Steel",
+        "stlo": "St Lo",
+        "stlos": "St Lo",
+        "strengthtraining": "strength training",
+        "strengthtrainings": "strength training",
+        "stroke": "stroke",
+        "strokes": "stroke",
+        "studie": "studies",
+        "studies": "studies",
+        "sugarbowl": "Sugarbowl",
+        "sugarbowls": "Sugarbowl",
+        "sweating": "sweating",
+        "sweatings": "sweating",
+        "teaching": "teaching",
+        "teachings": "teaching",
+        "technology": "technology",
+        "technologys": "technology",
+        "tegarden": "Tegarden",
+        "tegardens": "Tegarden",
+        "temperature": "temperature",
+        "temperatures": "temperature",
+        "thought": "thoughts",
+        "thoughts": "thoughts",
+        "tibia": "tibia",
+        "tibias": "tibia",
+        "tornmeniscu": "torn meniscus",
+        "tornmeniscus": "torn meniscus",
+        "trapeziu": "trapezius",
+        "trapezius": "trapezius",
+        "trend": "trends",
+        "trends": "trends",
+        "tricep": "triceps",
+        "triceps": "triceps",
+        "trumbo": "Trumbo",
+        "trumbos": "Trumbo",
+        "turpin": "Turpin",
+        "turpins": "Turpin",
+        "ulna": "ulna",
+        "ulnas": "ulna",
+        "valentine": "Valentine",
+        "valentines": "Valentine",
+        "vancouver": "Vancouver",
+        "vancouvers": "Vancouver",
+        "video": "video",
+        "videos": "video",
+        "vietnamwar": "Vietnam War",
+        "vietnamwars": "Vietnam War",
+        "viru": "virus",
+        "virus": "virus",
+        "walking": "walking",
+        "walkings": "walking",
+        "warmup": "warm-up",
+        "warmups": "warm-up",
+        "warof1812": "War of 1812",
+        "warof1812s": "War of 1812",
+        "weightlo": "weight loss",
+        "weightloss": "weight loss",
+        "wheeler": "Wheeler",
+        "wheelers": "Wheeler",
+        "womenhealth": "women health",
+        "womenhealths": "women health",
+        "worldwarii": "World War II",
+        "worldwariis": "World War II",
+        "wrist": "wrist",
+        "wrists": "wrist",
+        "yoga": "yoga",
+        "yogas": "yoga"
+    },
+    "tags": {
+        "Aachen": {
+            "key": "aachen",
+            "tally#": 6,
+            "true": "Aachen"
+        },
+        "abdominals": {
+            "abbr": "abs",
+            "key": "abdominals",
+            "long": "abdominal muscles",
+            "tally#": 0,
+            "true": "abdominals"
+        },
+        "abductors": {
+            "key": "abductors",
+            "tally#": 0,
+            "true": "abductors"
+        },
+        "activity": {
+            "key": "activity",
+            "synonyms": [
+                "activities",
+                "choosing an activity",
+                "staying active"
+            ],
+            "tally#": 0,
+            "true": "activity"
+        },
+        "adapting exercise": {
+            "key": "adaptingexercise",
+            "tally#": 0,
+            "true": "adapting exercise"
+        },
+        "adductors": {
+            "key": "adductors",
+            "synonyms": [
+                "adductor brevis",
+                "adductor longus",
+                "adductor magnus"
+            ],
+            "tally#": 0,
+            "true": "adductors"
+        },
+        "aerobic": {
+            "key": "aerobic",
+            "synonyms": [
+                "anaerobic"
+            ],
+            "tally#": 0,
+            "true": "aerobic"
+        },
+        "aging": {
+            "key": "aging",
+            "tally#": 0,
+            "true": "aging"
+        },
+        "air pollution": {
+            "key": "airpollution",
+            "tally#": 0,
+            "true": "air pollution"
+        },
+        "air quality": {
+            "key": "airquality",
+            "tally#": 0,
+            "true": "air quality"
+        },
+        "Allen": {
+            "key": "allen",
+            "tally#": 2,
+            "true": "Allen"
+        },
+        "allergies": {
+            "key": "allergies",
+            "tally#": 0,
+            "true": "allergies"
+        },
+        "Allison": {
+            "key": "allison",
+            "tally#": 2,
+            "true": "Allison"
+        },
+        "American Civil War": {
+            "key": "americancivilwar",
+            "tally#": 2,
+            "true": "American Civil War"
+        },
+        "American Revolution": {
+            "key": "americanrevolution",
+            "tally#": 0,
+            "true": "American Revolution"
+        },
+        "ankle": {
+            "key": "ankle",
+            "tally#": 0,
+            "true": "ankle"
+        },
+        "arm bones": {
+            "key": "armbones",
+            "tally#": 0,
+            "true": "arm bones"
+        },
+        "asthma": {
+            "key": "asthma",
+            "tally#": 0,
+            "true": "asthma"
+        },
+        "autobiography": {
+            "key": "autobiography",
+            "tally#": 0,
+            "true": "autobiography"
+        },
+        "av": {
+            "key": "av",
+            "tally#": 4,
+            "true": "av"
+        },
+        "back": {
+            "key": "back",
+            "tally#": 0,
+            "true": "back"
+        },
+        "backbone": {
+            "key": "backbone",
+            "tally#": 0,
+            "true": "backbone"
+        },
+        "balance": {
+            "key": "balance",
+            "tally#": 0,
+            "true": "balance"
+        },
+        "ball": {
+            "key": "ball",
+            "tally#": 0,
+            "true": "ball"
+        },
+        "ball-and-socket joint": {
+            "key": "ballandsocketjoint",
+            "tally#": 0,
+            "true": "ball-and-socket joint"
+        },
+        "barometric pressure": {
+            "key": "barometricpressure",
+            "tally#": 0,
+            "true": "barometric pressure"
+        },
+        "basketball": {
+            "key": "basketball",
+            "tally#": 2,
+            "true": "basketball"
+        },
+        "BCRPA": {
+            "key": "bcrpa",
+            "tally#": 0,
+            "true": "BCRPA"
+        },
+        "Beaver": {
+            "key": "beaver",
+            "tally#": 1,
+            "true": "Beaver"
+        },
+        "best of": {
+            "key": "bestof",
+            "tally#": 2,
+            "true": "best of"
+        },
+        "biceps": {
+            "key": "biceps",
+            "tally#": 0,
+            "true": "biceps"
+        },
+        "body systems": {
+            "key": "bodysystems",
+            "tally#": 0,
+            "true": "body systems"
+        },
+        "body temperature": {
+            "key": "bodytemperature",
+            "tally#": 0,
+            "true": "body temperature"
+        },
+        "bones": {
+            "key": "bones",
+            "tally#": 0,
+            "true": "bones"
+        },
+        "Boone": {
+            "key": "boone",
+            "tally#": 2,
+            "true": "Boone"
+        },
+        "boot camp": {
+            "key": "bootcamp",
+            "tally#": 0,
+            "true": "boot camp"
+        },
+        "brain": {
+            "key": "brain",
+            "tally#": 0,
+            "true": "brain"
+        },
+        "Brand": {
+            "key": "brand",
+            "tally#": 5,
+            "true": "Brand"
+        },
+        "breathing": {
+            "key": "breathing",
+            "tally#": 0,
+            "true": "breathing"
+        },
+        "burn": {
+            "key": "burn",
+            "tally#": 0,
+            "true": "burn"
+        },
+        "calf": {
+            "key": "calf",
+            "tally#": 0,
+            "true": "calf"
+        },
+        "calf muscles": {
+            "key": "calfmuscles",
+            "tally#": 0,
+            "true": "calf muscles"
+        },
+        "Canada's Food Guide": {
+            "key": "canadasfoodguide",
+            "tally#": 0,
+            "true": "Canada's Food Guide"
+        },
+        "cancer": {
+            "key": "cancer",
+            "tally#": 0,
+            "true": "cancer"
+        },
+        "canoe": {
+            "key": "canoe",
+            "tally#": 0,
+            "true": "canoe"
+        },
+        "cardio": {
+            "key": "cardio",
+            "tally#": 0,
+            "true": "cardio"
+        },
+        "cardiovascular": {
+            "key": "cardiovascular",
+            "tally#": 0,
+            "true": "cardiovascular"
+        },
+        "Cherbourg": {
+            "key": "cherbourg",
+            "tally#": 9,
+            "true": "Cherbourg"
+        },
+        "cholesterol": {
+            "key": "cholesterol",
+            "tally#": 0,
+            "true": "cholesterol"
+        },
+        "chronic pain": {
+            "key": "chronicpain",
+            "tally#": 0,
+            "true": "chronic pain"
+        },
+        "cold": {
+            "key": "cold",
+            "tally#": 0,
+            "true": "cold"
+        },
+        "computers": {
+            "key": "computers",
+            "tally#": 0,
+            "true": "computers"
+        },
+        "Corbin": {
+            "key": "corbin",
+            "tally#": 1,
+            "true": "Corbin"
+        },
+        "core": {
+            "key": "core",
+            "tally#": 0,
+            "true": "core"
+        },
+        "DeBolt": {
+            "key": "debolt",
+            "tally#": 1,
+            "true": "DeBolt"
+        },
+        "deltoids": {
+            "key": "deltoids",
+            "tally#": 0,
+            "true": "deltoids"
+        },
+        "dementia": {
+            "key": "dementia",
+            "tally#": 0,
+            "true": "dementia"
+        },
+        "depression": {
+            "key": "depression",
+            "tally#": 0,
+            "true": "depression"
+        },
+        "diabetes": {
+            "key": "diabetes",
+            "tally#": 0,
+            "true": "diabetes"
+        },
+        "diet": {
+            "key": "diet",
+            "synonyms": [
+                "dieting",
+                "diets",
+                "food"
+            ],
+            "tally#": 0,
+            "true": "diet"
+        },
+        "digestive system": {
+            "key": "digestivesystem",
+            "tally#": 0,
+            "true": "digestive system"
+        },
+        "Eddy": {
+            "key": "eddy",
+            "tally#": 4,
+            "true": "Eddy"
+        },
+        "elbow": {
+            "key": "elbow",
+            "tally#": 0,
+            "true": "elbow"
+        },
+        "elementary school": {
+            "key": "elementaryschool",
+            "tally#": 0,
+            "true": "elementary school"
+        },
+        "emergencies": {
+            "key": "emergencies",
+            "tally#": 0,
+            "true": "emergencies"
+        },
+        "emphysema": {
+            "key": "emphysema",
+            "synonyms": [
+                "COPD"
+            ],
+            "tally#": 0,
+            "true": "emphysema"
+        },
+        "endocrine system": {
+            "key": "endocrinesystem",
+            "tally#": 0,
+            "true": "endocrine system"
+        },
+        "erector spinae": {
+            "key": "erectorspinae",
+            "tally#": 0,
+            "true": "erector spinae"
+        },
+        "exercise": {
+            "key": "exercise",
+            "tally#": 0,
+            "true": "exercise"
+        },
+        "exercise research": {
+            "key": "exerciseresearch",
+            "tally#": 0,
+            "true": "exercise research"
+        },
+        "exocrine system": {
+            "key": "exocrinesystem",
+            "tally#": 0,
+            "true": "exocrine system"
+        },
+        "eye health": {
+            "key": "eyehealth",
+            "tally#": 0,
+            "true": "eye health"
+        },
+        "eyes": {
+            "key": "eyes",
+            "tally#": 0,
+            "true": "eyes"
+        },
+        "Fairbury": {
+            "key": "fairbury",
+            "tally#": 0,
+            "true": "Fairbury"
+        },
+        "Falaise Pocket": {
+            "key": "falaisepocket",
+            "tally#": 7,
+            "true": "Falaise Pocket"
+        },
+        "fall prevention": {
+            "key": "fallprevention",
+            "synonyms": [
+                "falling",
+                "falls"
+            ],
+            "tally#": 0,
+            "true": "fall prevention"
+        },
+        "family secrets": {
+            "key": "familysecrets",
+            "tally#": 0,
+            "true": "family secrets"
+        },
+        "fascia": {
+            "key": "fascia",
+            "tally#": 0,
+            "true": "fascia"
+        },
+        "fascial system": {
+            "key": "fascialsystem",
+            "tally#": 0,
+            "true": "fascial system"
+        },
+        "feet": {
+            "key": "feet",
+            "tally#": 0,
+            "true": "feet"
+        },
+        "femur": {
+            "key": "femur",
+            "tally#": 0,
+            "true": "femur"
+        },
+        "fibula": {
+            "key": "fibula",
+            "tally#": 0,
+            "true": "fibula"
+        },
+        "fiction": {
+            "key": "fiction",
+            "tally#": 0,
+            "true": "fiction"
+        },
+        "Fierro": {
+            "key": "fierro",
+            "parents": [
+                "New Mexico"
+            ],
+            "tally#": 0,
+            "true": "Fierro"
+        },
+        "fitness class": {
+            "key": "fitnessclass",
+            "synonyms": [
+                "fitness"
+            ],
+            "tally#": 0,
+            "true": "fitness class"
+        },
+        "fitness equipment": {
+            "key": "fitnessequipment",
+            "tally#": 0,
+            "true": "fitness equipment"
+        },
+        "fitness instructors": {
+            "key": "fitnessinstructors",
+            "tally#": 0,
+            "true": "fitness instructors"
+        },
+        "fitness principles": {
+            "key": "fitnessprinciples",
+            "tally#": 0,
+            "true": "fitness principles"
+        },
+        "fitness research": {
+            "key": "fitnessresearch",
+            "tally#": 0,
+            "true": "fitness research"
+        },
+        "fitness terms": {
+            "key": "fitnessterms",
+            "tally#": 0,
+            "true": "fitness terms"
+        },
+        "forearm": {
+            "key": "forearm",
+            "tally#": 0,
+            "true": "forearm"
+        },
+        "free weights": {
+            "key": "freeweights",
+            "tally#": 0,
+            "true": "free weights"
+        },
+        "French and Indian War": {
+            "key": "frenchandindianwar",
+            "synonyms": [
+                "French and Indian"
+            ],
+            "tally#": 0,
+            "true": "French and Indian War"
+        },
+        "gastrocnemius": {
+            "key": "gastrocnemius",
+            "tally#": 0,
+            "true": "gastrocnemius"
+        },
+        "genetics": {
+            "key": "genetics",
+            "tally#": 0,
+            "true": "genetics"
+        },
+        "glutes": {
+            "key": "glutes",
+            "tally#": 0,
+            "true": "glutes"
+        },
+        "Grand Canyon": {
+            "key": "grandcanyon",
+            "tally#": 0,
+            "true": "Grand Canyon"
+        },
+        "Grizzly Den": {
+            "key": "grizzlyden",
+            "tally#": 0,
+            "true": "Grizzly Den"
+        },
+        "group fitness": {
+            "key": "groupfitness",
+            "tally#": 0,
+            "true": "group fitness"
+        },
+        "hamstrings": {
+            "key": "hamstrings",
+            "tally#": 0,
+            "true": "hamstrings"
+        },
+        "hand": {
+            "key": "hand",
+            "tally#": 0,
+            "true": "hand"
+        },
+        "Hansen": {
+            "key": "hansen",
+            "tally#": 4,
+            "true": "Hansen"
+        },
+        "Harness": {
+            "key": "harness",
+            "tally#": 2,
+            "true": "Harness"
+        },
+        "Hastings": {
+            "key": "hastings",
+            "parents": [
+                "Nebraska"
+            ],
+            "tally#": 2,
+            "true": "Hastings"
+        },
+        "Hastings College": {
+            "key": "hastingscollege",
+            "tally#": 2,
+            "true": "Hastings College"
+        },
+        "Hastings High School": {
+            "key": "hastingshighschool",
+            "tally#": 2,
+            "true": "Hastings High School"
+        },
+        "Hatch": {
+            "key": "hatch",
+            "tally#": 2,
+            "true": "Hatch"
+        },
+        "head": {
+            "key": "head",
+            "tally#": 0,
+            "true": "head"
+        },
+        "health": {
+            "key": "health",
+            "tally#": 0,
+            "true": "health"
+        },
+        "healthy": {
+            "key": "healthy",
+            "tally#": 0,
+            "true": "healthy"
+        },
+        "heart disease": {
+            "key": "heartdisease",
+            "tally#": 0,
+            "true": "heart disease"
+        },
+        "Heartwell Nebraska": {
+            "key": "heartwellnebraska",
+            "short": "Heartwell",
+            "tally#": 0,
+            "true": "Heartwell Nebraska"
+        },
+        "heat injuries": {
+            "key": "heatinjuries",
+            "synonyms": [
+                "heat cramps",
+                "heat exhaustion",
+                "heatstroke"
+            ],
+            "tally#": 0,
+            "true": "heat injuries"
+        },
+        "Herrick": {
+            "key": "herrick",
+            "tally#": 5,
+            "true": "Herrick"
+        },
+        "Higby": {
+            "key": "higby",
+            "tally#": 4,
+            "true": "Higby"
+        },
+        "high blood pressure": {
+            "key": "highbloodpressure",
+            "tally#": 0,
+            "true": "high blood pressure"
+        },
+        "hike": {
+            "key": "hike",
+            "tally#": 0,
+            "true": "hike"
+        },
+        "hip": {
+            "key": "hip",
+            "synonyms": [
+                "hip flexors",
+                "hip joint"
+            ],
+            "tally#": 0,
+            "true": "hip"
+        },
+        "holiday": {
+            "key": "holiday",
+            "tally#": 0,
+            "true": "holiday"
+        },
+        "home safety": {
+            "key": "homesafety",
+            "tally#": 0,
+            "true": "home safety"
+        },
+        "hormones": {
+            "key": "hormones",
+            "tally#": 0,
+            "true": "hormones"
+        },
+        "Hornback": {
+            "key": "hornback",
+            "tally#": 1,
+            "true": "Hornback"
+        },
+        "humerus": {
+            "key": "humerus",
+            "tally#": 0,
+            "true": "humerus"
+        },
+        "Hurtgen Forest": {
+            "key": "hurtgenforest",
+            "tally#": 5,
+            "true": "Hurtgen Forest"
+        },
+        "hypertension": {
+            "key": "hypertension",
+            "tally#": 0,
+            "true": "hypertension"
+        },
+        "iliotibial band": {
+            "key": "iliotibialband",
+            "tally#": 0,
+            "true": "iliotibial band"
+        },
+        "Illinois": {
+            "key": "illinois",
+            "tally#": 0,
+            "true": "Illinois"
+        },
+        "immune system": {
+            "key": "immunesystem",
+            "tally#": 0,
+            "true": "immune system"
+        },
+        "impingement syndrome": {
+            "key": "impingementsyndrome",
+            "tally#": 0,
+            "true": "impingement syndrome"
+        },
+        "individuality": {
+            "key": "individuality",
+            "tally#": 0,
+            "true": "individuality"
+        },
+        "Ingraham": {
+            "key": "ingraham",
+            "tally#": 4,
+            "true": "Ingraham"
+        },
+        "inheritance": {
+            "key": "inheritance",
+            "tally#": 0,
+            "true": "inheritance"
+        },
+        "injuries": {
+            "key": "injuries",
+            "synonyms": [
+                "exercise injuries"
+            ],
+            "tally#": 0,
+            "true": "injuries"
+        },
+        "insomnia": {
+            "key": "insomnia",
+            "tally#": 0,
+            "true": "insomnia"
+        },
+        "instructors": {
+            "key": "instructors",
+            "tally#": 0,
+            "true": "instructors"
+        },
+        "Jasper": {
+            "key": "jasper",
+            "tally#": 0,
+            "true": "Jasper"
+        },
+        "Jensen": {
+            "key": "jensen",
+            "tally#": 3,
+            "true": "Jensen"
+        },
+        "joints": {
+            "key": "joints",
+            "long": "joint classification",
+            "related": [
+                "ball-and-socket joint",
+                "cartilagenous joint"
+            ],
+            "short": "joint",
+            "tally#": 0,
+            "true": "joints"
+        },
+        "judo": {
+            "key": "judo",
+            "tally#": 0,
+            "true": "judo"
+        },
+        "Kansas City": {
+            "key": "kansascity",
+            "tally#": 0,
+            "true": "Kansas City"
+        },
+        "knee": {
+            "key": "knee",
+            "long": "knee injury",
+            "synonyms": [
+                "knee joint",
+                "knee replacement"
+            ],
+            "tally#": 0,
+            "true": "knee"
+        },
+        "lab school": {
+            "key": "labschool",
+            "tally#": 0,
+            "true": "lab school"
+        },
+        "Lake": {
+            "key": "lake",
+            "tally#": 0,
+            "true": "Lake"
+        },
+        "latissimus dorsi": {
+            "key": "latissimusdorsi",
+            "short": "lats",
+            "tally#": 0,
+            "true": "latissimus dorsi"
+        },
+        "Lee": {
+            "key": "lee",
+            "tally#": 4,
+            "true": "Lee"
+        },
+        "leg": {
+            "key": "leg",
+            "tally#": 0,
+            "true": "leg"
+        },
+        "Lewis County": {
+            "key": "lewiscounty",
+            "tally#": 0,
+            "true": "Lewis County"
+        },
+        "lifestyle": {
+            "key": "lifestyle",
+            "tally#": 0,
+            "true": "lifestyle"
+        },
+        "Light Fit": {
+            "key": "lightfit",
+            "tally#": 0,
+            "true": "Light Fit"
+        },
+        "longevity": {
+            "key": "longevity",
+            "tally#": 0,
+            "true": "longevity"
+        },
+        "lower leg": {
+            "key": "lowerleg",
+            "tally#": 0,
+            "true": "lower leg"
+        },
+        "lunar landing": {
+            "key": "lunarlanding",
+            "tally#": 0,
+            "true": "lunar landing"
+        },
+        "Mahoney": {
+            "key": "mahoney",
+            "tally#": 3,
+            "true": "Mahoney"
+        },
+        "marriage": {
+            "key": "marriage",
+            "tally#": 0,
+            "true": "marriage"
+        },
+        "McDonald": {
+            "key": "mcdonald",
+            "tally#": 3,
+            "true": "McDonald"
+        },
+        "medications": {
+            "key": "medications",
+            "tally#": 0,
+            "true": "medications"
+        },
+        "memory": {
+            "key": "memory",
+            "tally#": 0,
+            "true": "memory"
+        },
+        "metabolism": {
+            "key": "metabolism",
+            "tally#": 0,
+            "true": "metabolism"
+        },
+        "Mexican War": {
+            "key": "mexicanwar",
+            "tally#": 0,
+            "true": "Mexican War"
+        },
+        "Minden": {
+            "key": "minden",
+            "tally#": 0,
+            "true": "Minden"
+        },
+        "Minnestoa": {
+            "key": "minnestoa",
+            "tally#": 0,
+            "true": "Minnestoa"
+        },
+        "mood": {
+            "key": "mood",
+            "tally#": 0,
+            "true": "mood"
+        },
+        "Mortain": {
+            "key": "mortain",
+            "tally#": 7,
+            "true": "Mortain"
+        },
+        "Mosher": {
+            "key": "mosher",
+            "tally#": 3,
+            "true": "Mosher"
+        },
+        "motherhood": {
+            "key": "motherhood",
+            "tally#": 0,
+            "true": "motherhood"
+        },
+        "motivation": {
+            "key": "motivation",
+            "long": "motivation to exercise",
+            "tally#": 0,
+            "true": "motivation"
+        },
+        "movement": {
+            "key": "movement",
+            "tally#": 0,
+            "true": "movement"
+        },
+        "muscles": {
+            "key": "muscles",
+            "tally#": 0,
+            "true": "muscles"
+        },
+        "muscular system": {
+            "key": "muscularsystem",
+            "tally#": 0,
+            "true": "muscular system"
+        },
+        "museum": {
+            "key": "museum",
+            "tally#": 0,
+            "true": "museum"
+        },
+        "music": {
+            "key": "music",
+            "tally#": 0,
+            "true": "music"
+        },
+        "musings": {
+            "key": "musings",
+            "tally#": 0,
+            "true": "musings"
+        },
+        "mystery": {
+            "key": "mystery",
+            "tally#": 0,
+            "true": "mystery"
+        },
+        "Nebraska": {
+            "key": "nebraska",
+            "tally#": 2,
+            "true": "Nebraska"
+        },
+        "nervous system": {
+            "key": "nervoussystem",
+            "tally#": 0,
+            "true": "nervous system"
+        },
+        "New Mexico": {
+            "key": "newmexico",
+            "tally#": 0,
+            "true": "New Mexico"
+        },
+        "Nissen": {
+            "key": "nissen",
+            "tally#": 3,
+            "true": "Nissen"
+        },
+        "Normandy": {
+            "key": "normandy",
+            "tally#": 10,
+            "true": "Normandy"
+        },
+        "novel": {
+            "key": "novel",
+            "tally#": 0,
+            "true": "novel"
+        },
+        "nutrition": {
+            "key": "nutrition",
+            "tally#": 0,
+            "true": "nutrition"
+        },
+        "obliques": {
+            "key": "obliques",
+            "tally#": 0,
+            "true": "obliques"
+        },
+        "old wives tales": {
+            "key": "oldwivestales",
+            "tally#": 0,
+            "true": "old wives tales"
+        },
+        "older adults": {
+            "key": "olderadults",
+            "tally#": 0,
+            "true": "older adults"
+        },
+        "opposing muscles": {
+            "key": "opposingmuscles",
+            "tally#": 0,
+            "true": "opposing muscles"
+        },
+        "osteoarthritis": {
+            "key": "osteoarthritis",
+            "synonyms": [
+                "arthritis"
+            ],
+            "tally#": 0,
+            "true": "osteoarthritis"
+        },
+        "osteopenia": {
+            "key": "osteopenia",
+            "tally#": 0,
+            "true": "osteopenia"
+        },
+        "osteoporosis": {
+            "key": "osteoporosis",
+            "tally#": 0,
+            "true": "osteoporosis"
+        },
+        "over-training": {
+            "key": "overtraining",
+            "tally#": 0,
+            "true": "over-training"
+        },
+        "Overturf": {
+            "key": "overturf",
+            "synonyms": [
+                "Oberdorf"
+            ],
+            "tally#": 5,
+            "true": "Overturf"
+        },
+        "pain": {
+            "key": "pain",
+            "tally#": 0,
+            "true": "pain"
+        },
+        "pandemic": {
+            "key": "pandemic",
+            "tally#": 0,
+            "true": "pandemic"
+        },
+        "pecs": {
+            "key": "pecs",
+            "tally#": 0,
+            "true": "pecs"
+        },
+        "pectoralis major": {
+            "key": "pectoralismajor",
+            "tally#": 0,
+            "true": "pectoralis major"
+        },
+        "perceived exertion scale": {
+            "key": "perceivedexertionscale",
+            "tally#": 0,
+            "true": "perceived exertion scale"
+        },
+        "perfume": {
+            "key": "perfume",
+            "tally#": 0,
+            "true": "perfume"
+        },
+        "Porter": {
+            "key": "porter",
+            "tally#": 2,
+            "true": "Porter"
+        },
+        "Power": {
+            "key": "power",
+            "tally#": 2,
+            "true": "Power"
+        },
+        "Prince George": {
+            "key": "princegeorge",
+            "tally#": 0,
+            "true": "Prince George"
+        },
+        "quadriceps": {
+            "key": "quadriceps",
+            "short": "quads",
+            "tally#": 0,
+            "true": "quadriceps"
+        },
+        "Quebec": {
+            "key": "quebec",
+            "tally#": 0,
+            "true": "Quebec"
+        },
+        "quotations": {
+            "key": "quotations",
+            "tally#": 0,
+            "true": "quotations"
+        },
+        "radius": {
+            "key": "radius",
+            "tally#": 0,
+            "true": "radius"
+        },
+        "research": {
+            "key": "research",
+            "tally#": 0,
+            "true": "research"
+        },
+        "respiratory system": {
+            "key": "respiratorysystem",
+            "tally#": 0,
+            "true": "respiratory system"
+        },
+        "review": {
+            "key": "review",
+            "tally#": 0,
+            "true": "review"
+        },
+        "rheumatoid arthritis": {
+            "key": "rheumatoidarthritis",
+            "tally#": 0,
+            "true": "rheumatoid arthritis"
+        },
+        "rhomboids": {
+            "key": "rhomboids",
+            "tally#": 0,
+            "true": "rhomboids"
+        },
+        "ribs": {
+            "key": "ribs",
+            "synonyms": [
+                "floating rib",
+                "rib injuries"
+            ],
+            "tally#": 0,
+            "true": "ribs"
+        },
+        "safety": {
+            "key": "safety",
+            "tally#": 0,
+            "true": "safety"
+        },
+        "Salem Witch Trials": {
+            "key": "salemwitchtrials",
+            "tally#": 0,
+            "true": "Salem Witch Trials"
+        },
+        "scientific studies": {
+            "key": "scientificstudies",
+            "tally#": 0,
+            "true": "scientific studies"
+        },
+        "Sheldon": {
+            "key": "sheldon",
+            "tally#": 1,
+            "true": "Sheldon"
+        },
+        "shins": {
+            "key": "shins",
+            "tally#": 0,
+            "true": "shins"
+        },
+        "shoulder": {
+            "key": "shoulder",
+            "tally#": 0,
+            "true": "shoulder"
+        },
+        "Silver City": {
+            "key": "silvercity",
+            "tally#": 0,
+            "true": "Silver City"
+        },
+        "singing": {
+            "key": "singing",
+            "tally#": 0,
+            "true": "singing"
+        },
+        "size L": {
+            "key": "sizel",
+            "tally#": 12,
+            "true": "size L"
+        },
+        "size M": {
+            "key": "sizem",
+            "tally#": 0,
+            "true": "size M"
+        },
+        "size S": {
+            "key": "sizes",
+            "tally#": 4,
+            "true": "size S"
+        },
+        "size XL": {
+            "key": "sizexl",
+            "tally#": 20,
+            "true": "size XL"
+        },
+        "skeleton": {
+            "key": "skeleton",
+            "tally#": 0,
+            "true": "skeleton"
+        },
+        "sleep": {
+            "key": "sleep",
+            "tally#": 0,
+            "true": "sleep"
+        },
+        "small town": {
+            "key": "smalltown",
+            "tally#": 0,
+            "true": "small town"
+        },
+        "Solart": {
+            "key": "solart",
+            "tally#": 4,
+            "true": "Solart"
+        },
+        "spine": {
+            "key": "spine",
+            "tally#": 0,
+            "true": "spine"
+        },
+        "sports": {
+            "key": "sports",
+            "tally#": 0,
+            "true": "sports"
+        },
+        "St Lo": {
+            "key": "stlo",
+            "tally#": 8,
+            "true": "St Lo"
+        },
+        "Steel": {
+            "key": "steel",
+            "tally#": 2,
+            "true": "Steel"
+        },
+        "strength training": {
+            "key": "strengthtraining",
+            "tally#": 0,
+            "true": "strength training"
+        },
+        "stroke": {
+            "key": "stroke",
+            "tally#": 0,
+            "true": "stroke"
+        },
+        "studies": {
+            "key": "studies",
+            "tally#": 0,
+            "true": "studies"
+        },
+        "Sugarbowl": {
+            "key": "sugarbowl",
+            "tally#": 0,
+            "true": "Sugarbowl"
+        },
+        "sweating": {
+            "key": "sweating",
+            "tally#": 0,
+            "true": "sweating"
+        },
+        "teaching": {
+            "key": "teaching",
+            "tally#": 0,
+            "true": "teaching"
+        },
+        "technology": {
+            "key": "technology",
+            "tally#": 0,
+            "true": "technology"
+        },
+        "Tegarden": {
+            "key": "tegarden",
+            "tally#": 1,
+            "true": "Tegarden"
+        },
+        "temperature": {
+            "key": "temperature",
+            "tally#": 0,
+            "true": "temperature"
+        },
+        "thoughts": {
+            "key": "thoughts",
+            "tally#": 0,
+            "true": "thoughts"
+        },
+        "tibia": {
+            "key": "tibia",
+            "tally#": 0,
+            "true": "tibia"
+        },
+        "torn meniscus": {
+            "key": "tornmeniscus",
+            "tally#": 0,
+            "true": "torn meniscus"
+        },
+        "trapezius": {
+            "key": "trapezius",
+            "tally#": 0,
+            "true": "trapezius"
+        },
+        "trends": {
+            "key": "trends",
+            "tally#": 0,
+            "true": "trends"
+        },
+        "triceps": {
+            "key": "triceps",
+            "tally#": 0,
+            "true": "triceps"
+        },
+        "Trumbo": {
+            "key": "trumbo",
+            "tally#": 2,
+            "true": "Trumbo"
+        },
+        "Turpin": {
+            "key": "turpin",
+            "tally#": 2,
+            "true": "Turpin"
+        },
+        "ulna": {
+            "key": "ulna",
+            "tally#": 0,
+            "true": "ulna"
+        },
+        "Valentine": {
+            "key": "valentine",
+            "parents": [
+                "Nebraska"
+            ],
+            "tally#": 0,
+            "true": "Valentine"
+        },
+        "Vancouver": {
+            "key": "vancouver",
+            "parents": [
+                "British Columbia",
+                "Canada"
+            ],
+            "tally#": 0,
+            "true": "Vancouver"
+        },
+        "video": {
+            "key": "video",
+            "tally#": 0,
+            "true": "video"
+        },
+        "Vietnam War": {
+            "key": "vietnamwar",
+            "tally#": 0,
+            "true": "Vietnam War"
+        },
+        "virus": {
+            "key": "virus",
+            "tally#": 0,
+            "true": "virus"
+        },
+        "walking": {
+            "key": "walking",
+            "tally#": 0,
+            "true": "walking"
+        },
+        "War of 1812": {
+            "key": "warof1812",
+            "tally#": 0,
+            "true": "War of 1812"
+        },
+        "warm-up": {
+            "key": "warmup",
+            "tally#": 0,
+            "true": "warm-up"
+        },
+        "weight loss": {
+            "key": "weightloss",
+            "tally#": 0,
+            "true": "weight loss"
+        },
+        "Wheeler": {
+            "key": "wheeler",
+            "tally#": 2,
+            "true": "Wheeler"
+        },
+        "women health": {
+            "key": "womenhealth",
+            "tally#": 0,
+            "true": "women health"
+        },
+        "World War II": {
+            "key": "worldwarii",
+            "tally#": 10,
+            "true": "World War II"
+        },
+        "wrist": {
+            "key": "wrist",
+            "tally#": 0,
+            "true": "wrist"
+        },
+        "yoga": {
+            "key": "yoga",
+            "tally#": 0,
+            "true": "yoga"
+        }
+    }
+}

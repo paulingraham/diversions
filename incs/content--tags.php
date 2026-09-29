@@ -4,7 +4,7 @@ TAG ENGINE: making `tags easier to use, for PubSys originally, and PainSci more 
 
 Tagging is a powerful organizational tool, and yet a simple list of tags quickly becomes unwieldy as it grows. Just like the data they are applied to, tags themselves need organizing — there are different types and categories of tags, different types of tags, aliases for ease of data entry, and so on (and on and on).  Taxonomy is hard!  I’ve been tinkering with this since about 2015, and there's still no end in sight.
 
-There are significant USAGE notes in the header of the tag database itself. These notes are more about how it WORKS, more technical. 
+This header documents how the tag engine WORKS. Semantics and usage doctrine — the record format and example entry, field meanings (including the full related/“synonyms for now” doctrine), shorthand syntaxes, meta tags, and usage rules — were consolidated into notes/tag-system.md (2026-08-26), out of this header and the tags-ps.txt header.
 
 Goals for this system:
 
@@ -50,29 +50,11 @@ TAG ENGINE GLOSSARY
 	STRAY TAG: tag created by usage in error or is never or very rarely used again
 	SORT PREFIX: a useful syntax for grouping tags alphabetically under a selected parent
 
-Example tag data entry (this is duplicated in the tag engine notes and in the tag database header):
+RELATED TAGS: the two purposes of the related field (notes-about-adjacent-topics vs “synonyms for now”) are doctrine, documented in notes/tag-system.md § The related field. The implementation gotcha:
 
-tx » quackery [#] 						< parent » tag (a selected major parent for sorting purposes, AKA sorting prefix » canonical tag)
-	notes = My favourite tag. 		< private notes about the tag, eg clarifying what kind of content
-	description = Bullshit txs!		< public description of the tag, eg appears in tooltips on mouseover
-	short = quack						< a shorter form of the tag
-	long = quackery &snake oil	< a longer form of the tag
-	abbr = qky 							< abbreviation of the tag
-	synonyms = snake oil				< usage of these terms will always be replaced by the main tag
-	parents = skeptagticism			< significant umbrella categories, added to the tag list for the item
-	children = skeptagticism		< significant umbrella categories, added to the tag list for the item
-	tags = core							< description/classification of topics for admin purposes, e.g. like core, probation, requested
-	related = altmed					< similar existing tags (#altmed), or terms that are synonymous for my purposes (patent medicine)
-
-MORE ABOUT RELATED TAGS, or “SYNONYMS FOR NOW” — This field is tricky! It has an obvious purpose, and a non-obvious purpose. Its obvious purpose is to list existing tags that are related in some way, and they are effectively just notes, reminders of what related topics exist.  Its non-obvious purpose is another kind of synonym. This distinction is so confusing that I should probably separate them, and call the second field something like "synonyms for now." The idea is to have a place to put topics that are so closely related that I don’t really want to both with a separate tag … but I might someday. Example: #cannabis and CBD. Not synonyms! But close enough FOR MY PURPOSES that I want to treat them as such. If CBD is listed as a related term for #cannabis, then any usage of CBD will be treated as if it were a usage of #cannabis — exactly like a synonym.  The difference is that I can break that link at will by just creating a dedicated #CBD tag, and suddenly all references to CBD will be treated as #CBD usages, not #cannabis. The term "CBD" can remain in the related list for #cannabis (inert but a useful reminder), or to be more taxonomically precise it could be re-defined as a child.  And why not just make it a child in the first place?  Well, it could be.  That basically works the same way.  But the relationship of many related terms isn't so clear.  It’s just a dumping ground for "close enough for my purposes" synonyms, while falling short of being an obvious synonym, child, etc.
-	
 	Note that duplication of related tags can get confusing. If both #A and #B tags claim that they are "related" to "C" (not it’s own tag)... then C can't be used as synonym for both, and it ends up getting assigned to the last one processed by getTags while building the thesaurus.
 
 Sort prefixes — Sort prefixes exist originally solely for "display", so that tags like "arthritis » osteoarthritis" and "arthritis » rheumatoid arthritis" are visually grouped together. The prefix was not used in any other way. getTags() removed them and saved them in the sort_prefix field, where they remain until updateTags() restores them right before regenerating the tags files. But the sort prefixes are a selected parent tag conceptually: the point is to group related (sibling) tags for organizational convenience, so that I can see several sibling tags together in the database. And so in time I decided to make them functionally equivalent. The sorting prefix syntax is now fully synonymous with declaring parentage.  When parsing, they are added to the parents list. Before output, the prefix syntax is restored for that parent.  If that prefix is the only parent, the parents field isn't even generated.
-
-Cleanup — Because the spontaneous creation of tags in various contexts actually spawns new tags in the tag db — e.g. if I spell a tag wrong and put "snackery" on a post instead of "quackery," then the #snackery tag will be created.  The practical implication is that it becomes necessary to go through the tag db and identify these stray tags and either correct the source, or merge the stray tag into another tag by making it a synonym or relative.
-
-	
 
 Code overview
 
@@ -127,15 +109,12 @@ The condensed syntax is more cryptic but clear enough, tidier, and saves real sp
 
 ⚠️ It’s still easy to acidentally declare an illegal parent this way, and I may have some debugging ahead.
 
-And why have a combo tag like "activators+harms" instead of just tagging with each of those independently?  Every well-tagged post is theoretically tagged with a combo tag that combines all the tags on the post, e.g. 
+Why combo tags exist at all (the “content specifically about the relationship” rationale) is doctrine: notes/tag-system.md § Shorthand syntaxes.
 
-	#activators+harms   ~=   #activators #harms
-
-But only the combo tag will be in database as a combo tag FOR SPECIFIC CONTENT. In other words, it’s descriptive of existing content.  It says "yes, I have content that is specifically about the relationship between these things" … which otherwise could only be theoretically inferred from the presence of both tags, but that wouldn't even actually be possible, because that "signal" would be impossible to separate from the noise of countless other combinations of tags which do not apply to specific content.  Another way of putting it: if you're searching for content that id about both "activators" and "harms," you would want anything taged with "activators+harms" to be at the very top of that list … even though there might be several other articles that do actually have both of those tags.
 
 CATEGORIES
 
-A tag prefixed by an underscore is a “category.”  (The prefix is 100% non-functional: it’s stored, but never actually used in the tag-engine.  It’s parsed out of the input, and put back in when the tags are canonicalized. The sole purpose of the underscore is data-entry convenience in BibDesk.)  What does “category” mean?  Isn’t every tag a category?  It’s an imprecise distinction.  Category-ness is a rough expression of the importance of the tag, which is roughly an intersection of the number of items it applies to, how directly it applies to them.  The “back pain” tag is not only applied to more items than “elbow pain,” but the items it is applied to are mostly about back pain, whereas elbow pain is typically a peripheral or sub-topic.  Thus back pain is definitely a category, but it would be difficult to determine it algorithmically.   The underscore tags also began life in my file system as tags specifically referring to the TYPE of content, as opposed to what it was about or its tone.  To some extent, types of content tend to be large or important categories. In time, I may replace the category syntax with a more granular tag rating system.
+A tag prefixed by an underscore is a “category.” The prefix is 100% non-functional in this code: stored but never used, parsed out of the input and put back when the tags are canonicalized (its sole purpose is data-entry convenience in BibDesk). What “category” actually means: notes/tag-system.md § Shorthand syntaxes.
 
 
 HOW DOES TAG TALLYING WORK?
@@ -605,6 +584,32 @@ function updateTags() {
 		saveAs($tags_str_qrg, $tag_qrg_fn);
 		}
 
+	/* Machine-readable sibling of the QRG (added 2026-09-03). The QRG is for Paul's eyes and is lossy for code: synonyms/related are space-joined (multi-word terms can't be split back out), sort prefixes look like tags but may not be (getTag('lbp') is 'back pain'), and the real match contract — simplify() + auto-plurals + first-come precedence for related terms — is only visible in the built thesaurus. So export the resolved products directly: `thesaurus` maps every simplified lookup key to the TRUE tag name (what getTag() returns), and `tags` carries each record (public fields only; `notes` is private). Consumers (tools/image-index.py, future #tag harvesters) load this instead of re-parsing tags-ps.txt or the QRG — see notes/tag-system.md. No timestamp in the payload: a `generated` field defeated the write-if-changed guard below and made the file show as modified in git after every build (removed 2026-09-12); git history and mtime already say when it changed. Predecessors incs/tags.json + content--tags-thesaurus.txt were deleted with the old articles page (d19f038cb8) and had gone stale because they weren't regenerated on build; this one is written on every blog build, same as the QRG. */
+	$trueByKey = []; // by this point $tags has been re-keyed for sorting (restoreSortPrefixes), so index by each record's own simplified key, which is what the thesaurus values are
+	foreach ($tags as $td) if (isset($td['key'], $td['true'])) $trueByKey[$td['key']] = $td['true'];
+	$thesaurus = [];
+	foreach ($GLOBALS['tag_thesaurus'] as $k => $key) if (isset($trueByKey[$key])) $thesaurus[$k] = $trueByKey[$key];
+	foreach ($trueByKey as $key => $true) $thesaurus[$key] = $true; // tags harvested this build (tallyTags/getBlogTags) postdate the thesaurus built in getTags(), so make sure every true tag resolves to itself
+	ksort($thesaurus, SORT_STRING);
+	$records = [];
+	$listy = ['synonyms', 'related', 'parents', 'parents_inferred', 'children', 'tags'];
+	foreach ($tags as $key => $td) {
+		unset($td['notes']);
+		foreach ($listy as $f) if (isset($td[$f]) and !is_array($td[$f])) $td[$f] = array_values(array_filter(array_map('trim', explode(',', $td[$f])), 'strlen'));
+		ksort($td);
+		$records[$td['true']] = $td;
+		}
+	ksort($records, SORT_STRING | SORT_FLAG_CASE);
+	$tags_str_json = json_encode(['simplify' => 'lowercase; strip spaces and the punctuation list in simplify() (util--core.php); plural/singular variants are pre-expanded in thesaurus', 'thesaurus' => $thesaurus, 'tags' => $records], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+	$tag_json_fn = "guts/tags-{$sitecode}.json";
+	if (fileExistsNoChange($tags_str_json, $tag_json_fn)) {
+		journal("tags JSON export has not changed, <em>not</em> writing file: $tag_json_fn",2,true);
+		}
+	else {
+		journal("<strong>tags JSON export has changed</strong>, writing file: $tag_json_fn", 2, true);
+		saveAs($tags_str_json, $tag_json_fn);
+		}
+
 	$tags_canonicalized = $GLOBALS["tag_db_header"] . $tags_str_db;
 	if (fileExistsNoChange($tags_canonicalized, $tag_fn)) {
 		journal("tags file has not changed, <em>not</em> writing file: $tag_fn",2,true);
@@ -864,19 +869,6 @@ function formatTagRecord_DB ($td) {
 		if (is_null($td[$tag_field])) $tagRecord .= "<##>\n"; // could put <##> here, maybe
 	} // end fields loop
 	return $tagRecord;
-}
-
-function makeThesaurusFile () {
-	if (!is_array($GLOBALS['tag_thesaurus'])) exit("\$GLOBALS['tag_thesaurus'] is not an array");
-	$tag_thesaurus_json = json_encode($GLOBALS['tag_thesaurus']);
-	$tag_thesaurus_fn = _ROOT . "/incs/content--tags-thesaurus.txt";
-	if (fileExistsNoChange($tag_thesaurus_json, $tag_thesaurus_fn)) {
-		journal("tags file has not changed, <em>not</em> writing file: $tag_thesaurus_fn",2,true);
-		}
-	else {
-		journal("<strong>tags file has changed</strong>, writing file: $tag_thesaurus_fn", 2, true);
-		saveAs($tag_thesaurus_json, $tag_thesaurus_fn);
-		}	
 }
 
 /** returns @array, tags: tag record with 'parents_inferred' removed from 'parents' */

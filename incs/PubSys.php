@@ -47,7 +47,7 @@ function getPosts()
 		if (preg_match("@posts/20\d\d-\d\d-\d\d[a-p]{0,1} .*$@", $fn) == 0) {
 			continue;
 		} // ignore filenames that don’t begin with a correctly formatted date and a space eg "2013-07-20 filename"; in practice this means that filenames without a leading date can be drafts (preg_match returns a zero if there's no match)
-		if (preg_match('@(.sm.txt|.bd.md)@', $fn) == 1) { // ignore filenames with .sm.txt or .bd.md extensions — these are alternate versions, not source files for posts
+		if (preg_match('@\.(sm|bd)\.@', $fn) == 1) { // ignore .sm.* and .bd.* filenames — social-media and Buttondown derivatives of the current post (see derivativePaths), plus ~28 legacy hand-kept ones; never post sources themselves
 			continue;
 		}
 		// skip stale files
@@ -912,14 +912,78 @@ function makeWebVersions()
 
 			makeTextVersion();			// make a version of the post that is partially prepared for use in plain text contexts (social media posts)
 			makeButtondownVersion();	// make a version of the post partially prepped for use with Buttondown
+			cleanupDerivatives();		// retire the .sm.md/.bd.md files of older posts
 		} // end making files for current post
 	}	// end of post loop, I think
+}
+
+/** returns @array: filenames/paths for one derivative ('sm' or 'bd') of a post — 'name' (basename, shared by both copies), 'draft' (hidden machine-draft path), 'working' (visible hand-finishing path) */
+function derivativePaths($thePost, $kind)
+{ /* Naming doctrine for the social-media (.sm.md) and Buttondown (.bd.md) derivatives of the current post (Aug 2026, replacing TEMP files on the Desktop and then a first attempt at plain `<source name>.sm.md` siblings):
+
+	1. Two copies per derivative, distinguished by LOCATION, not name. The machine draft regenerates on every build and lives in the hidden `posts/.derivatives/` folder — invisible in Finder and BBEdit's sidebar, but there for Claude to diff against. The visible sibling beside the post source is seeded ONCE from the machine draft and never touched by the build again, so it is safe to hand-finish; that is the only copy Paul ever needs to open. Same basename in both places, so `diff` is trivial.
+
+	2. The kind marker is an emoji right after the date — `2026-08-10 📣 slug.sm.md` (social) / `2026-08-10 📧 slug.bd.md` (newsletter) — because a trailing extension is exactly what a narrow BBEdit sidebar truncates, and `.sm.md` vs `.bd.md` proved indistinguishable at a glance (three wrong-file mistakes in the first two posts). Single-codepoint emoji only, no variation selectors, so the names stay regex- and shell-friendly. The `.sm.md`/`.bd.md` suffix is kept because the post scan excludes derivatives by it.
+
+	3. The stem is the source-file stem for macroposts (so the visible copies still sort beside their source) but the post's own URL slug for microposts, whose source is a shared POSTS container: naming derivatives after the container meant the write-once copy was seeded from the first micropost and never refreshed for later ones. Micropost derivatives therefore don't sort with their source — accepted. */
+	if ($thePost['post_class'] == 'micro') {
+		$stem = $thePost['title_smpl'];
+	} else {
+		$stem = preg_replace(['/^\d{4}-\d\d-\d\d[a-p]? /', '/\.md$/i'], '', $thePost['source_file']);
+	}
+	$marker = ['sm' => '📣', 'bd' => '📧'][$kind];
+	$name = "{$thePost['date']} $marker $stem.$kind.md";
+	$dir = dirname($thePost['source_path']);
+	return ['name' => $name, 'working' => "$dir/$name", 'draft' => "$dir/.derivatives/$name"];
+}
+
+/** returns nothing: saves a derivative of the current post — regenerating machine draft in posts/.derivatives/, plus a write-once visible copy beside the source (see derivativePaths for the doctrine) */
+function saveDerivative($thePost, $theContent, $kind, $label)
+{
+	$p = derivativePaths($thePost, $kind);
+	if (!is_dir(dirname($p['draft']))) mkdir(dirname($p['draft']), 0755, true);
+	if (fileExistsNoChange($theContent, $p['draft'])) {
+		journal("skipping current post $label version (machine draft unchanged: {$p['name']})", 2, true);
+	} else {
+		journal("making current post $label version of '{$thePost['title']}' (machine draft: .derivatives/{$p['name']})", 2, true);
+		saveAs($theContent, $p['draft']); // `path
+	}
+	if (!file_exists($p['working'])) {
+		$url_bbe = 'x-bbedit://open?url=file://' . realpath(dirname($p['working'])) . '/' . rawurlencode($p['name']);
+		journal("seeding one-time <a href='$url_bbe'>hand-finishing copy</a> of the $label version: {$p['name']}", 2, true);
+		saveAs($theContent, $p['working']); // `path
+	}
+}
+
+/** returns nothing: deletes derivative files (machine drafts and hand-finishing copies alike) belonging to any post other than the current one, once they are more than a week old */
+function cleanupDerivatives()
+{ /* Derivatives are temporary by nature — once the Facebook post and the Buttondown email exist, they are redundant (the sent email is durably archived by buttondown-archive-sync). The week's grace covers building a new post before the previous one's social/newsletter work is finished. Only files in the emoji-marked naming pattern are candidates: the ~28 pre-Aug-2026 hand-kept `.bd.md` files tracked in git never match, and are never touched. */
+	global $posts;
+	if (! $GLOBALS['ps']) {
+		return;
+	}
+	foreach ($posts as $thePost) { // the first post is the current post
+		break;
+	}
+	$keep = [derivativePaths($thePost, 'sm')['name'], derivativePaths($thePost, 'bd')['name']];
+	$dir = dirname($thePost['source_path']);
+	$candidates = array_merge(glob("$dir/*.{sm,bd}.md", GLOB_BRACE), glob("$dir/.derivatives/*.{sm,bd}.md", GLOB_BRACE));
+	foreach ($candidates as $fn) {
+		if (!preg_match('@/20\d\d-\d\d-\d\d[a-p]? [📣📧] @u', $fn)) continue; // not the current naming pattern → not ours to delete
+		if (in_array(basename($fn), $keep)) continue; // current post's own derivatives
+		if (filemtime($fn) > time() - 7 * 86400) continue; // grace period
+		unlink($fn);
+		journal('deleted stale derivative: ' . basename($fn), 2, true);
+	}
 }
 
 /* <##> Convert a rendered post into a plain text version relatively ready for use in social media sharing (e.g. italics → ALLCAPS, links on their own line). */
 function makeTextVersion()
 { /* There is much overlap between all of the post-converting functions: makeRSS, makeTextVersion, and makeButtondownVersion. In all cases, code is messy and the output is perpetually imperfect, and it’s probably impossible to make it perfect… but the text and Bd versions only have to be better than manual conversion a post, and that's a low bar. The makeTextVersion() function is the easiest of the three because the output is the most bare bones, and in particular because it never produces paywall stuff and member content, it can remove images completely, etc. */
 	global $posts, $settings;
+	if (! $GLOBALS['ps']) { // PainSci-only, like makeButtondownVersion: the social-media draft workflow has no counterpart on the family blogs
+		return;
+	}
 	extract($settings);
 
 	foreach ($posts as $thePost) { // get the first post from the posts array
@@ -973,16 +1037,8 @@ function makeTextVersion()
 	$theContent = preg_replace('|<!--.*?-->|', '', $theContent); // remove all comments
 	$theContent = tidyWhitespace($theContent);
 
-	// okay, done building the text version, now to save it
-	$path = '/Users/paul/Desktop/';
-	$fn = "TEMP {$thePost['title_smpl']}.sm.txt";
-	$url_bbe = "x-bbedit://open?url=file:///$path$fn";
-	if (fileExistsNoChange($theContent, $path.$fn)) {
-		journal("skipping <a href='$url_bbe'>current post TEXT version</a> (file unchanged: {$fn})", 2, true);
-	} else { // go ahead and save it
-		journal("making <a href='$url_bbe'>current post TEXT version</a> of '{$thePost['title']}'", 2, true);
-		saveAs($theContent, $path.$fn); // `path
-	}
+	// okay, done building the text version, now to save it (hidden machine draft + visible hand-finishing copy; see derivativePaths)
+	saveDerivative($thePost, $theContent, 'sm', 'TEXT');
 }
 
 /* <##> Convert post content into a Markdown+Buttondown version relatively ready for newsletter use. */
@@ -1014,7 +1070,9 @@ function makeButtondownVersion()
 	// >Q or >q mark blockquotes that are styled distinctively in the web version, and at some point I could also style them for Buttondown as well, but for the moment this code simply gets rid of the '>Q' or '>q' markup.
 	$theContent = preg_replace("/>*[qQ]\s+/", '>', $theContent);
 	
-//	$theContent = preg_replace("@<aside class='sidebar'>(.+?)</aside>@", "<div class='sidebar'>$1</div>", $theContent); // #2do: fix this, but it’s not terribly important; the idea here is to change to <div class='meta'>, but divs are stripped out below, and other markup and even artificial delimters do not work: html conversion below seperated any <p> elements with vertical whitespace, effectively disassociating my delimiters here from what the delimit; I can imagine workarounds, but it’s all just too ridiculous
+	/* Convert asides (all flavours: sidebar, meta, widebar, ftd_citation…) to blockquotes, the email-safe "set apart" idiom (already used for P.S.es). Left alone, the aside element passes through to Buttondown as unstyled raw HTML, which also inertizes its contents: markdown inside an HTML block never renders, so emphasis arrives as literal asterisks (defect confirmed Aug 2026, reverse-referral post). As a blockquote, HtmlConverter converts the contents to live markdown below. */
+	$theContent = preg_replace('|<aside[^>]*>|', '<blockquote>', $theContent);
+	$theContent = str_replace('</aside>', '</blockquote>', $theContent);
 
 
 		
@@ -1051,6 +1109,9 @@ Convert that to:
 	// first strip out zoom links; this doesn't remove the </a>, but that will get stripped out later
 	$theContent = preg_replace("|<a href='.+?' target='_blank' title='Embiggen! Open larger version in new tab/window.'>\n*|", '', $theContent);
 
+	// Run-in caption headings (the `cap:Lead-in*rest` source form) render as a caphead <p> immediately followed by a body <p>; the generic caption pattern below would swallow the pair whole, and the interior </p><p…> tags get dropped downstream, welding the lead-in to the caption text ("Where it all beganThe first page…" — defect confirmed Aug 2026, reverse-referral post). Convert the pair to one caption with the lead-in bolded plus an em dash, the established hand-fix form.
+	$theContent = preg_replace("|<p class='capt caphead[^']*'><!--caption-->(.+?)</p><p class='capt[^']*'>(.+?)<!--/caption--></p>|", ' <CAPTION><strong>$1</strong> — $2</CAPTION> ', $theContent);
+
 	// Managing captions and bylines is tricky because they are in the wrong order for the Buttondown format, and there may be one, the other, both, or neither.
 	$theContent = preg_replace("|<p class='capt .*?><!--caption-->(.+?)<!--/caption--></p>|", ' <CAPTION>$1</CAPTION> ', $theContent);
 	$theContent = preg_replace("|<p class='img_byline'>(.+?)</p>|", ' <BYLINE>$1</BYLINE> ', $theContent);
@@ -1083,6 +1144,24 @@ Convert that to:
 	// We now have a mixture of both HTML and Markdown+Buttondown!  If we try to convert Markdown to Markdown, we get a bunch of escaping of symbols and such.  So we have to, good grief, convert the HTML to Markdown, and then immediately convert the fully Markdownified post right back to HTML! Sheesh.
 	$theContent = MarkdownExtra::defaultTransform($theContent); // convert the mixture of Markdown and HTML to pure HTML...
 
+	/* Footnote formatting: give each footnote's annotation its own paragraph. The cite() templates end their bibliographic info at a findable seam: usually a bare empty comment (the expand fallback in xRefRecord.php), but some record shapes (books, no-PMID vintage records) end with the last link glyph (&#10064;</a>) or a closing </span> instead. HtmlConverter drops comments and collapses whitespace, which used to weld the citation and annotation into one long line in the numbered footnote list. So: insert placeholder characters at the seam — ¶¶ becomes a blank line and ⇥ becomes a tab below, making the annotation a continuation paragraph of its footnote (same protect-linefeeds-from-conversion trick as elsewhere in this function). */
+	$theContent = preg_replace_callback('~<li id=.fcj\d+.>.*?</li>~s', function ($m) {
+		$li = $m[0];
+		if (preg_match('~\s*<!-- -->\s*~', $li)) {
+			return preg_replace('~\s*<!-- -->\s*~', '¶¶⇥', $li, 1);
+		}
+		if (preg_match_all('~(&#10064;</a>|</span>)~', $li, $mm, PREG_OFFSET_CAPTURE)) { // no empty-comment seam: fall back to the last citation-ending marker, if annotation text follows it
+			$last = end($mm[1]);
+			$pos = $last[1] + strlen($last[0]);
+			$after = substr($li, $pos);
+			if (preg_match('~\S~', str_replace('</li>', '', $after))) {
+				return substr($li, 0, $pos) . '¶¶⇥' . ltrim($after);
+			}
+		}
+		return $li;
+	}, $theContent);
+	$theContent = preg_replace('|<jsflag[^>]*></jsflag>|', '', $theContent); // web-only flag elements (e.g. the noteworthy-fn markers in footnotes) otherwise survive conversion as literal junk in the email
+
 	$html2md = new HtmlConverter(['header_style'=>'atx']);  // invoke HtmlConverter (to remove specified notes: new HtmlConverter(array('remove_nodes' => 'span div'));
 	$theContent = $html2md->convert($theContent); // and back to markdown!
 	// a few hacky repairs after that janky step...
@@ -1109,7 +1188,9 @@ exit;
 	$theContent = str_replace('UNDERSCORE', '_', $theContent); // restore underscores to Buttondown template tags
 	$theContent = str_replace('&lt;', '<', $theContent); // restore some angle brackets that got rendered into entities
 	$theContent = str_replace('&gt;', '>', $theContent); // restore some angle brackets that got rendered into entities
-	$theContent = str_replace('¶', "\n", $theContent); // insert some intended CRs that got nuked	
+	$theContent = str_replace('\*', '*', $theContent); // HtmlConverter backslash-escapes asterisks in any text it couldn't parse as emphasis — which here is always raw markdown that sat inside an HTML block (footnote annotations especially) and SHOULD be emphasis; unescape so Buttondown renders italics instead of literal \*word\* (defect confirmed Aug 2026, reverse-referral post)
+	$theContent = str_replace('¶', "\n", $theContent); // insert some intended CRs that got nuked
+	$theContent = str_replace('⇥', "\t", $theContent); // and the intended tab for footnote annotation paragraphs (see the citation/annotation boundary replacement above)
 	
 	// the worst is over, but still plenty of busy work now…
 
@@ -1187,7 +1268,7 @@ exit;
 				{% comment %} AUDIO CTA UPSELL FOR PST1 {% endcomment %}
 				{% if subscriber.stripe_subscription.product == 'pst1' %}This post has an audio version for PainSci members paying $5+/month. <a href="{{ manage_premium_subscription_url }}">Upgrade now</a>.{% endif %}
 				{% comment %} AUDIO INFO FOR FULL (PST2 AND PST3) MEMBERS ONLY {% endcomment %}
-				{% if subscriber.can_view_premium_content and subscriber.stripe_subscription.product != 'pst1' %}This post has an audio version for full members like you. <a href="https://www.painscience.com/{$thePost['post_audio']}">Listen in your web browser</a> or <a href="https://www.painscience.com/login.php?{{ subscriber.email }}">login to get your personal podcast subscription link</a>.{% endif %}
+				{% if subscriber.can_view_premium_content and subscriber.stripe_subscription.product != 'pst1' %}This post has an audio version for full members like you. <a href="https://www.painscience.com/{$thePost['post_audio']}">Listen in your web browser</a> or <a href="https://www.painscience.com/login.php?{{ subscriber.email }}">log in to get your personal podcast subscription link</a>.{% endif %}
 				</p>
 				AUDIO;
 			$theContent = $audio . "\n\n\n\n\n\n" . $theContent;
@@ -1197,7 +1278,7 @@ exit;
 				{% comment %} AUDIO CTA UPSELL FOR PST1 {% endcomment %}
 				{% if subscriber.stripe_subscription.product == 'pst1' %}This post has an audio version and a nicer web version for PainSci members paying $5+/month. To get all versions and more (like post archives) <strong><a href="{{ manage_premium_subscription_url }}">upgrade now</a></strong>.{% endif %}
 				{% comment %} AUDIO INFO FOR FULL (PST2 AND PST3) MEMBERS ONLY {% endcomment %}
-				{% if subscriber.can_view_premium_content and subscriber.stripe_subscription.product != 'pst1' %}This post has an audio version for full members like you. <a href="https://www.painscience.com/{$thePost['post_audio']}">Listen in your web browser</a> or <a href="https://www.painscience.com/login.php?{{ subscriber.email }}">login to get your personal podcast subscription link</a>.{% endif %}
+				{% if subscriber.can_view_premium_content and subscriber.stripe_subscription.product != 'pst1' %}This post has an audio version for full members like you. <a href="https://www.painscience.com/{$thePost['post_audio']}">Listen in your web browser</a> or <a href="https://www.painscience.com/login.php?{{ subscriber.email }}">log in to get your personal podcast subscription link</a>.{% endif %}
 				</p>
 				AUDIO;
 			$theContent = str_replace('Welcome!***', "Welcome!***\n\n{$audio}", $theContent); // insert after "and welcome" 
@@ -1235,16 +1316,8 @@ exit;
 		$theContent = str_replace("<!--end-->", "\n\n{$endmark}\n\n<!--end-->", $theContent);
 	}
 
-	// okay, done building the text version, now to save it
-	$path = '/Users/paul/Desktop/';
-	$fn = "TEMP {$thePost['title_smpl']}.bd.md";
-	$url_bbe = "x-bbedit://open?url=file:///$path$fn";
-	if (fileExistsNoChange($theContent, $path.$fn)) {
-		journal("skipping <a href='$url_bbe'>current post NEWSLETTER version</a> (file unchanged: {$fn})", 2, true);
-	} else { // go ahead and save it
-		journal("making <a href='url_bbe'>current post NEWSLETTER version</a> of '{$thePost['title']}'", 2, true);
-		saveAs($theContent, $path.$fn); // `path
-	}
+	// okay, done building the newsletter version, now to save it (hidden machine draft + visible hand-finishing copy; see derivativePaths)
+	saveDerivative($thePost, $theContent, 'bd', 'NEWSLETTER');
 }
 
 /* <##> make the home page (index.html) */
@@ -1775,7 +1848,7 @@ function get_settings()
 	$fnarr = glob('guts/settings-*'); // find the settings file
 //	include($fnarr[0]);
 	$settings = getArrFromFile($fnarr[0], false, true); // $synonyms = false, $simple = true;
-	date_default_timezone_set(defined('PS_TIMEZONE') ? PS_TIMEZONE : 'US/Pacific'); // #timezone — canonical constant from util--errors.php (always loaded before PubSys in both the PS env and the blog loader; ternary is just belt-and-braces)
+	date_default_timezone_set(defined('PS_TIMEZONE') ? PS_TIMEZONE : 'America/Los_Angeles'); // #timezone — canonical constant from util--errors.php (always loaded before PubSys in both the PS env and the blog loader; ternary is just belt-and-braces)
 	$settings['year'] = date('Y');
 
 	if (!empty($settings['optional_subdir'])) {
