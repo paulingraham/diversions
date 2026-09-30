@@ -53,7 +53,7 @@ function getPosts()
 		// skip stale files
 //		if (!fileFresh($fn, 500)) continue; // only make posts from files that have been changed recently
 		// of the files that remain …
-		if (preg_match('@POSTS*@', $fn)) {			// look for filenames including "POSTS"
+		if (preg_match('@POSTS@', $fn)) {			// look for filenames including "POSTS" (until Sept 2026 the pattern was POSTS*, i.e. POST plus zero or more S's, so an ordinary post with the capitalized word POST in its filename was read as a micropost file and silently disappeared)
 			$micropost_files[] = $fn;
 			$cacheFile = $cacheDir . '/' . basename($fn) . '.cache';
 			if (!$forceRebuild && file_exists($cacheFile) && filemtime($cacheFile) > filemtime($fn)

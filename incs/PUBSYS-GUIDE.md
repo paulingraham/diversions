@@ -54,7 +54,7 @@ A post's filename starts with its date, then **one space**, then any name you li
 - The name after the date is only for you. It doesn't affect the page title or address.
 - The extension doesn't matter. `.html`, `.md`, and `.txt` files are all read the same way: as Markdown, with HTML allowed (§6).
 - **A file whose name doesn't start with a date is ignored by the build.** That's the simplest way to keep a draft in `posts/` without it appearing anywhere.
-- **Don't put the capitalized word `POST` in a filename.** Any filename containing `POST` is read as a micropost file (§11), and an ordinary post in one silently disappears. Image files in `posts/` are special too (§11).
+- **Don't put the capitalized word `POSTS` in the filename of an ordinary post.** Any filename containing `POSTS` is read as a micropost file (§11), and an ordinary post in one silently disappears. Image files in `posts/` are special too (§11).
 
 ### Inside the file
 
