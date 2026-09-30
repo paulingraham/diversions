@@ -253,7 +253,7 @@ $post = array('canonical' => null,
 			$md = mb_strtolower($mdo); // work with a lowercase version, to reduce the potential for matching failures
 			$md_pt2 = null; // reset every iteration — only set below if this item has a colon; without this reset, a bare flag (no colon) would inherit $md_pt2 from a previous, unrelated colon'd item in the same post (this was a real latent bug: one Writerly post's public URL was accidentally derived from a stale tags value via a bare `slug` flag — that post now carries an explicit `slug:` value to preserve its URL)
 			if ($colonPos = strpos($mdo, ':')) { // find first occurrence of a colon in the string
-				$md = substr($mdo, 0, $colonPos); // echo "<p>md = $md</p>";
+				$md = mb_strtolower(substr($mdo, 0, $colonPos)); // lowercased like the no-colon case above; until Sept 2026 this overwrote the lowercase version with the original, so capitalized setting names ("Tags:", "Description:") were silently ignored
 				$md_pt2 = trim(substr($mdo, $colonPos + 1)); // echo "<p>md_pt2 = `$md_pt2`</p>";
 			}
 			if (preg_match('@(jpg|gif|png)$@', $md, $tmp)) {
@@ -663,7 +663,7 @@ $post = array('canonical' => null,
 			$md = strtolower($mdo); // work with a lowercase version, to reduce the potential for matching failures
 			$md_pt2 = null; // reset every iteration — see the twin comment in getMicropost: without this, a bare flag (no colon) would inherit $md_pt2 from a previous, unrelated colon'd item in the same post
 			if ($colonPos = strpos($mdo, ':')) { // find first occurrence of a colon in the string
-				$md = substr($mdo, 0, $colonPos); // echo "<p>md = $md</p>";
+				$md = strtolower(substr($mdo, 0, $colonPos)); // lowercased like the no-colon case above — see the twin comment in getMicropost
 				$md_pt2 = trim(substr($mdo, $colonPos + 1)); // echo "<p>md_pt2 = `$md_pt2`</p>";
 			}
 
