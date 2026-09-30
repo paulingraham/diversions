@@ -1371,7 +1371,8 @@ function prepareContent($content)
 	//		shorthands with synonyms (“sh” for shorthand)
 		$sh_syns = getArrFromFile('synonyms-pubsys-shorthands.txt', true); // sh for shorthand
 		$crs = "[\r\n]{1,3}"; // the vertical space pattern gets used a lot, so var it
-		$sh_pattern = "@{$crs}!(\w{2,30}){$crs}@";
+		$own_line_start = '(?<=[\r\n])'; $own_line_end = '(?=[\r\n])'; // a line break before and after, checked with lookarounds that don't consume it; until Sept 2026 the patterns consumed the breaks with {$crs}, so when two shorthands were separated only by a blank line, the first match used up the breaks the second needed, and the second was skipped with no warning
+		$sh_pattern = "@{$own_line_start}!(\w{2,30}){$own_line_end}@";
 
 	// look for shorthands: prefixed by ! and isolated vertically
 	if (preg_match_all($sh_pattern, $content, $matches, PREG_PATTERN_ORDER)) {
@@ -1386,22 +1387,22 @@ function prepareContent($content)
 			//	 then white-space, then replace sh with content
 			$sh_known = false; // psErr* audit batch 3: track category membership so an unmatched shorthand can be reported instead of shipping literally
 			if (in_array($sh, $sh_syns['clear'])) {
-				$content = preg_replace("@({$crs})!{$sh}({$crs})@", "$1<br style='clear:both'>$2", $content);
+				$content = preg_replace("@{$own_line_start}!{$sh}{$own_line_end}@", "<br style='clear:both'>", $content);
 				$sh_known = true;
 			}
 
 			if (in_array($sh, $sh_syns['break'])) {
-				$content = preg_replace("@({$crs})!{$sh}({$crs})@", '$1<br>$2', $content);
+				$content = preg_replace("@{$own_line_start}!{$sh}{$own_line_end}@", '<br>', $content);
 				$sh_known = true;
 			}
 
 			if (in_array($sh, $sh_syns['stars'])) {
-				$content = preg_replace("@({$crs})!{$sh}({$crs})@", "$1<div class='separator stars'>&#9733; &#9733; &#9733;</div>$2", $content);
+				$content = preg_replace("@{$own_line_start}!{$sh}{$own_line_end}@", "<div class='separator stars'>&#9733; &#9733; &#9733;</div>", $content);
 				$sh_known = true;
 			}
 
 			if (in_array($sh, $sh_syns['sidebar'])) {
-				$content = preg_replace("@({$crs})!{$sh}{$crs}(.*?)({$crs})@", "$1<p class='sidebar'>$2</p>$3", $content);
+				$content = preg_replace("@{$own_line_start}!{$sh}{$crs}(.*?){$own_line_end}@", "<p class='sidebar'>$1</p>", $content);
 				$sh_known = true;
 			}
 
