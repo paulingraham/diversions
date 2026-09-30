@@ -56,7 +56,7 @@ if (!$ps AND stripos(ROOT_DEV, "paul") !== false) {
 	$makesite_canonical_fn = "$canonical_dir/bin/make-ps-blog.php"; // the canonical code
 	$makesite_target_fn = ROOT_DEV . "/make-site.php"; // this file in the current site folder (might be writerly, diversions, etc)
 
-	$filenames = array ("PubSys.php", "util--core.php", "util--build.php", "util--errors.php", "css-errors.css", "content--tags.php", "table-sort.js", "table-sort-setup.js", "synonyms-pubsys-shorthands.txt", "synonyms-post-metadata.txt", "synonyms-image-options.txt", "easy-img.php","css-pubsys.css","lazyload-imgs.js");
+	$filenames = array ("PubSys.php", "util--core.php", "util--build.php", "util--errors.php", "css-errors.css", "content--tags.php", "table-sort.js", "table-sort-setup.js", "synonyms-pubsys-shorthands.txt", "synonyms-post-metadata.txt", "synonyms-image-options.txt", "easy-img.php","css-pubsys.css","lazyload-imgs.js", "PUBSYS-GUIDE.md"); // PUBSYS-GUIDE.md: user documentation, imported by the family blogs' CLAUDE.md files (Sept 2026)
 	$target_dirs = array ("writerly", "diversions", "ephemeral");
 
 	if (stripos($_SERVER['QUERY_STRING'] ?? '', 'sync') === false) {

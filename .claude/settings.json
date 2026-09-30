@@ -1,0 +1,45 @@
+{
+  "model": "opus",
+  "permissions": {
+    "allow": [
+      "Edit(/posts/**)",
+      "Edit(/html/imgs/**)",
+      "Edit(/guts/**)",
+      "Edit(/for-paul/**)",
+      "Edit(/CLAUDE.md)",
+      "Bash(curl -s http://diversions.test/make-site.php)",
+      "Bash(curl -s http://diversions.test/make-site.php?full)",
+      "Bash(git fetch *)",
+      "Bash(git status *)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git show *)",
+      "Bash(git pull --ff-only *)",
+      "Bash(git stash push *)",
+      "Bash(git stash list)",
+      "Bash(sips *)"
+    ],
+    "deny": [
+      "Edit(/make-site.php)",
+      "Edit(/incs/**)",
+      "Edit(/*.command)",
+      "Edit(/MAKE.webloc)",
+      "Edit(/.claude/**)",
+      "Edit(/html/*.html)",
+      "Edit(/html/*.xml)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git reset *)",
+      "Bash(git checkout *)",
+      "Bash(git restore *)",
+      "Bash(git rebase *)",
+      "Bash(git merge *)",
+      "Bash(git clean *)",
+      "Bash(git rm *)",
+      "Bash(git stash drop *)",
+      "Bash(git stash pop *)",
+      "Bash(git stash clear *)",
+      "Bash(sudo *)"
+    ]
+  }
+}
