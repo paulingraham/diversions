@@ -1735,8 +1735,11 @@ function makeSitemap()
 		if ($ps) {
 			$default_priority = $default_priority - 2; // on ps, posts are relatively less important than the rest of the site
 		}
-		if (!empty($post['priority'])) {
-			$sitemap_str .= "<priority>0.{$post['priority']}</priority>";
+		if (!empty($post['priority']) and !(is_numeric($post['priority']) and inRange($post['priority'], 1, 10))) {
+			journal("warning: priority '{$post['priority']}' is not a number from 1 to 10, using the default; post dated {$post['date']}", 2, true);
+		}
+		if (!empty($post['priority']) and is_numeric($post['priority']) and inRange($post['priority'], 1, 10)) {
+			$sitemap_str .= '<priority>' . number_format($post['priority'] / 10, 1) . '</priority>'; // 1–10 → 0.1–1.0; until Sept 2026 this was the text "0." + priority, so 10 came out as 0.10, the lowest priority of all
 		} elseif ($post['post_class'] == 'macro') {
 			$sitemap_str .= '<priority>0.' . $default_priority . '</priority>';
 		} else {

@@ -81,7 +81,7 @@ Notes to self down here are never published.
 
 ## 4. Header settings
 
-Each header line is either `name: value` or a single word. **Setting names must be lowercase:** `Tags: stamps` is silently ignored, but `tags: stamps` works. Lines the build doesn't recognize are ignored without any warning, so a misspelled setting simply does nothing.
+Each header line is either `name: value` or a single word. Capitalization of setting names doesn't matter: `Tags: stamps` and `tags: stamps` both work. Lines the build doesn't recognize are ignored without any warning, so a misspelled setting simply does nothing.
 
 | Setting | Example | What it does |
 |---|---|---|
@@ -94,7 +94,7 @@ Each header line is either `name: value` or a single word. **Setting names must 
 | `lock` | `lock` | Also accepts `ignore`. Doesn't build the post at all. **If the page already exists, the build deletes it** from `html/`, so `lock` takes a post off the site. |
 | `link` | `link: https://example.com/story` | A "featured link": the post's title links to that address (marked with ∞), and a "Featured link" line appears at the end of the post. |
 | `hidelink` | `hidelink: https://…` | Like `link`, but without the line at the end. |
-| `priority` | `priority: 8`, or just `8` | How important the post is, from 1 to 9, as a hint to search engines (via the sitemap). Ordinary posts default to 7. 9 also adds a "best of" tag. **Don't use 10:** it comes out as 0.10, the lowest priority of all. |
+| `priority` | `priority: 8`, or just `8` | How important the post is, from 1 to 10, as a hint to search engines (via the sitemap). Ordinary posts default to 7. 9 or 10 also adds a "best of" tag. |
 
 Some other settings exist in the code but only matter on PainScience.com.
 
