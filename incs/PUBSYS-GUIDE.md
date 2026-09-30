@@ -217,7 +217,7 @@ These are PubSys's own additions to Markdown.
 
 The alternative words (like `!3stars`) come from `incs/synonyms-pubsys-shorthands.txt`, and there are similar lists for header settings and image options. On the family blogs those files are shared code, replaced by every update, so new synonyms have to be added by Paul.
 
-**Nothing may follow the word on its line, not even a space:** `!clear ` with a trailing space is printed on the page as-is, with no warning. A mistyped shorthand (`!clearr`) is also printed as-is, but the build shows a warning.
+Nothing else may be on the shorthand's line, though trailing spaces don't matter. A mistyped shorthand (`!clearr`) is printed on the page as-is, and the build shows a warning.
 
 **The bullet divider**: a line containing just `•` becomes a small, light centred divider, often used before a closing section. Watch out: a bullet at the *end* of any line also becomes a divider.
 

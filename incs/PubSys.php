@@ -1371,7 +1371,7 @@ function prepareContent($content)
 	//		shorthands with synonyms (“sh” for shorthand)
 		$sh_syns = getArrFromFile('synonyms-pubsys-shorthands.txt', true); // sh for shorthand
 		$crs = "[\r\n]{1,3}"; // the vertical space pattern gets used a lot, so var it
-		$own_line_start = '(?<=[\r\n])'; $own_line_end = '(?=[\r\n])'; // a line break before and after, checked with lookarounds that don't consume it; until Sept 2026 the patterns consumed the breaks with {$crs}, so when two shorthands were separated only by a blank line, the first match used up the breaks the second needed, and the second was skipped with no warning
+		$own_line_start = '(?<=[\r\n])'; $own_line_end = '[ \t]*(?=[\r\n])'; // a line break before and after (trailing spaces/tabs allowed, and removed; until Sept 2026 a trailing space made the pattern miss, and the shorthand shipped as text with no warning), checked with lookarounds that don't consume it; also until Sept 2026 the patterns consumed the breaks with {$crs}, so when two shorthands were separated only by a blank line, the first match used up the breaks the second needed, and the second was skipped with no warning
 		$sh_pattern = "@{$own_line_start}!(\w{2,30}){$own_line_end}@";
 
 	// look for shorthands: prefixed by ! and isolated vertically
@@ -1402,7 +1402,7 @@ function prepareContent($content)
 			}
 
 			if (in_array($sh, $sh_syns['sidebar'])) {
-				$content = preg_replace("@{$own_line_start}!{$sh}{$crs}(.*?){$own_line_end}@", "<p class='sidebar'>$1</p>", $content);
+				$content = preg_replace("@{$own_line_start}!{$sh}[ \t]*{$crs}(.*?)(?=[\r\n])@", "<p class='sidebar'>$1</p>", $content);
 				$sh_known = true;
 			}
 
