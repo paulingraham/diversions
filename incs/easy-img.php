@@ -75,13 +75,11 @@ $h = $imagedata[1];
 
 // look for arguments that are just simple flags
 
-$synonyms = array("right","ri","r","rside");
-	if (array_intersect($synonyms,$args))
-		$position = "right";
+if (array_intersect($img_opt_syns["right"],$args))
+	$position = "right";
 
-$synonyms = array("left","le","l","lside");
-	if (array_intersect($synonyms,$args))
-		$position = "left";
+if (array_intersect($img_opt_syns["left"],$args))
+	$position = "left";
 
 /* Look for compound arguments of the form “arg:data” */
 

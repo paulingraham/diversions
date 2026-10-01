@@ -43,6 +43,7 @@ function getPosts()
 	$cacheDir = _ROOT . '/.cache';
 	if (!is_dir($cacheDir)) mkdir($cacheDir, 0755, true);
 	$forceRebuild = (strpos($_SERVER['QUERY_STRING'] ?? '', 'full') !== false);
+	$sharedCodeTime = (int) @filemtime(ROOT_DEV . '/incs/shared-code-version.txt'); // family blogs only (PainSci has no such file, so 0 there, and still needs ?full after a code change): the stamp is rewritten by every ?sync and arrives with every pull of new shared code, so a cache older than it was rendered by older code and is re-parsed below (>= rather than >, because a ?sync build writes the stamp and then most of its caches within the same second); without this, a quick build on another Mac rendered unedited posts from its own stale cache and overwrote pages already rebuilt with the new code
 	foreach (glob('posts/*') as $fn) {
 		if (preg_match("@posts/20\d\d-\d\d-\d\d[a-p]{0,1} .*$@", $fn) == 0) {
 			continue;
@@ -56,7 +57,7 @@ function getPosts()
 		if (preg_match('@POSTS@', $fn)) {			// look for filenames including "POSTS" (until Sept 2026 the pattern was POSTS*, i.e. POST plus zero or more S's, so an ordinary post with the capitalized word POST in its filename was read as a micropost file and silently disappeared)
 			$micropost_files[] = $fn;
 			$cacheFile = $cacheDir . '/' . basename($fn) . '.cache';
-			if (!$forceRebuild && file_exists($cacheFile) && filemtime($cacheFile) > filemtime($fn)
+			if (!$forceRebuild && file_exists($cacheFile) && filemtime($cacheFile) > filemtime($fn) && filemtime($cacheFile) >= $sharedCodeTime
 					&& ($filePosts = unserialize((string) file_get_contents($cacheFile))) !== false) {
 				journal("cache: [$fn]", 2);
 				global $timestamps;
@@ -80,7 +81,7 @@ function getPosts()
 			$posts[] = getImgPost($fn);
 		} else { 																	// anything remaining is assumed to be a macropost file
 			$cacheFile = $cacheDir . '/' . basename($fn) . '.cache';
-			if (!$forceRebuild && file_exists($cacheFile) && filemtime($cacheFile) > filemtime($fn)
+			if (!$forceRebuild && file_exists($cacheFile) && filemtime($cacheFile) > filemtime($fn) && filemtime($cacheFile) >= $sharedCodeTime
 					&& ($post = unserialize((string) file_get_contents($cacheFile))) !== false) {
 				journal("cache: [$fn]", 2);
 				global $timestamps;
@@ -306,7 +307,11 @@ $post = array('canonical' => null,
 				$post['description_audio'] = getdescription_audio($md_pt2);
 			}
 			if (in_array($md, $md_syns['priority'])) {
-				$post['priority'] = $md_pt2;
+				if (is_numeric($md_pt2) and inRange($md_pt2, 1, 10)) {
+					$post['priority'] = $md_pt2;
+				} else { // checked here, where the value is read, so everything that uses it later (sitemap, post matrix sort, "best of" tag) can count on a number from 1 to 10
+					journal("warning: priority '{$md_pt2}' is not a number from 1 to 10, ignoring it; post dated {$post['date']}", 2, true);
+				}
 			}
 			if (is_numeric($mdo) and inRange($mdo, 1, 10)) {
 				$post['priority'] = $mdo;
@@ -741,7 +746,11 @@ $post = array('canonical' => null,
 				$post['description_audio'] = getdescription_audio($md_pt2);
 			}
 			if (in_array($md, $md_syns['priority'])) {
-				$post['priority'] = $md_pt2;
+				if (is_numeric($md_pt2) and inRange($md_pt2, 1, 10)) {
+					$post['priority'] = $md_pt2;
+				} else { // checked here, where the value is read, so everything that uses it later (sitemap, post matrix sort, "best of" tag) can count on a number from 1 to 10
+					journal("warning: priority '{$md_pt2}' is not a number from 1 to 10, ignoring it; post dated {$post['date']}", 2, true);
+				}
 			}
 			if (is_numeric($mdo) and inRange($mdo, 1, 10)) {
 				$post['priority'] = $mdo;
@@ -1737,11 +1746,8 @@ function makeSitemap()
 		if ($ps) {
 			$default_priority = $default_priority - 2; // on ps, posts are relatively less important than the rest of the site
 		}
-		if (!empty($post['priority']) and !(is_numeric($post['priority']) and inRange($post['priority'], 1, 10))) {
-			journal("warning: priority '{$post['priority']}' is not a number from 1 to 10, using the default; post dated {$post['date']}", 2, true);
-		}
-		if (!empty($post['priority']) and is_numeric($post['priority']) and inRange($post['priority'], 1, 10)) {
-			$sitemap_str .= '<priority>' . number_format($post['priority'] / 10, 1) . '</priority>'; // 1–10 → 0.1–1.0; until Sept 2026 this was the text "0." + priority, so 10 came out as 0.10, the lowest priority of all
+		if (!empty($post['priority'])) {
+			$sitemap_str .= '<priority>' . number_format($post['priority'] / 10, 1) . '</priority>'; // 1–10 → 0.1–1.0 (the value is checked where it's read from the post header); until Sept 2026 this was the text "0." + priority, so 10 came out as 0.10, the lowest priority of all
 		} elseif ($post['post_class'] == 'macro') {
 			$sitemap_str .= '<priority>0.' . $default_priority . '</priority>';
 		} else {
