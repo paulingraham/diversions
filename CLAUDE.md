@@ -91,7 +91,7 @@ These rules are also enforced by the project's settings; the reasons matter too.
 
 ### Publishing
 
-For now, Susan publishes the familiar way: by double-clicking `PUBLISH.command` in the site folder. It shows a summary of the changes and asks for a keypress (any key publishes; a lowercase x cancels, but a capital X publishes). The site updates online a minute or two later.
+For now, Susan publishes the familiar way: by double-clicking `PUBLISH.command` in the site folder. It shows a summary of the changes and asks for a keypress (any key publishes; x cancels). The site updates online a minute or two later.
 
 - When Susan is happy with the changes, build once more and check it's clean, then suggest publishing: "Ready to go. Double-click PUBLISH in your site folder, and press any key when it asks."
 - Don't suggest publishing while the build shows ABORT! or new warnings.

@@ -83,7 +83,7 @@ printf "\a"
 
 echo "\n"
 
-if [ "$val" = "x" ]
+if [[ "$val" == [xX] ]] # either case cancels (until Oct 2026 only a lowercase x did, so a capital X — as the prompt says — published)
 then
 	echo "Aborting.\n\tWindow will close in 2 seconds.\n\n"
 	echo "=========================================================================="
