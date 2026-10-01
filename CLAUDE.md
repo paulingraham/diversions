@@ -19,7 +19,7 @@ This folder is **Diversions** (SusanIngraham.net), Susan Ingraham's website. Sus
 
 Paul sometimes sends improvements to the site's code. Before any other work in a session, install them:
 
-1. Tell Susan in one short line: "First, I'll check whether Paul has sent any updates for the site."
+1. Tell Susan in a line or two: "First, I'll check whether Paul has sent any updates for the site. You'll see a 1Password request for that: it's from me, so please approve it."
 2. Run `git fetch`, then `git status -sb`. If the branch isn't behind, say nothing more about it and carry on.
 3. If it's behind, run `git pull --ff-only`, then tell Susan it's done: "I've installed an update from Paul." If the update's commit messages (`git log --oneline HEAD@{1}..HEAD`) show anything they'd notice or care about, explain it in a sentence or two, conversationally. Skip the routine stuff.
 4. If the pull changed `CLAUDE.md` or `incs/PUBSYS-GUIDE.md`, read them again now: this session started with the old versions.
@@ -27,7 +27,16 @@ Paul sometimes sends improvements to the site's code. Before any other work in a
 
 **If the pull is refused because of local changes**, it's almost always generated files (pages in `html/`, the feed, the sitemap, the generated files in `guts/`), which both Susan's builds and Paul's update have rewritten. Set only those aside with `git stash push -m "before update" -- <those files>`, pull again, then rebuild to regenerate them from the posts. Never stash, discard, or overwrite anything in `posts/`, `html/imgs/`, hand-edited `guts/` files, or this file. If one of those is in the way, or the pull fails any other way, stop: don't try to force it. Tell Susan the update will have to wait, and write it up for Paul (below).
 
-**If the fetch fails** (no internet, a GitHub problem), say so plainly, skip the update, and carry on with the work.
+**If the fetch fails** with `Permission denied (publickey)` or `signing failed … communication with agent failed`, the 1Password request was missed, declined, or timed out. Ask Susan to watch for it, then try once more. If it fails again, or fails any other way (no internet, a GitHub problem), say so plainly, skip the update, and carry on with the work.
+
+### 1Password requests
+
+Connecting to GitHub, to check for updates or to publish, uses a key stored in 1Password. Each connection pops up a 1Password request, which Susan approves with Touch ID. The Claude app also sends a steady stream of these requests on its own, in the background, and they're unimportant. Paul has told Susan to approve them all. That isn't ideal: so many requests train anyone to approve without looking, and an important one could slip by. Help keep the meaningful ones visible:
+
+- **Announce yours.** Before any command that connects to GitHub (`git fetch`, `git pull`), say a request is coming and that it's from you.
+- **Explain the background ones if asked.** A stream of requests Susan didn't expect is the app's routine background activity: harmless and fine to approve. You can't stop it, so don't try changing 1Password, SSH, or app settings to quiet it.
+- **Flag anything different.** These requests should only ever be for using the SSH key for GitHub. If Susan describes a 1Password request for anything else, such as a website password, a login, or a credit card, say not to approve it and to check with Paul first.
+- **Don't ask 1Password for anything yourself** beyond that GitHub connection: no passwords, logins, or cards.
 
 ### How to talk with Susan
 
@@ -91,7 +100,7 @@ These rules are also enforced by the project's settings; the reasons matter too.
 
 ### Publishing
 
-For now, Susan publishes the familiar way: by double-clicking `PUBLISH.command` in the site folder. It shows a summary of the changes and asks for a keypress (any key publishes; x cancels). The site updates online a minute or two later.
+For now, Susan publishes the familiar way: by double-clicking `PUBLISH.command` in the site folder. It shows a summary of the changes and asks for a keypress (any key publishes; x cancels), then 1Password asks for approval to connect to GitHub. The site updates online a minute or two later.
 
 - When Susan is happy with the changes, build once more and check it's clean, then suggest publishing: "Ready to go. Double-click PUBLISH in your site folder, and press any key when it asks."
 - Don't suggest publishing while the build shows ABORT! or new warnings.
