@@ -41,6 +41,24 @@ if (!file_exists($path)) { // missing image: failure-severity by the visible-gib
 	return "  !!! IMG FILE '$filename' NOT FOUND !!! "; // report just the filename, not $path: the full path churns between machines (this runs on two Macs with different home dirs), producing spurious rendered-output diffs on every cross-machine build
 	}
 
+/* Wrong capitalization: the Mac's filesystem ignores case, so file_exists() above accepts 'Photo.JPG' for photo.jpg, and the build and local preview look fine, but the live server is case-sensitive and the picture is missing there (until Sept 2026 this passed silently; real cases on Diversions and Writerly). So look up each part of the path's real on-disk name (only a directory listing has it; realpath() echoes the case it was given), build with that, and warn so the post gets corrected. */
+static $dir_listings = []; // scandir once per folder per build: easyImg runs for every picture, and imgs/ can hold 1,600+ files
+$real_filename = '';
+$dir = STAGE . "/{$imgs_dir}";
+foreach (explode('/', $filename) as $part) {
+	$dir_listings[$dir] ??= scandir($dir);
+	$matches = preg_grep('/^' . preg_quote($part, '/') . '$/iu', $dir_listings[$dir]);
+	$real = (in_array($part, $matches) or !$matches) ? $part : reset($matches);
+	$real_filename .= ($real_filename === '' ? '' : '/') . $real;
+	$dir .= "/$real";
+}
+if ($real_filename !== $filename) {
+	psErrWarn("easy-img: image '$filename' is really named '$real_filename' — the Mac ignores the difference but the live site doesn't, so the build used the real name; correct the post to match");
+	$filename = $real_filename;
+	$path = STAGE . "/{$imgs_dir}/$filename";
+	$src = "{$imgs_dir}/$filename";
+}
+
 // So if we didn't find anything, that's the end of it. But if we did find a file, well then by golly we just keep on truckin' ...
 
 /* GET SOME IMAGE META DATA */

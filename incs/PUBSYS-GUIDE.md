@@ -160,7 +160,7 @@ PubSys doesn't change quotation marks, so curly quotes stay curly and straight q
 
 ## 7. Images
 
-Put image files in `html/imgs/`, then refer to them by filename. The best filenames use only letters, numbers, hyphens, and underscores: `harbour-1946.jpg`, not `Harbour 1946.JPG`. **Match capitalization exactly:** the Mac forgives `Photo.jpg` vs `photo.jpg`, so the build and the local preview look fine, but on the live site the picture is missing. (Checked on the live Diversions site in September 2026.)
+Put image files in `html/imgs/`, then refer to them by filename. The best filenames use only letters, numbers, hyphens, and underscores: `harbour-1946.jpg`, not `Harbour 1946.JPG`. **Match capitalization exactly.** The Mac forgives `Photo.jpg` vs `photo.jpg`, but the live site doesn't, and the picture goes missing there. The image shortcut (below) catches it: the build uses the file's real name, so the picture works, and shows a warning naming both spellings so the post can be corrected. Plain HTML `<img>` tags aren't checked.
 
 ### The PubSys image shortcut
 
