@@ -136,7 +136,7 @@ Leave these habits alone. They work, and changing them isn't your job:
 ### Where Susan most often needs help
 
 - **The home page** is `guts/template-home-page.php`, hand-written HTML with Susan's introduction and highlights (the automatic list of posts is switched off). Edit it there, never `html/index.html`, then build and check the page. Its markup is imperfect but displays acceptably; leave that alone unless Susan asks. Don't touch the scrambled-looking script in it: it hides Susan's email address from spammers.
-- **Pictures that don't show up online.** A picture's name in the post must match the file's capitalization exactly: `Bill-shortcake.jpeg` and `bill-shortcake.jpeg` look the same in the preview, but the live site shows nothing (guide §7). When you notice a mismatch on a page you're working on, it's worth offering to fix, since readers see the gap.
+- **Picture names with the wrong capitalization.** A picture's name in the post should match the file's capitalization exactly: `Bill-shortcake.jpeg` vs `bill-shortcake.jpeg`. For picture lines, the build catches a mismatch: it uses the file's real name, so the picture still shows online, and the build page shows a warning naming both spellings (guide §7). When you see that warning, offer to correct the name in the post. Plain HTML `<img>` tags aren't checked, so there a mismatch still leaves a gap online.
 - **Footnotes** that show up as literal `[^2]` on the page mean the note itself is missing or misnumbered.
 - **Links to pages that don't exist yet.** A few family pages link to pages that were planned but never written.
 
