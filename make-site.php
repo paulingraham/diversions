@@ -211,6 +211,7 @@ tstart('getPosts'); $posts = getPosts(); tstop('getPosts'); // #timing_code read
 if (!$ps) makeTagUsageList($posts); // save every post tag to a list, to be ingested and tallied by the tag-engine (PainSci does this in it's own special way)
 if ($ps) { tstart('auditPsids'); auditPsids(); tstop('auditPsids'); } // #timing_code aborts for missing psids & generates one (common with new posts)
 tstart('makeWebVersions'); makeWebVersions(); tstop('makeWebVersions'); // #timing_code make all post files (web-ready HTML5); do this before updating tag database!
+buildTrackDoc(''); // the steps below are site-wide, not building any one post, so stop the error panel blaming whatever post makeWebVersions() rendered last (until Sept 2026 it did, e.g. for makeTagIndexes() warnings); makeRSS() tracks its own posts, and leaves the last one set for the few steps after it
 tstart('updateTags'); updateTags(); tstop('updateTags'); // #timing_code add tags found in posts, make tag index files
 tstart('makeTagIndexes'); makeTagIndexes(); tstop('makeTagIndexes'); // #timing_code
 tstart('remove_old_files'); remove_old_files($posts); tstop('remove_old_files'); // #timing_code

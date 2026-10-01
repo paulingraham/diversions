@@ -828,6 +828,7 @@ function getBlogTags ($tags) {
 		foreach ($post_new_tags as $newtag) {
 			$tags[simplify($newtag)]['true'] = $newtag;
 			$tags[simplify($newtag)]['notes'] = "new from “{$post['title']}” [{$post['psid']}]";
+			$tags[simplify($newtag)]['tally#'] ??= 0; // new tags aren't counted until the next build (extractTags keeps them out of tags_private), and the tags file already records them as [0]; until Sept 2026 the key was missing here, so makeTagIndexes() raised "Undefined array key tally#" on the first build after any new tag
 			if (strpos($newtag, ".") === 0) // _ prefix denotes "admin" type tag, add it to the tags field
 				$tags[simplify($newtag)]['tags'] = "admin";
 			if (strpos($newtag, "_") === 0) // _ prefix denotes "category" type tag, add it to the tags field
