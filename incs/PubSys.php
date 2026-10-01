@@ -1594,6 +1594,7 @@ function makeRSS($max = 30)
 		$rss_posts .= stripslashes($rss_post); // remove the slashes we just added
 		$rss_posts = preg_replace("|\n{3,5}|", "\n\n", $rss_posts); // standardize vertical whitespace (to minimize spurious whitespaces diffs)
 	}
+	if (function_exists('buildTrackDoc')) buildTrackDoc(''); // done with individual posts: clear the doc set in the loop, so errors in the channel-level code below and in the build steps after makeRSS() aren't blamed on the last feed post
 
 	// We now have a string containing all posts: $content.  For PainSci, that string has had all member content removed, leaving any teaser content.  And for PainSci, there's a second string containing all posts — $content_member — which has all teaser stuff removed.
 
