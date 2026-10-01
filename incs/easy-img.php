@@ -87,12 +87,12 @@ foreach ($args as $arg) {
 	
 	if ($arg == "inline") $containerType = "span"; // the default container type is a div; change it to a span only if the image is used inline
 	
-	// if the argument is not a compound and a long string, assume it’s a caption (>= not >: an arg of exactly 15 chars used to fall through BOTH this guard and the skip below, reaching the explode and triggering an undefined-key warning on $halves[1] — e.g. the 15-char caption 'William Saroyan' in an Ephemeral post)
-	if (strpos($arg, "|") === false and strlen($arg) >= 15)
-		{ $caption = $arg; continue;}
-
-	// if it’s not a compound argument and it’s very short, skip it (already dealt with above)
-	if (strpos($arg, "|") === false and strlen($arg) < 15) continue;
+	// any other plain (non-compound) argument is the caption; until Sept 2026 only plain arguments of 15+ characters counted, and shorter captions ("Uncle Bill") were silently dropped
+	if (strpos($arg, "|") === false) {
+		$option_words = array_merge($img_opt_syns["right"], $img_opt_syns["left"], $img_opt_syns["shadow"], $img_opt_syns["centre"], array("inline")); // plain arguments already handled above
+		if ($arg !== '' and !in_array($arg, $option_words) and substr($arg,-2) != 'px') $caption = $arg;
+		continue;
+	}
 
 	// extract the arg
 	$halves = explode("|", $arg, 2);

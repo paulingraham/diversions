@@ -175,8 +175,8 @@ The options:
 - **`left`, `right`, `centre`** (or `center`): placement. `right` is the default, with the text wrapping around the picture. **Images wider than 380 pixels are always centred**, whatever you ask for.
 - **`300px`**: displays the image 300 pixels wide; the height scales to match.
 - **`shadow`** (or `ds`): a drop shadow.
-- **Any option 15 characters or longer** is the caption. Captions can contain Markdown, such as italics and links.
-- **`c|` followed by text** is a caption of any length. **A caption shorter than 15 characters needs the `c|`**: `c|My dog`. Without it, the short caption is silently dropped.
+- **Anything else** is the caption, whatever its length: `harbour-1946.jpg---left---My dog`. Captions can contain Markdown, such as italics and links. A misspelled option (`rigth`) therefore shows up as a caption.
+- **`c|` followed by text** is also a caption, for the rare caption that would otherwise be read as an option: `c|shadow`.
 - **`alt|` followed by text**: a description for people using screen readers.
 - **`inline`**: places the image inside a paragraph (with the `<<…>>` form below) rather than as its own block.
 
