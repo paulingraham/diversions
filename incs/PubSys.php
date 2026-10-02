@@ -126,6 +126,10 @@ function getPosts()
 			$rss_only_posts[$key] = $post; // save it to its own array
 			unset($posts[$key]); // and make it a ghost!  remove it from the main posts array, so that it effectively doesn't exist for anything else: indexes, sitemap, making post files, etc... NONE of that has to be handled independently if it’s just taken out of the main post array in the first place
 		}
+		if (!empty($post['lock'])) { // locked posts are ghosted the same way, minus the RSS: until Oct 2026 they were only skipped when making post files, so tag pages, the posts matrix, indexes, and prev/next links went on linking to pages the build had just deleted (reported from Ephemeral, for-paul/2026-10-01-locked-posts-listed-on-tag-pages.md)
+			journal('skipping locked post [' . mb_substr($post['title_smpl'] ?? $post['title'] ?? '?', 0, 25) . ']', 2, true);
+			unset($posts[$key]);
+		}
 	}
 
 	// prepare for next/prev link building by making an array of keys we can use to reference prev/last posts
@@ -836,11 +840,6 @@ function makeWebVersions()
 			printArr($post);
 			continue;
 		}
-		if (!empty($post['lock'])) {
-			journal('skipping locked post [' . mb_substr($post['title_smpl'], 0, 25) . ']', 2, true);
-			continue;
-		}
-
 		// #2d0: it's a fairly straightforward code cleanup job to do this by this method eval('return "' . addslashes($str) . '";');
 		// that is, instead of "manually" replacing var names with values (which isn't a travesty), render them as bona fide vars
 		// that's how I'm doing it for the rss file; but it's a bit tedious and low priority here … maybe someday
