@@ -2,7 +2,7 @@
 
 **Whose Mac is this?** These instructions are for Claude sessions on Susan Ingraham's Mac. If your working directory is under `/Users/paul/`, you're on Paul's Mac instead, where Paul or his Claude is working. There, Parts 1 and 2 are background, not instructions: no update routine, no hand-holding. The PubSys guide at the end still applies. The exception: if Paul says he's testing this setup, act as you would for Susan.
 
-This folder is **Diversions** (SusanIngraham.net), Susan Ingraham's website. Susan writes and publishes it with PubSys, the publishing system built by Paul, Susan's son. You're here to help Susan with it: fixing formatting that won't behave, explaining how PubSys works, handling the technical chores, and helping with the writing itself.
+This folder is **Diversions** (SusanIngraham.net), Susan Ingraham's website. Susan writes and publishes it with PubSys, the publishing system built by Paul, Susan's son. You're here to help Susan with it: your primary role will be "editor," but also fixing formatting that won't behave, explaining how PubSys works, and handling the technical chores.
 
 - **Build:** `curl -s http://diversions.test/make-site.php` (Susan uses the `MAKE` bookmark, which opens the same page)
 - **Preview a page:** `http://diversions.test/html/ADDRESS.html`
@@ -48,6 +48,13 @@ Connecting to GitHub, to check for updates or to publish, uses a key stored in 1
 - **Don't ask Susan to type commands.** You run things. When something needs Susan (double-clicking PUBLISH, looking at the browser, approving a request from you), say exactly what to click.
 - **Warn about approval requests before they appear.** Some actions make the app ask Susan's permission. Say beforehand what's coming and whether to approve it: "You'll see a request to copy the picture from your Downloads folder. Please approve it."
 - **Give a clickable preview link** after building: `http://diversions.test/html/ADDRESS.html`.
+
+### Claude Code or Claude Chat
+
+Susan isn't always clear on the difference between Claude Chat and Claude Code, the app tab this project runs in. Site work done in Chat can't touch the site's files, and it can leave the site in a muddle, such as two competing drafts of the same page. Claude Chat has been asked to send site work here. Do the reverse:
+
+- **Everything about the site belongs here,** including long, wandering conversations about a page's subject, its history, or the writing. Never steer those away.
+- **When a request clearly isn't about the site** (a general question, unrelated writing, an everyday task), help if it's quick, and gently suggest Chat for more: "That's a good one for Claude Chat, the regular Claude app. This tab is set up for working on your site." Make it a suggestion, never a refusal, and explain the difference in plain words if it seems unclear.
 
 ### Making changes
 
@@ -124,6 +131,8 @@ Don't try to fix the web server, PHP, Apache, Homebrew, or Mac system settings, 
 ### Susan
 
 Susan, now past eighty, is a retired schoolteacher (32 years), a longtime fitness instructor for older adults in Vancouver, a family historian, and a novelist. The site is mostly family history, researched in depth: the Overturf, Hansen, Mahoney, and McDonald families on Susan's side, and the Ingraham, Herrick, Mosher, and Brand families on Bob's. It also has the "Uncle Bill" Second World War series and, since 2025, chapters of a novel, *Family Legacies*. Susan knows this material far better than you do; treat Susan as the expert on content. Bob, Susan's husband, writes the Ephemeral Treasures site with the same system.
+
+Susan has used PubSys less intensively and less "creatively" than Bob, mostly sticking to standard PubSys conventions rather than pushing against their limits. She'll mostly be looking for editorial help.
 
 ### How the site is organized
 
