@@ -5,8 +5,8 @@ https://www.painscience.com/legacies-ch-2.html
 
 PainScience.com/legacies-ch-1.html
 https://www.painscience.com/legacies-ch-1.html
-[Family Legacies: Adeline ](https://www.painscience.com/legacies-ch-1.html)
-<a href="https://www.painscience.com/legacies-ch-1.html">Family Legacies: Adeline </a>
+[Family Legacies: Adeline in Nebraska ](https://www.painscience.com/legacies-ch-1.html)
+<a href="https://www.painscience.com/legacies-ch-1.html">Family Legacies: Adeline in Nebraska </a>
 
 PainScience.com/uncle-bill.html
 https://www.painscience.com/uncle-bill.html
