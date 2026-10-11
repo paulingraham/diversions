@@ -64,7 +64,7 @@ Susan isn't always clear on the difference between Claude Chat and Claude Code, 
 - **Always build and check** after a change (guide §13), then tell Susan to reload the preview. Never say it's fixed without having looked at the built page.
 - **Images:** copy new pictures into `html/imgs/` with simple filenames (lowercase, hyphens, no spaces). Resize big photos while copying: `sips -Z 1200 ORIGINAL --out html/imgs/NEWNAME.jpg`. Never modify or delete the originals wherever they came from.
 - **Ask before deleting** any post or picture, or making changes to more than one post.
-- **Templates and stylesheets** (`guts/template-*.php`, `guts/css-*.css`) affect every page. Explain what a change will do and get a yes first.
+- **Templates and stylesheets** (`guts/template-*.php`, `guts/css-*.css`) affect every page. Explain what a change will do and get a yes first, and see "Keeping the scope right" below for what's too big to do at all.
 
 ### A website, not a blog
 
@@ -84,6 +84,16 @@ Both sites are full of old, imperfect markup that mostly displays fine. You'll s
 - **Leave invisible problems alone:** sloppy but harmless HTML, outdated tags like `<font>` or `<center>`, inconsistent style. Don't "modernize" markup that works.
 - **Offer, don't do, the rest.** When a problem on the page you're already working on is clearly visible to readers (a garbled passage, a broken picture, a layout collapse), or there's an obvious missed opportunity, mention it once: "While I was in there, I noticed the caption under the second photo is missing. Want me to fix that too?" One or two offers per request at most, and not every time.
 - **No site-wide cleanups, audits, or sweeping changes** unless Susan asks for one.
+
+### Keeping the scope right
+
+Paul built PubSys and maintains the machinery behind both family sites, so anything you add to that machinery becomes his to understand and fix later. Help generously with the writing and the pages; be careful with anything that changes how the whole site works:
+
+- **Go ahead:** writing, editing, proofreading, formatting fixes, pictures, links, and new pages, a page or a series at a time. A touch of HTML or CSS inside one page, to get the look Susan wants, is fine; that has always been part of how Susan writes.
+- **Explain first and get a clear yes:** changes to more than a couple of pages at once; renaming, re-dating, or unpublishing pages; small cosmetic changes to the whole site, like a colour or font size in the stylesheet, or wording on the home page.
+- **Don't build new "features" for the whole site:** scripts, pop-ups, menus, new layouts in the templates, new homemade conventions, or clever workarounds for things PubSys doesn't do. Even when it would be easy for you, it adds something Paul will have to understand and maintain. PubSys may already have a way (check the guide and the site's own folders). If not, tell Susan it's a good one to run past Paul, and write it up in `for-paul/`: what Susan wants and why, plus any approach you'd suggest. It's a redirect, not a refusal; Susan is entitled to want it.
+- **Whole-site jobs** ("proofread every page", "check all my pages") are mostly too big for one go: a long, tiring list of fixes, and more work than a session can finish. Explain that kindly, and suggest a page or a series at a time instead, or a narrower scope (wide but shallow changes). Offer to keep track of what's done in your memory, so the next session can pick up where you left off.
+- **One job at a time.** Finish it, build, check, and show Susan the result before starting the next.
 
 ### Editorial help
 
