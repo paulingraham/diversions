@@ -10,7 +10,7 @@
 
 <title>Diversions</title>
 
-<link href="https://susaningraham.net/feed-diversions.xml" rel="alternate" type="application/rss+xml" title="Diversions RSS Feed" />
+<link href="https://susaningraham.net/feed-div.xml" rel="alternate" type="application/rss+xml" title="Diversions RSS Feed" />
 
 <meta name='title' 						content='Diversions'>
 <meta name='og:url' 						content='https://susaningraham.net/index.html'>
@@ -78,16 +78,16 @@ while(x=eval(x));
 
 <p>After retirement from 32 years of public school teaching, at the age of 57, I started exercising for my own well being and found that I wanted to impart my knowledge to others. It took a year to earn my qualifications: several courses and a pretty tough exam from the British Columbia Parks and Recreation Association. Plus, I’m expected to update my qualifications every year, including CPR and First Aid. I have also had special training in teaching Older Adults and Adapted Fit. Today, at 80, I continue to teach four classes a week.</p>
 
-<p><span class='red'>Light Fit</span> encourages men and women of any age (though the emphasis is on the older adult) to get active:warmup, strength training, cardiovascular exercise, balance training, stretch and flexibility. If you have been away from exercise, had a recent injury, or you are just starting to exercise, you should find this class a good one to start with, but many participants are "regulars" who enjoy the general mood and tone of the class. It meets from 10:45 a.m. to 11:45 a.m. on Tuesdays and Thursdays at the West End Community Centre, 870 Denman Street, in Vancouver, BC. </p>
+<p><span class='red'>Light Fit</span> encourages men and women of any age (though the emphasis is on the older adult) to get active: warmup, strength training, cardiovascular exercise, balance training, stretch and flexibility. If you have been away from exercise, had a recent injury, or you are just starting to exercise, you should find this class a good one to start with, but many participants are "regulars" who enjoy the general mood and tone of the class. It meets from 10:45 a.m. to 11:45 a.m. on Tuesdays and Thursdays at the West End Community Centre, 870 Denman Street, in Vancouver, BC. </p>
 
 <span class='red'>Adapted Fit</span> is a fitness class for older adults (usually 55 and older) who may have strength or mobility issues. Participants do many exercises in a chair and they stand up for some activities while using the chair for support. It meets on Mondays and Fridays from 11:00 a.m. to noon.</p>
 
 <li>MY FAMILY HISTORY: I have done research on my own family which includes: 
-<a href="family-history-home-page.html">Overturfs, Hansens, Mahoneys, and McDonalds."</a></li>
+<a href="family-history-home-page.html">Overturfs, Hansens, Mahoneys, and McDonalds.</a></li>
 
 <li>MORE FAMILY HISTORY: I have also done research on my husband's family history which includes: <a href="ingraham-family-home-page.html">Ingrahams, Herricks, Moshers, and Brands.</a></li>
 
-<li>A CHAPTER OF A NOVEL: Adeline and Nebraska (Adeline gives birth and waits for her house to be built):  <a href="legacies-ch-1.html">Family Legacies, Chapter 1</a></li>
+<li>A CHAPTER OF A NOVEL: Adeline in Nebraska (Adeline gives birth and waits for her house to be built):  <a href="legacies-ch-1.html">Family Legacies, Chapter 1</a></li>
 
 <li>A CHAPTER OF A NOVEL: Janie in Illinois (a little girl says good-bye to her mother):  <a href="legacies-ch-2.html">Family Legacies, Chapter 2</a></li>
 
@@ -95,7 +95,7 @@ while(x=eval(x));
 
 <h2>Another Site of Interest</h2>
 
-<p>My husband, Bob Ingraham, offers you a very different web site. He says: “<a href="https://ephemeraltreasures.net">Ephemeral Treasures </a> is a mostly philatelic web site which reflects my interests in the early commercial aviation and the Second World War, and showcases items from my collections — old envelopes (aka covers), stamps, and postcards. But it also highlights some of the adventures I've had in my life, including surviving a plane crash in New Mexico's Black Range and being badly wounded in Vietnam when I was a Marine Corps hospital corpsman.”</p>
+<p>My husband, Bob Ingraham, offers you a very different web site. He says: “<a href="https://ephemeraltreasures.net">Ephemeral Treasures </a> is a mostly philatelic web site which reflects my interests in early commercial aviation and the Second World War, and showcases items from my collections — old envelopes (aka covers), stamps, and postcards. But it also highlights some of the adventures I've had in my life, including surviving a plane crash in New Mexico's Black Range and being badly wounded in Vietnam when I was a Marine Corps hospital corpsman.”</p>
 
 
 
