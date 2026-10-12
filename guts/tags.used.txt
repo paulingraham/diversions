@@ -124,7 +124,7 @@ Mahoney
  Turpin
  Steel
  Porter
- _size_xl
+ _size_l
 Hansen
  Nissen
  Jensen
