@@ -1157,25 +1157,11 @@ $title = "$rating-star ratings are for {$key[$rating]}. Ratings are a highly sub
 return "<span title='$title'>$stars</span><span class='pupb lighter-link' onClick='toglDispId(\"bibrat\")'>?</span><span class='pupw'id='bibrat'>$title<span class='pupx' onClick='toglDisp(this.parentElement)'></span></span>";
 }
 
-/** returns @array: absolute paths to all PHP error log files under $root: per-dir `error_log` files plus the unified `logs/php-errors.log`. Canonical documentation of error logging is in /incs/env-bootstrap.php. */
+/** returns @array: absolute paths to the PHP error log files under $root — just the unified `logs/php-errors.log`, when it exists. Canonical documentation of error logging is in /incs/env-bootstrap.php. */
 function findErrorLogs(string $root): array {
-	$found = [];
-
-	/* Recursively scan for files literally named "error_log" — the conventional name PHP/Apache uses for the per-directory error log fallback. The filename is specific enough that false positives anywhere in the tree (vendor/, assets/, .git/, etc.) are essentially impossible, so no exclusion list is needed. The mild cost of traversing large gitignored trees like assets/ is invisible at the call rate of the only two callers (the cron daemon every 10 min, and view-log-errors.php interactively). */
-	$iter = new RecursiveIteratorIterator(
-		new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS)
-	);
-	foreach ($iter as $f) {
-		if ($f->isFile() && $f->getFilename() === 'error_log') {
-			$found[] = $f->getPathname();
-		}
-	}
-
-	// Append the unified log set via ini_set('error_log',…) in env-bootstrap.php; not named "error_log" so the recursive scan above won't catch it.
+	/* Until Oct 2026 this also recursively scanned the whole tree for per-directory `error_log` files, the cPanel-era pre-bootstrap fallback. php-fpm never writes them (prod's pool sends pre-bootstrap errors to the unified log), and a walk of the prod tree found none, so the scan was dropped. Kept as a function so the daemon and the viewer still share one definition of "the logs". */
 	$unified = "$root/logs/php-errors.log";
-	if (is_file($unified)) $found[] = $unified;
-
-	return $found;
+	return is_file($unified) ? [$unified] : [];
 }
 
 function logToFile($logfile, $msg)  {
@@ -1295,8 +1281,6 @@ function topFreqKeys(array $counts, int $minCount = 2): array { // Given an arra
 
 function notifyMe($message, $app_token, $sound = "pushover") { // notify myself via Pushover API, see https://pushover.net/api
 	// echo "posting message '$message' to app '$app_token'<br>";
-	$host = explode('.', gethostname())[0]; // which SERVER is talking: with an old host and a standby running in parallel (Sept 2026 migration) an unlabelled page is ambiguous, and Pushover shows no sender. Every notifyMe() caller gets it here, once; callers that already put "[host]" in the message (the error-logs daemon's subject) aren't doubled. function-tooManyRequests.php has its own curl (minimal bootstrap) and labels itself.
-	if (!str_contains($message, "[$host]")) $message = "[$host] " . $message;
 // if (defined('MODE_DEV')) if (MODE_DEV) return; // no need for push notifications in dev
 	curl_setopt_array($ch = curl_init(), array(
 	  CURLOPT_URL => "https://api.pushover.net/1/messages.json",

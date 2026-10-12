@@ -1272,9 +1272,9 @@ exit;
 			$audio = <<<AUDIO
 				<p class="aside top">
 				{% comment %} AUDIO CTA FOR FREE SUBSCRIBERS {% endcomment %}
-				{% if subscriber.can_be_upsold and subscriber.stripe_subscription.product != 'pst1' %}This post has an audio version for PainSci members. <a href="{{ upgrade_url}}?product=pst2">Join now</a>.{% endif %}
+				{% if subscriber.can_be_upsold and subscriber.stripe_subscription.product != 'pst1' %}This post has an audio version for PainSci members: <a href="{{ upgrade_url}}?product=pst2">join now</a>.{% endif %}
 				{% comment %} AUDIO CTA UPSELL FOR PST1 {% endcomment %}
-				{% if subscriber.stripe_subscription.product == 'pst1' %}This post has an audio version for PainSci members paying $5+/month. <a href="{{ manage_premium_subscription_url }}">Upgrade now</a>.{% endif %}
+				{% if subscriber.stripe_subscription.product == 'pst1' %}This post has an audio version for PainSci members paying $5+/month: <a href="{{ manage_premium_subscription_url }}">upgrade now</a>.{% endif %}
 				{% comment %} AUDIO INFO FOR FULL (PST2 AND PST3) MEMBERS ONLY {% endcomment %}
 				{% if subscriber.can_view_premium_content and subscriber.stripe_subscription.product != 'pst1' %}This post has an audio version for full members like you. <a href="https://www.painscience.com/{$thePost['post_audio']}">Listen in your web browser</a> or <a href="https://www.painscience.com/login.php?{{ subscriber.email }}">log in to get your personal podcast subscription link</a>.{% endif %}
 				</p>
@@ -1858,7 +1858,7 @@ function get_settings()
 	$fnarr = glob('guts/settings-*'); // find the settings file
 //	include($fnarr[0]);
 	$settings = getArrFromFile($fnarr[0], false, true); // $synonyms = false, $simple = true;
-	date_default_timezone_set(defined('PS_TIMEZONE') ? PS_TIMEZONE : 'America/Los_Angeles'); // #timezone — canonical constant from util--errors.php (always loaded before PubSys in both the PS env and the blog loader; ternary is just belt-and-braces)
+	date_default_timezone_set(defined('PS_TIMEZONE') ? PS_TIMEZONE : 'America/Vancouver'); // #timezone — canonical constant from util--errors.php (always loaded before PubSys in both the PS env and the blog loader; ternary is just belt-and-braces)
 	$settings['year'] = date('Y');
 
 	if (!empty($settings['optional_subdir'])) {
@@ -3017,7 +3017,8 @@ function prepareTemplate($post, $templateFile)
 		$thisTemplate = str_replace('{$robots}', "<meta name='robots' content='index, follow'>", $thisTemplate);
 	}
 
-	$thisTemplate = str_replace('{$description}', $post['description'] ?? '', $thisTemplate);
+	/* {$description} and the content='{$title}' attributes (below, in the titles block) are HTML-escaped because all four post templates single-quote their meta content attributes: an unescaped straight apostrophe ended the attribute and truncated it (reported by the diversions Claude, Oct 2026; ~30 pages across PS and the blogs). ENT_QUOTES escapes both quote styles; double_encode=false leaves entities already in the text alone (descriptions derived from post HTML routinely carry &amp; and &#8217;). Only attribute uses of {$title} are escaped: BibliographyUpdater.pl harvests PS blog post titles verbatim from <title>. */
+	$thisTemplate = str_replace('{$description}', htmlspecialchars($post['description'] ?? '', ENT_QUOTES, 'UTF-8', false), $thisTemplate);
 	$thisTemplate = str_replace('{$psid}', $post['psid'] ?? '', $thisTemplate);
 
 	if (!$GLOBALS['ps']) { // some non-ps tag handling
@@ -3154,6 +3155,7 @@ function prepareTemplate($post, $templateFile)
 	} else {
 		$title = $post['title'];
 	}
+	$thisTemplate = str_replace("content='{\$title}'", "content='" . htmlspecialchars(strip_tags($title), ENT_QUOTES, 'UTF-8', false) . "'", $thisTemplate); // meta attribute uses get escaped (see the {$description} comment above)
 	$thisTemplate = str_replace('{$title}', strip_tags($title), $thisTemplate); // insert other instances of the title, this time with stripped markup
 
 	$post_date1 = date('Y-m-d', parseDate($post['date']));
