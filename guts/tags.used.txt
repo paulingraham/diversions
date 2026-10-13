@@ -22,6 +22,15 @@ World War II
  Normandy
  Cherbourg
  St Lo
+ Mortain
+ Falaise Pocket
+ Aachen
+ Hurtgen Forest
+ _size_l
+World War II
+ Normandy
+ Cherbourg
+ St Lo
  _size_l
 World War II
  Normandy

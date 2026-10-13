@@ -92,7 +92,7 @@ Paul built PubSys and maintains the machinery behind both family sites, so anyth
 - **Go ahead:** writing, editing, proofreading, formatting fixes, pictures, links, and new pages, a page or a series at a time. A touch of HTML or CSS inside one page, to get the look Susan wants, is fine; that has always been part of how Susan writes.
 - **Explain first and get a clear yes:** changes to more than a couple of pages at once; renaming, re-dating, or unpublishing pages; small cosmetic changes to the whole site, like a colour or font size in the stylesheet, or wording on the home page.
 - **Don't build new "features" for the whole site:** scripts, pop-ups, menus, new layouts in the templates, new homemade conventions, or clever workarounds for things PubSys doesn't do. Even when it would be easy for you, it adds something Paul will have to understand and maintain. PubSys may already have a way (check the guide and the site's own folders). If not, tell Susan it's a good one to run past Paul, and write it up in `for-paul/`: what Susan wants and why, plus any approach you'd suggest. It's a redirect, not a refusal; Susan is entitled to want it.
-- **Whole-site jobs** ("proofread every page", "check all my pages") are mostly too big for one go: a long, tiring list of fixes, and more work than a session can finish. Explain that kindly, and suggest a page or a series at a time instead, or a narrower scope (wide but shallow changes). Offer to keep track of what's done in your memory, so the next session can pick up where you left off.
+- **Whole-site jobs** ("proofread every page", "check all my pages") are mostly too big for one go: a long, tiring list of fixes, and more work than a session can finish. Explain that kindly, and suggest a page or a series at a time instead, or a narrower scope (wide but shallow changes). Offer to add a simple checklist for the project to Part 2 of this file, and tick items off as they're done, so every session can see it and pick up where the last one left off. Keep it a checklist, not a log of changes: the git history has those.
 - **One job at a time.** Finish it, build, check, and show Susan the result before starting the next.
 
 ### Editorial help
@@ -171,6 +171,37 @@ Leave these habits alone. They work, and changing them isn't your job:
 ### Writing
 
 Susan writes family history (careful, source-based, with quotations and footnotes) and, more recently, fiction. For the novel, useful help is about story and prose: clarity, pacing, dialogue, consistency of names and dates across chapters. Spelling is a mix of Canadian and American: don't standardize it, and don't flag spelling variants as typos.
+
+### Project: editing every page
+
+Since October 2026, Susan has been going through the whole site one page at a time with Claude: proofreading, a new `description:`, wording suggestions, and an updated "last edited" date. Susan calls this list "the inventory page". When a page is finished and published, tick it off here. Don't add notes about what was changed: the git history has those. (Uncle Bill pages end their "Or return to…" line with "(This page last edited on DATE.)"; update that date when a Bill page is edited.)
+
+Susan is organizing her Claude sessions by dedicating sessions to one couple in the family at a time. When she is done working on a specific couple, do not suggest what couple to do next.
+
+- [x] Home page (`guts/template-home-page.php`)
+- [x] my-family-home-page (Susan's family hub)
+- [x] dad-bb-high-school
+- [x] dad-bb-college
+- [x] don-and-jo
+- [x] george-overturf-and-nellie
+- [x] hans-t-hansen-and-katherine
+- [x] hans-and-stella
+- [x] michael-and-josephine
+- [x] charles-and-sarah
+- [x] bob-family-home-page (Bob's family hub)
+- [x] robert-and-hazel
+- [x] robert-and-ratie
+- [x] franklin-and-belle
+- [x] george-and-gertrude
+- [ ] augustus-and-josephine
+- [ ] pierce-and-ann
+- [ ] bert-and-grace
+- [ ] baker-and-sarah
+- [ ] samuel-and-martha
+- [ ] higby-family
+- [x] uncle-bill, plus all nine Bill pages
+- [x] Family Legacies, chapters 1 and 2
+- [ ] The four photo pages (picture files in `posts/` named with a date)
 
 ## Part 3: The PubSys guide
 

@@ -595,7 +595,7 @@
     "tags": {
         "Aachen": {
             "key": "aachen",
-            "tally#": 6,
+            "tally#": 7,
             "true": "Aachen"
         },
         "abdominals": {
@@ -845,7 +845,7 @@
         },
         "Cherbourg": {
             "key": "cherbourg",
-            "tally#": 9,
+            "tally#": 10,
             "true": "Cherbourg"
         },
         "cholesterol": {
@@ -988,7 +988,7 @@
         },
         "Falaise Pocket": {
             "key": "falaisepocket",
-            "tally#": 7,
+            "tally#": 8,
             "true": "Falaise Pocket"
         },
         "fall prevention": {
@@ -1259,7 +1259,7 @@
         },
         "Hurtgen Forest": {
             "key": "hurtgenforest",
-            "tally#": 5,
+            "tally#": 6,
             "true": "Hurtgen Forest"
         },
         "hypertension": {
@@ -1469,7 +1469,7 @@
         },
         "Mortain": {
             "key": "mortain",
-            "tally#": 7,
+            "tally#": 8,
             "true": "Mortain"
         },
         "Mosher": {
@@ -1545,7 +1545,7 @@
         },
         "Normandy": {
             "key": "normandy",
-            "tally#": 10,
+            "tally#": 11,
             "true": "Normandy"
         },
         "novel": {
@@ -1751,7 +1751,7 @@
         },
         "size L": {
             "key": "sizel",
-            "tally#": 13,
+            "tally#": 14,
             "true": "size L"
         },
         "size M": {
@@ -1801,7 +1801,7 @@
         },
         "St Lo": {
             "key": "stlo",
-            "tally#": 8,
+            "tally#": 9,
             "true": "St Lo"
         },
         "Steel": {
@@ -1963,7 +1963,7 @@
         },
         "World War II": {
             "key": "worldwarii",
-            "tally#": 10,
+            "tally#": 11,
             "true": "World War II"
         },
         "wrist": {

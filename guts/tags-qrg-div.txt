@@ -1,6 +1,6 @@
 TAGS QUICK REFERENCE GUIDE
 
-Aachen	6						
+Aachen	7						
 abdominals	0		abs		abdominal muscles		
 abductors	0						
 activity	0					activities choosing an activity staying active	
@@ -47,7 +47,7 @@ cancer	0
 canoe	0						
 cardio	0						
 cardiovascular	0						
-Cherbourg	9						
+Cherbourg	10						
 cholesterol	0						
 chronic pain	0						
 cold	0						
@@ -74,7 +74,7 @@ exocrine system	0
 eye health	0						
 eyes	0						
 Fairbury	0						
-Falaise Pocket	7						
+Falaise Pocket	8						
 fall prevention	0					falling falls	
 family secrets	0						
 fascia	0						
@@ -123,7 +123,7 @@ home safety	0
 hormones	0						
 Hornback	1						
 humerus	0						
-Hurtgen Forest	5						
+Hurtgen Forest	6						
 hypertension	0						
 iliotibial band	0						
 Illinois	0						
@@ -162,7 +162,7 @@ Mexican War	0
 Minden	0						
 Minnestoa	0						
 mood	0						
-Mortain	7						
+Mortain	8						
 Mosher	3						
 motherhood	0						
 motivation	0				motivation to exercise		
@@ -177,7 +177,7 @@ Nebraska	2
 nervous system	0						
 New Mexico	0						
 Nissen	3						
-Normandy	10						
+Normandy	11						
 novel	0						
 nutrition	0						
 obliques	0						
@@ -216,7 +216,7 @@ shins	0
 shoulder	0						
 Silver City	0						
 singing	0						
-size L	13						
+size L	14						
 size M	0						
 size S	4						
 size XL	19						
@@ -227,7 +227,7 @@ Solart	4
 spine	0						
 sports	0						
 Steel	2						
-St Lo	8						
+St Lo	9						
 strength training	0						
 stroke	0						
 studies	0						
@@ -257,7 +257,7 @@ War of 1812	0
 weight loss	0						
 Wheeler	2						
 women health	0						
-World War II	10						
+World War II	11						
 wrist	0						
 yoga	0						
 

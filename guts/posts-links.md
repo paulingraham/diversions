@@ -18,6 +18,11 @@ https://www.painscience.com/hoax.html
 [Uncle Bill and World War II - The Hoax](https://www.painscience.com/hoax.html)
 <a href="https://www.painscience.com/hoax.html">Uncle Bill and World War II - The Hoax</a>
 
+PainScience.com/bill-timeline.html
+https://www.painscience.com/bill-timeline.html
+[Uncle Bill and World War II - A Timeline](https://www.painscience.com/bill-timeline.html)
+<a href="https://www.painscience.com/bill-timeline.html">Uncle Bill and World War II - A Timeline</a>
+
 PainScience.com/bill-at-st-lo.html
 https://www.painscience.com/bill-at-st-lo.html
 [Uncle Bill and World War II - Battle of the Hedgerows and the Battle of St. Lo](https://www.painscience.com/bill-at-st-lo.html)
