@@ -89,9 +89,6 @@ Brand
 Brand
  Higby
  _size_xl
-Brand
- Higby
- _size_xl
 Herrick
  Solart
  American Civil War

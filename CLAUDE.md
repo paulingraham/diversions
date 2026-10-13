@@ -199,9 +199,9 @@ Susan is organizing her Claude sessions by dedicating sessions to one couple in 
 - [x] augustus-and-josephine
 - [x] pierce-and-ann
 - [ ] bert-and-grace
-- [ ] baker-and-sarah
-- [ ] samuel-and-martha
-- [ ] higby-family
+- [x] baker-and-sarah
+- [ ] samuel-and-martha (on hold: not linked from anywhere, on purpose)
+- [x] higby-family (switched off with `lock`, not on the site; Susan may reuse it someday)
 - [x] uncle-bill, plus all nine Bill pages
 - [x] Family Legacies, chapters 1 and 2
 - [ ] The four photo pages (picture files in `posts/` named with a date)

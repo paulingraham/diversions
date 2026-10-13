@@ -107,7 +107,7 @@ Tags preceded by a DOT are “admin” tags for your eyes only. They will never 
 
 » brain [0]
 
-» Brand [5]
+» Brand [4]
 
 » breathing [0]
 
@@ -270,7 +270,7 @@ Tags preceded by a DOT are “admin” tags for your eyes only. They will never 
 
 » Herrick [5]
 
-» Higby [4]
+» Higby [3]
 
 » high blood pressure [0]
 
@@ -493,7 +493,7 @@ Tags preceded by a DOT are “admin” tags for your eyes only. They will never 
 
 » size S [4]
 
-» size XL [19]
+» size XL [18]
 
 » skeleton [0]
 

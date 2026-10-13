@@ -795,7 +795,7 @@
         },
         "Brand": {
             "key": "brand",
-            "tally#": 5,
+            "tally#": 4,
             "true": "Brand"
         },
         "breathing": {
@@ -1210,7 +1210,7 @@
         },
         "Higby": {
             "key": "higby",
-            "tally#": 4,
+            "tally#": 3,
             "true": "Higby"
         },
         "high blood pressure": {
@@ -1766,7 +1766,7 @@
         },
         "size XL": {
             "key": "sizexl",
-            "tally#": 19,
+            "tally#": 18,
             "true": "size XL"
         },
         "skeleton": {

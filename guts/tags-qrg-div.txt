@@ -37,7 +37,7 @@ bones	0
 Boone	2						
 boot camp	0						
 brain	0						
-Brand	5						
+Brand	4						
 breathing	0						
 burn	0						
 calf	0						
@@ -114,7 +114,7 @@ heart disease	0
 Heartwell Nebraska	0	Heartwell		Heartwell			
 heat injuries	0					heat cramps heat exhaustion heatstroke	
 Herrick	5						
-Higby	4						
+Higby	3						
 high blood pressure	0						
 hike	0						
 hip	0					hip flexors hip joint	
@@ -219,7 +219,7 @@ singing	0
 size L	14						
 size M	0						
 size S	4						
-size XL	19						
+size XL	18						
 skeleton	0						
 sleep	0						
 small town	0						

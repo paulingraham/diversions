@@ -68,11 +68,6 @@ https://www.painscience.com/samuel-and-martha.html
 [Samuel Perkins Brand and Martha Elizabeth Hatch: Family Secrets](https://www.painscience.com/samuel-and-martha.html)
 <a href="https://www.painscience.com/samuel-and-martha.html">Samuel Perkins Brand and Martha Elizabeth Hatch: Family Secrets</a>
 
-PainScience.com/higby-family.html
-https://www.painscience.com/higby-family.html
-[The Higby Family](https://www.painscience.com/higby-family.html)
-<a href="https://www.painscience.com/higby-family.html">The Higby Family</a>
-
 PainScience.com/baker-and-sarah.html
 https://www.painscience.com/baker-and-sarah.html
 [Baker Brand and Sarah Ann Higby: Tragedies and a Troubled Marriage](https://www.painscience.com/baker-and-sarah.html)
