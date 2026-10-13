@@ -196,8 +196,8 @@ Susan is organizing her Claude sessions by dedicating sessions to one couple in 
 - [x] robert-and-ratie
 - [x] franklin-and-belle
 - [x] george-and-gertrude
-- [ ] augustus-and-josephine
-- [ ] pierce-and-ann
+- [x] augustus-and-josephine
+- [x] pierce-and-ann
 - [ ] bert-and-grace
 - [ ] baker-and-sarah
 - [ ] samuel-and-martha
