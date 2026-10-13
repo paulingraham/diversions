@@ -728,7 +728,7 @@ function truncateToWord ($str, $max) {
 		$arr = explode(" ", $str);
 		array_pop($arr); // die, last word, die
 		$str = implode(" ", $arr);
-		$str = rtrim($str, ",—’:;"); // trim awkwardly trailing punctuation
+		$str = preg_replace('/(&#?\w+;)?[,—’:;]*$/u', '$1', $str); // trim awkwardly trailing punctuation, but never the ; that closes an HTML entity (callers pass text that still contains &amp; etc.; a plain rtrim left a broken "&amp" that later escaping turned into visible "&amp;amp")
 		if (!in_array(mb_substr($str,-1), $end_puncs)) $str .= "…"; // if the content segment doesn’t have concluding punctuation, append ellipsis
 		return $str;
 }

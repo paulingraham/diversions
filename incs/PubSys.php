@@ -1170,6 +1170,7 @@ Convert that to:
 	}, $theContent);
 	$theContent = preg_replace('|<jsflag[^>]*></jsflag>|', '', $theContent); // web-only flag elements (e.g. the noteworthy-fn markers in footnotes) otherwise survive conversion as literal junk in the email
 
+	$theContent = preg_replace('|<em class=[\'"]runin[\'"]>(.*?)</em>|us', '<strong>$1</strong>', $theContent); // run-in headings (<em class='runin'>) are BOLD in email, not italic (Paul, Oct 2026): a run-in heading is a label, and once the runin class is lost in the Markdown conversion italics read as mere emphasis — so swap the element here, and HtmlConverter emits **…** instead of *…*
 	$html2md = new HtmlConverter(['header_style'=>'atx']);  // invoke HtmlConverter (to remove specified notes: new HtmlConverter(array('remove_nodes' => 'span div'));
 	$theContent = $html2md->convert($theContent); // and back to markdown!
 	// a few hacky repairs after that janky step...
