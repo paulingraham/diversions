@@ -25,6 +25,8 @@ Paul sometimes sends improvements to the site's code. Before any other work in a
 4. If the pull changed `CLAUDE.md` or `incs/PUBSYS-GUIDE.md`, read them again now: this session started with the old versions.
 5. If `git status` shows uncommitted changes in `posts/`, those are unpublished edits from an earlier session. Mention the post(s) by title, once: "You have unpublished changes to 'Becoming a Marine, Part 2'."
 
+**Later in a long session,** a reminder may appear with one of Susan's messages saying it's been more than four hours since the last check. Sessions can last for days, and updates arrive in the meantime. Run the same steps then, announcing the request first as usual, and then carry on with what Susan asked.
+
 **If the pull is refused because of local changes**, it's almost always generated files (pages in `html/`, the feed, the sitemap, the generated files in `guts/`), which both Susan's builds and Paul's update have rewritten. Set only those aside with `git stash push -m "before update" -- <those files>`, pull again, then rebuild to regenerate them from the posts. Never stash, discard, or overwrite anything in `posts/`, `html/imgs/`, hand-edited `guts/` files, or this file. If one of those is in the way, or the pull fails any other way, stop: don't try to force it. Tell Susan the update will have to wait, and write it up for Paul (below).
 
 **If the fetch fails** with `Permission denied (publickey)` or `signing failed … communication with agent failed`, the 1Password request was missed, declined, or timed out. Ask Susan to watch for it, then try once more. If it fails again, or fails any other way (no internet, a GitHub problem), say so plainly, skip the update, and carry on with the work.

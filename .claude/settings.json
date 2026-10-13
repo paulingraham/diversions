@@ -41,5 +41,18 @@
       "Bash(git stash clear *)",
       "Bash(sudo *)"
     ]
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/update-reminder.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
   }
 }
