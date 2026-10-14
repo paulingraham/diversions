@@ -1,3 +1,8 @@
+PainScience.com/sisters-chapter-2.html
+https://www.painscience.com/sisters-chapter-2.html
+[Book 1: Sarah Etta](https://www.painscience.com/sisters-chapter-2.html)
+<a href="https://www.painscience.com/sisters-chapter-2.html">Book 1: Sarah Etta</a>
+
 PainScience.com/sisters-chapter-1.html
 https://www.painscience.com/sisters-chapter-1.html
 [Book 1: Sarah Etta](https://www.painscience.com/sisters-chapter-1.html)
