@@ -1,3 +1,13 @@
+PainScience.com/sisters-prologue.html
+https://www.painscience.com/sisters-prologue.html
+[Sisters: Prologue](https://www.painscience.com/sisters-prologue.html)
+<a href="https://www.painscience.com/sisters-prologue.html">Sisters: Prologue</a>
+
+PainScience.com/sisters-home-page.html
+https://www.painscience.com/sisters-home-page.html
+[SISTERS](https://www.painscience.com/sisters-home-page.html)
+<a href="https://www.painscience.com/sisters-home-page.html">SISTERS</a>
+
 PainScience.com/legacies-ch-2.html
 https://www.painscience.com/legacies-ch-2.html
 [Family Legacies: Janie in Illinois ](https://www.painscience.com/legacies-ch-2.html)

@@ -217,7 +217,7 @@ shoulder	0
 Silver City	0						
 singing	0						
 size L	14						
-size M	0						
+size M	2						
 size S	4						
 size XL	18						
 skeleton	0						

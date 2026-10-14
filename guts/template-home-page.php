@@ -91,6 +91,8 @@ while(x=eval(x));
 
 <li>A CHAPTER OF A NOVEL: Janie in Illinois (a little girl says good-bye to her mother):  <a href="legacies-ch-2.html">Family Legacies, Chapter 2</a></li>
 
+<li><a href="sisters-home-page.html">SISTERS</a>: A true story of five women attempting to thrive in 19th Century America when women's rights were limited.</li>
+
 </ul>
 
 <h2>Another Site of Interest</h2>
