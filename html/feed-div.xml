@@ -68,6 +68,72 @@
 
 </ul>
 
+<h3>My Family Tree</h3>
+
+<p>From my great-grandparents at the top down to my parents, Don and Jo. Click a name to go to that couple's page.</p>
+
+<style>
+
+.ftree {width:100%; table-layout:fixed; border-collapse:separate; border-spacing:6px 0; font-size:0.85em; line-height:1.3; text-align:center; margin:1em 0}
+
+.ftree td {vertical-align:bottom; padding:0; height:1px}
+
+.ftree .box {border:1px solid #888; border-radius:6px; padding:8px 4px; background:#fafafa; height:100%; box-sizing:border-box}
+
+.ftree .couple {display:flex; align-items:center}
+
+.ftree .couple > div {flex:1 1 0; min-width:0}
+
+.ftree .amp {flex:none; padding:0 0.3em; color:gray}
+
+.ftree .vline {position:relative; width:2px; height:16px; background:#888; margin:0 auto 8px}
+
+.ftree .vline::after {content:""; position:absolute; left:50%; bottom:-8px; transform:translateX(-50%); border-left:6px solid transparent; border-right:6px solid transparent; border-top:8px solid #888}
+
+.ftree small {color:gray; white-space:nowrap}
+
+.ftree small.wrap {white-space:normal}
+
+.ftree a {text-decoration:none}
+
+@media (max-width:600px) {.ftree {font-size:0.68em; border-spacing:3px 0} .ftree .box {padding:6px 2px}}
+
+</style>
+
+<table class="ftree">
+
+<tr>
+
+<td></td>
+
+<td><div class="box"><a href="charles-and-sarah.html"><span class='blue'>Charles Henry McDonald</span></a><br><small>1865-1930</small><br>&amp;<br><a href="charles-and-sarah.html"><span class='purple'>Sarah Jane Allison</span></a><br><small>1869-1893</small></div></td>
+
+<td><div class="box"><a href="hans-t-hansen-and-katherine.html"><span class='blue'>Hans Thomsen Hansen</span></a><br><small>1870-1945</small><br>&amp;<br><a href="hans-t-hansen-and-katherine.html"><span class='purple'>Katherine Marie Nissen</span></a><br><small>1875-1953</small></div></td>
+
+<td><div class="box"><a href="michael-and-josephine.html"><span class='blue'>Michael James Mahoney</span></a><br><small>1868-1939</small><br>&amp;<br><a href="michael-and-josephine.html"><span class='purple'>Josephine Amanda Porter</span></a><br><small>1875-1966</small></div></td>
+
+</tr>
+
+<tr><td></td><td><div class="vline"></div></td><td><div class="vline"></div></td><td><div class="vline"></div></td></tr>
+
+<tr>
+
+<td colspan="2"><div class="box couple"><div><a href="george-and-nellie.html"><span class='blue'>George Edwin Overturf</span></a><br><small>1886-1949</small></div><span class="amp">&amp;</span><div><a href="george-and-nellie.html"><span class='purple'>Nellie Allison McDonald</span></a><br><small>1888-1963</small></div></div></td>
+
+<td colspan="2"><div class="box couple"><div><a href="hans-and-stella.html"><span class='blue'>Hans Lloyd Hansen</span></a><br><small>1894-1954</small></div><span class="amp">&amp;</span><div><a href="hans-and-stella.html"><span class='purple'>Estella Mary Mahoney</span></a><br><small>1895-1967</small></div></div></td>
+
+</tr>
+
+<tr><td colspan="2"><div class="vline"></div></td><td colspan="2"><div class="vline"></div></td></tr>
+
+<tr>
+
+<td colspan="4"><div class="box couple"><div><a href="don-and-jo.html"><span class='blue'>Donald Sheldon Overturf</span></a><br><small>1916-1998</small></div><span class="amp">&amp;</span><div><a href="don-and-jo.html"><span class='purple'>Josephine Marie Hansen</span></a><br><small>1917-1988</small></div></div></td>
+
+</tr>
+
+</table>
+
 <h2>My Husband's Family: Ingrahams, Moshers, Herricks, and Brands</h2>
 
 <ul>
@@ -105,6 +171,58 @@
 <li><span class='purple'>Wheeler, Gertrude Edna</span> (1868-ABT 1958), married name Mosher: <strong><a href="george-and-gertrude.html">George and Gertrude</a></strong>, <a href="robert-and-ratie.html">Robert Lee and Ratie</a>, <a href="robert-and-hazel.html">Robert Mosher and Hazel</a>, <a href="ingraham-family-home-page.html">Ingraham Family Home Page</a></li>
 
 </ul>
+
+<h3>My Husband's Family Tree</h3>
+
+<p>From Bob's great-great-grandparents at the top down to his parents, Robert and Hazel. Click a name to go to that couple's page.</p>
+
+<table class="ftree">
+
+<tr>
+
+<td></td>
+
+<td></td>
+
+<td><div class="box"><a href="pierce-and-ann.html"><span class='blue'>Pierce Herrick</span></a><br><small>1804-1887</small><br>&amp;<br><a href="pierce-and-ann.html"><span class='purple'>Ann Miller</span></a><br><small>1807-1872</small></div></td>
+
+<td><div class="box"><a href="baker-and-sarah.html"><span class='blue'>Baker Brand</span></a><br><small>1826-1903</small><br>&amp;<br><a href="baker-and-sarah.html"><span class='purple'>Sarah Ann Higby</span></a><br><small>1831-1904</small></div></td>
+
+</tr>
+
+<tr><td></td><td></td><td><div class="vline"></div></td><td><div class="vline"></div></td></tr>
+
+<tr>
+
+<td><div class="box"><a href="franklin-and-belle.html"><span class='blue'>Franklin Ingraham</span></a><br><small>1858-1944</small><br>&amp;<br><a href="franklin-and-belle.html"><span class='purple'>Belle Captola Lee</span></a><br><small>1866-1920</small></div></td>
+
+<td><div class="box"><a href="george-and-gertrude.html"><span class='blue'>George Henry Mosher</span></a><br><small>1865-1929</small><br>&amp;<br><a href="george-and-gertrude.html"><span class='purple'>Gertrude Edna Wheeler</span></a><br><small class="wrap">1868-ABT&nbsp;1958</small></div></td>
+
+<td><div class="box"><a href="augustus-and-josephine.html"><span class='blue'>Augustus Charles Herrick</span></a><br><small>1834-1912</small><br>&amp;<br><a href="augustus-and-josephine.html"><span class='purple'>Josephine Niver</span></a><br><small>1834-1919</small></div></td>
+
+<td><div class="box"><span class='purple'>Sarah Etta Brand</span><br><small>1853-1890</small></div></td>
+
+</tr>
+
+<tr><td><div class="vline"></div></td><td><div class="vline"></div></td><td><div class="vline"></div></td><td><div class="vline"></div></td></tr>
+
+<tr>
+
+<td colspan="2"><div class="box couple"><div><a href="robert-and-ratie.html"><span class='blue'>Robert Lee Ingraham</span></a><br><small>1888-1962</small></div><span class="amp">&amp;</span><div><a href="robert-and-ratie.html"><span class='purple'>Ratie Jane Mosher</span></a><br><small>1889-1985</small></div></div></td>
+
+<td colspan="2"><div class="box couple"><div><a href="bert-and-grace.html"><span class='blue'>Bert Herrick</span></a><br><small class="wrap">1874-ABT&nbsp;1948</small></div><span class="amp">&amp;</span><div><a href="bert-and-grace.html"><span class='purple'>Grace Mae Brand</span></a><br><small>1879-1972</small></div></div></td>
+
+</tr>
+
+<tr><td colspan="2"><div class="vline"></div></td><td colspan="2"><div class="vline"></div></td></tr>
+
+<tr>
+
+<td colspan="4"><div class="box couple"><div><a href="robert-and-hazel.html"><span class='blue'>Robert Mosher Ingraham</span></a><br><small>1911-1995</small></div><span class="amp">&amp;</span><div><a href="robert-and-hazel.html"><span class='purple'>Hazel Marie Herrick</span></a><br><small>1914-2010</small></div></div></td>
+
+</tr>
+
+</table>
 
 <p><center><a href="index.html">Return to Home Page</a></center></p>
 
