@@ -37,7 +37,7 @@ bones	0
 Boone	2						
 boot camp	0						
 brain	0						
-Brand	4						
+Brand	5						
 breathing	0						
 burn	0						
 calf	0						
@@ -101,7 +101,7 @@ Grizzly Den	0
 group fitness	0						
 hamstrings	0						
 hand	0						
-Hansen	4						
+Hansen	5						
 Harness	2						
 Hastings	2						
 Hastings College	2						
@@ -113,7 +113,7 @@ healthy	0
 heart disease	0						
 Heartwell Nebraska	0	Heartwell		Heartwell			
 heat injuries	0					heat cramps heat exhaustion heatstroke	
-Herrick	5						
+Herrick	6						
 Higby	3						
 high blood pressure	0						
 hike	0						
@@ -130,7 +130,7 @@ Illinois	0
 immune system	0						
 impingement syndrome	0						
 individuality	0						
-Ingraham	4						
+Ingraham	5						
 inheritance	0						
 injuries	0					exercise injuries	
 insomnia	0						
@@ -152,9 +152,9 @@ Light Fit	0
 longevity	0						
 lower leg	0						
 lunar landing	0						
-Mahoney	3						
+Mahoney	4						
 marriage	0						
-McDonald	3						
+McDonald	4						
 medications	0						
 memory	0						
 metabolism	0						
@@ -163,7 +163,7 @@ Minden	0
 Minnestoa	0						
 mood	0						
 Mortain	8						
-Mosher	3						
+Mosher	4						
 motherhood	0						
 motivation	0				motivation to exercise		
 movement	0						
@@ -188,7 +188,7 @@ osteoarthritis	0					arthritis
 osteopenia	0						
 osteoporosis	0						
 over-training	0						
-Overturf	5					Oberdorf	
+Overturf	6					Oberdorf	
 pain	0						
 pandemic	0						
 pecs	0						
@@ -216,7 +216,7 @@ shins	0
 shoulder	0						
 Silver City	0						
 singing	0						
-size L	14						
+size L	15						
 size M	2						
 size S	4						
 size XL	21						

@@ -158,7 +158,7 @@ Leave these habits alone. They work, and changing them isn't your job:
 - **Post files** are `.html` files named like `2021-03-29 uncle-bill.html`, written almost entirely in Markdown (guide §3).
 - **The header,** with no blank lines: title, `subtitle`, `filename:` (which sets the page address), `description:`, `tags:`, then a row of asterisks. The novel chapters use just title, `filename:`, and `description:`.
 - **Headings** are `##Heading`, with no space (that works here).
-- **Names are colour-coded** with the classes in `guts/css-diversions.css`: `<span class='blue'>` for men, `<span class='purple'>` for women, and red, green, or orange for ancestral lines. When adding names to a family-history page, follow the same scheme.
+- **Names are colour-coded** with the classes in `guts/css-diversions.css`: `<span class='blue'>` for men, `<span class='purple'>` for women (it shows as pink since October 2026), and red, green, or orange for ancestral lines. When adding names to a family-history page, follow the same scheme.
 - **Numbers in comments** like `<!-- 12, 13 -->` are genealogy reference numbers. Leave them.
 - **Most posts open with an "Editor's Note"** explaining that the three dots are footnotes. On this site footnotes show as small "three dots" buttons that pop up the note when clicked.
 - **Every post ends with `!3stars`**, and many end with a hand-typed "last updated on …" line. When Susan makes a real update to such a page, offer to change that date too.
