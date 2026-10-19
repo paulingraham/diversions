@@ -109,7 +109,7 @@ function psErrorHandler($errno, $msg, $file, $line) {
 }
 
 
-/** returns @void: the uncaught-exception handler. Logs a native-format fatal line (with stack trace and context suffix); renders the dev panel immediately (the request is dying); in build context echoes a visible FATAL line so the build scripts and make-all.command's failure scan see it (the exception handler pre-empts the E_ERROR that buildErrorsMark's shutdown reporter watches for).  */
+/** returns @void: the uncaught-exception handler. Logs a native-format fatal line (with stack trace and context suffix); renders the dev panel immediately (the request is dying); in build context echoes a visible FATAL line so the build scripts and make-all.command's failure scan see it (the exception handler pre-empts the E_ERROR that psShutdown() watches for).  */
 function psExceptionHandler($e) {
 	$msg = 'Uncaught ' . get_class($e) . ': ' . $e->getMessage();
 
@@ -124,7 +124,8 @@ function psExceptionHandler($e) {
 
 	if ($context === 'build') {
 		$doc = $GLOBALS['_buildCurrentDoc'] ?? '';
-		echo "<h2 class='warning' style='color:red'>☠️ BUILD FATAL (uncaught " . get_class($e) . ")" . ($doc ? " while processing: " . htmlentities($doc) : "") . "</h2><p>" . htmlentities($e->getMessage()) . " ({$file}:{$line})</p>"; // $file/$line, not the exception's own — the psErrThrow attribution remap above applies here too
+		$banner = "\n☠️ BUILD FATAL (uncaught " . get_class($e) . ")" . ($doc ? " while processing: $doc" : '') . "\n" . $e->getMessage() . " ({$file}:{$line})"; // $file/$line, not the exception's own — the psErrThrow attribution remap above applies here too; plain text, like the rest of the build log (util--build.php)
+		if (function_exists('buildOut')) buildOut($banner); else echo $banner . "\n";
 	}
 
 	psCollect('exception', 'failure', $msg, $file, $line, $e->getTrace(), true);
@@ -142,7 +143,8 @@ function psShutdown() {
 			$doc = $GLOBALS['_buildCurrentDoc'] ?? '' ?: '(no document being tracked)';
 			$msg = "BUILD FATAL while processing: {$doc}";
 			error_log($msg); // enrich the log: the fatal's own native line typically blames only "eval()'d code", with no doc and no suffix (native lines don't get psErrLogSuffix)
-			echo "<h2 class='warning' style='color:red'>☠️ {$msg}</h2><p>" . htmlentities($e['message']) . " ({$e['file']}:{$e['line']})</p>"; // 'BUILD FATAL' trips make-all.command's failure-marker scan, aborting the build chain
+			$banner = "\n☠️ {$msg}\n{$e['message']} ({$e['file']}:{$e['line']})"; // 'BUILD FATAL' trips make-all.command's failure-marker scan, aborting the build chain; plain text, like the rest of the build log (util--build.php)
+			if (function_exists('buildOut')) buildOut($banner); else echo $banner . "\n";
 		} else {
 			error_log('FATAL CONTEXT:' . (psErrLogSuffix() ?: ' (no url/doc context)'));
 		}

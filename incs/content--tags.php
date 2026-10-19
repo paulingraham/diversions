@@ -577,10 +577,10 @@ function updateTags() {
 	$tags_str_qrg = "TAGS QUICK REFERENCE GUIDE\n\n" . $tags_str_qrg . "\n";
 	$tag_qrg_fn = "guts/tags-qrg-{$sitecode}.txt";
 	if (fileExistsNoChange($tags_str_qrg, $tag_qrg_fn)) {
-		journal("tags quick-reference guide has not changed, <em>not</em> writing file: $tag_qrg_fn",2,true);
+		journal("tags quick-reference guide has not changed, not writing file: $tag_qrg_fn",2,true);
 		}
 	else {
-		journal("<strong>tags quick-reference guide has changed</strong>, writing file: $tag_qrg_fn", 2, true);
+		journal("tags quick-reference guide has changed, writing file: $tag_qrg_fn", 2, true);
 		saveAs($tags_str_qrg, $tag_qrg_fn);
 		}
 
@@ -603,19 +603,19 @@ function updateTags() {
 	$tags_str_json = json_encode(['simplify' => 'lowercase; strip spaces and the punctuation list in simplify() (util--core.php); plural/singular variants are pre-expanded in thesaurus', 'thesaurus' => $thesaurus, 'tags' => $records], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
 	$tag_json_fn = "guts/tags-{$sitecode}.json";
 	if (fileExistsNoChange($tags_str_json, $tag_json_fn)) {
-		journal("tags JSON export has not changed, <em>not</em> writing file: $tag_json_fn",2,true);
+		journal("tags JSON export has not changed, not writing file: $tag_json_fn",2,true);
 		}
 	else {
-		journal("<strong>tags JSON export has changed</strong>, writing file: $tag_json_fn", 2, true);
+		journal("tags JSON export has changed, writing file: $tag_json_fn", 2, true);
 		saveAs($tags_str_json, $tag_json_fn);
 		}
 
 	$tags_canonicalized = $GLOBALS["tag_db_header"] . $tags_str_db;
 	if (fileExistsNoChange($tags_canonicalized, $tag_fn)) {
-		journal("tags file has not changed, <em>not</em> writing file: $tag_fn",2,true);
+		journal("tags file has not changed, not writing file: $tag_fn",2,true);
 		}
 	else {
-		journal("<strong>tags file has changed</strong>, writing file: $tag_fn", 2, true);
+		journal("tags file has changed, writing file: $tag_fn", 2, true);
 		saveAs($tags_canonicalized, $tag_fn);
 		}	
 /* echo "<pre><span class='boogers'>!!!<br>";
@@ -660,12 +660,11 @@ function makeTagIndexes () {
 		// make filename, add filename to list of confirmed html files
 		$tag_as_fn = titleToFn($tag['true']); // yep, yet another form of the tag!
 		$fn = $GLOBALS['filenames'][] = STAGE . "/tag-{$tag_as_fn}.html";  // `path
-		$preview_link = makePreviewLink($fn);
 		if (fileExistsNoChange($ti_page, $fn)) {
-			journal("ignoring unchanged #<strong>{$tag_as_fn}</strong> index page [$preview_link]", 2);
+			journal("unchanged: tag index #{$tag_as_fn}", 2);
 			continue;
 			}
-		journal("saving new/changed #<strong>{$tag_as_fn}</strong> index page [$preview_link]", 2, true);
+		journal("saving new/changed tag index #{$tag_as_fn}: " . basename($fn), 2);
 		saveAs($ti_page, $fn);
 		} // tag_index loop
 

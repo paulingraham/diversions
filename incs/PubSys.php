@@ -96,7 +96,7 @@ function getPosts()
 	}
 
 	if (! $posts) { // but if not, print the bad news and quit
-		echo '<h1>No posts! ☹</h1>';
+		echo "\nABORT! No posts found.\n";
 		exit;
 	}
 	//otherwise, carry on …
@@ -174,7 +174,7 @@ function getPosts()
 	}
 
 	$posts_count = count($posts);
-	echo "&nbsp;($posts_count posts found)";
+	journal("$posts_count posts found", 2, true);
 
 	$posts = $new_posts; // replace $posts array with $new_posts array
 
@@ -229,7 +229,7 @@ $post = array('canonical' => null,
 	$post['source_file'] = basename($fn);
 	$post['source_path'] = $fn; // full (relative) path, kept for tooling that writes back to the source, e.g. psid provisioning in auditPsids()
 	$post['source_line'] = $ln; // the raw source line for this micropost, kept so auditPsids() can find the line again to append a psid
-	if (function_exists('buildTrackDoc')) buildTrackDoc("$fn [ln $lnno]"); // so a fatal while reading/rendering this micropost gets blamed on the right line (see buildErrorsMark in util--build.php)
+	if (function_exists('buildTrackDoc')) buildTrackDoc("$fn [ln $lnno]"); // so a fatal while reading/rendering this micropost gets blamed on the right line (see buildMark in util--build.php)
 	$data = parseSloppyData($ln);
 	$post['date'] = $data[0];  // assume the first item is a date
 	$post = get_timestamp_from_post_date($post); // gets a timestamp from the date, optionally modified by day-order
@@ -263,6 +263,11 @@ $post = array('canonical' => null,
 			}
 			if (preg_match('@(jpg|gif|png)$@', $md, $tmp)) {
 				$post['post_img'] = "{$imgs_dir}/{$mdo}";
+				$img_path = _ROOT . (!empty($GLOBALS['ps']) ? '' : '/html') . '/' . $post['post_img']; // PainSci serves post images from the project root; the family blogs from html/
+				if (!file_exists($img_path)) { // moved here from the retired post matrix (Oct 2026), where it only fired when the matrix rendered; same two-channel pattern as the audio check below
+					journal("warning: cannot find post image {$post['post_img']}, post dated {$post['date']}", 2, true);
+					if (function_exists('psErrWarn')) psErrWarn("cannot find post image {$post['post_img']}, post dated {$post['date']}");
+				}
 			}
 
 			if (preg_match('@mp3$@', $md, $tmp) and $mdo !== '<#filename#>.mp3') {			
@@ -514,15 +519,11 @@ function abortIfPostHasErrorMarkers($post) {
 	$errCount = count($errorsArr);
 	if ($errCount == 0) return;
 	$errPlural = ($errCount > 1) ? 's' : '';
-	echo "<br><h2 class='warning'><em class='runin'>ABORT!</em> $errCount user error{$errPlural} in rendered content for post '{$post['title']}':</h2>";
-	echo '<ol>';
+	journal("ABORT! $errCount user error{$errPlural} in rendered content for post '{$post['title']}':", 1, true); // 'ABORT!' is a contract with make-all.command's failure scan
+	$n = 0;
 	foreach ($errorsArr as $error) {
-		if (strlen($error) > 5) {
-			echo "<li>{$error}</li>";
-		}
+		if (strlen($error) > 5) journal(++$n . ". $error", 2, true);
 	}
-	echo '</ol>';
-	echo "<h3 class='warning'>The post markup</h3><pre style='white-space: pre-wrap;'>" . htmlspecialchars($html) . '</pre>';
 	exit;
 }
 
@@ -610,7 +611,7 @@ $post = array('canonical' => null,
 	journal("reading macropost source file [ $fn ]", 2);
 	$post['post_class'] = 'macro';
 	$post['source_path'] = $fn; // full (relative) path, kept for tooling that writes back to the source, e.g. psid provisioning in auditPsids()
-	if (function_exists('buildTrackDoc')) buildTrackDoc($fn); // so a fatal while reading/rendering this macropost gets blamed on the right doc (see buildErrorsMark in util--build.php)
+	if (function_exists('buildTrackDoc')) buildTrackDoc($fn); // so a fatal while reading/rendering this macropost gets blamed on the right doc (see buildMark in util--build.php)
 	$lines = file($fn, FILE_IGNORE_NEW_LINES);
 	// get metadata from the filename
 	$fn = basename($fn);
@@ -678,6 +679,11 @@ $post = array('canonical' => null,
 
 			if (preg_match('@(jpeg|jpg|gif|png)$@', $md, $tmp)) {
 				$post['post_img'] = "{$imgs_dir}/{$mdo}";
+				$img_path = _ROOT . (!empty($GLOBALS['ps']) ? '' : '/html') . '/' . $post['post_img']; // PainSci serves post images from the project root; the family blogs from html/
+				if (!file_exists($img_path)) { // moved here from the retired post matrix (Oct 2026), where it only fired when the matrix rendered; same two-channel pattern as the audio check below
+					journal("warning: cannot find post image {$post['post_img']}, post dated {$post['date']}", 2, true);
+					if (function_exists('psErrWarn')) psErrWarn("cannot find post image {$post['post_img']}, post dated {$post['date']}");
+				}
 			}
 
 			if (preg_match('@psid(\d+)$@', $md, $tmp)) {
@@ -833,11 +839,10 @@ function makeWebVersions()
 		if ($prepMode and $n > 3) { // prepMode still works with the complete posts array, but does MUCH LESS with it, like making files out of only the first 3 of them (and the third generally has no changes)
 			break;
 		}
-		if (function_exists('buildTrackDoc')) buildTrackDoc('web version of ' . ($post['source_file'] ?? $post['title'] ?? '?')); // so a fatal while templating this post gets blamed on the right doc (see buildErrorsMark in util--build.php)
+		if (function_exists('buildTrackDoc')) buildTrackDoc('web version of ' . ($post['source_file'] ?? $post['title'] ?? '?')); // so a fatal while templating this post gets blamed on the right doc (see buildMark in util--build.php)
 		if (! isset($post['title_smpl']) or $post['title_smpl'] == ' ') {
 			// if there’s no title, issue a warning and skip this post (can’t save a file with a title)
 			journal('warning: cannot make a post, date ' . $post['date']. ', file ' . $post['source_file'], 2, true);
-			printArr($post);
 			continue;
 		}
 		// #2d0: it's a fairly straightforward code cleanup job to do this by this method eval('return "' . addslashes($str) . '";');
@@ -866,7 +871,7 @@ function makeWebVersions()
 		$preview_link = "<a href='$preview_url' target='_blank'>{$post['fn']}</a>";
 
 		if (strpos($thePost, 'parse error') !== false) {
-			journal("warning! parse error in [$preview_link]", 2, true);
+			journal("warning: parse error in {$post['fn']}", 2, true);
 		}
 
 		// if (inStr("full-fledged evidence",$thePost)) {exit("<pre>" . htmlspecialchars($thePost) . "</pre>");}
@@ -877,15 +882,14 @@ function makeWebVersions()
 			}
 
 		if (fileExistsNoChange($thePost, $postPath)) {
-			journal("skipping <a href='$preview_url' target='_blank'>web version file</a> (file unchanged: [{$post['title_smpl']}]", 2, $prepMode ? true : false); // in prepMode, I want to know that the file is NOT being written; in all-posts mode, that output would be excessive
+			journal("unchanged: {$post['fn']}", 2); // verbose-mode detail; the changes report at the end of the build covers what was written
 		} else { // go ahead and save it
 			if (strlen($post['title_smpl']) > 50) {
 				$caution = " caution: that's a pretty long filename, consider using a slug?";
 			} else {
 				$caution = '';
 			}
-			journal("making post file [$preview_link] from {$post['source_file']}{$caution}", 2, true);
-			echo 'saving regular post! ••••';
+			journal("making post file {$post['fn']} from {$post['source_file']}{$caution}", 2, $caution !== ''); // verbose-mode detail unless there's a caution to show; the changes report covers the rest
 			saveAs($thePost, $postPath); // `path
 		}
 
@@ -909,12 +913,10 @@ function makeWebVersions()
 			$post['fn'] = '===CURRENT-POST-PREVIEW.html';
 			$postPath = $GLOBALS['filenames'][] = _ROOT . "/{$post['fn']}"; // if the path isn't added to the global list, it will get cleaned up
 			$preview_url = "/{$post['fn']}?rand=" . mt_rand(1, 10000); // `paths
-			$preview_link = "<a href='$preview_url' target='_blank'>current post PREVIEW version</a>";
 			if (fileExistsNoChange($thePost_preview, $postPath)) {
-				journal("skipping $preview_link (file unchanged: {$post['fn']})", 2, true);
+				journal("current post preview unchanged: {$post['fn']}", 2);
 			} else { // go ahead and save it
-				journal("making $preview_link", 2, true);
-				echo 'saving post preview! ••••';
+				journal("making current post preview: {$post['fn']}", 2);
 				saveAs($thePost_preview, $postPath); // `path
 			}
 
@@ -958,7 +960,7 @@ function saveDerivative($thePost, $theContent, $kind, $label)
 	}
 	if (!file_exists($p['working'])) {
 		$url_bbe = 'x-bbedit://open?url=file://' . realpath(dirname($p['working'])) . '/' . rawurlencode($p['name']);
-		journal("seeding one-time <a href='$url_bbe'>hand-finishing copy</a> of the $label version: {$p['name']}", 2, true);
+		journal("seeding one-time hand-finishing copy of the $label version: {$p['name']} ($url_bbe)", 2, true);
 		saveAs($theContent, $p['working']); // `path
 	}
 }
@@ -981,6 +983,7 @@ function cleanupDerivatives()
 		if (in_array(basename($fn), $keep)) continue; // current post's own derivatives
 		if (filemtime($fn) > time() - 7 * 86400) continue; // grace period
 		unlink($fn);
+		if (function_exists('buildRecordDelete')) buildRecordDelete($fn);
 		journal('deleted stale derivative: ' . basename($fn), 2, true);
 	}
 }
@@ -1009,7 +1012,7 @@ function makeTextVersion()
 	$theContent = preg_replace('/.*?paywall markup:.*?\n/', '', $theContent); // remove all paywall markup lines
 	$theContent = preg_replace('|<style.*</style>|uism', '', $theContent); // remove all style blocks
 	$theContent = preg_replace('|<a href="#fcj\d+" title="" id="frj\d+">\d+</a> |', '', $theContent); // remove footnote reference links
-	$theContent = preg_replace('|<li id="fcj\d+">(.+?)</li>|', '† $1', $theContent); // convert notes list
+	$theContent = preg_replace('|<li id="fcj\d+">(.+?)</li>|s', '† $1', $theContent); // convert notes list; /s since 2026-10-15 because a footnote <li> may span lines
 	$theContent = preg_replace('|<li.*?>(.+?)</li>|', '👉🏻 $1', $theContent); // convert lists
 	$theContent = str_replace('&nbsp;', ' ', $theContent);
 	$theContent = preg_replace('|<em>et al(.{0,1})</em>|', 'et al$1', $theContent); // remove <em> from et al. before convertin all other em'd text to ALL CAPS; note that it’s looking not for a literal period following et al, but any character SUCH AS a period (but it’s a period if there's anything there), so this changes both <em>et al</em> and <em>et al.</em>
@@ -1108,11 +1111,6 @@ Convert that to:
 
 */
 
-// TESTING: to print the output for a given post for auditing, identify it with a distinct title substr:
-/*  if (inStr('Demo post', $thePost['title'])) {
-		echo "<br><textarea cols=80 rows=100 style='font-size:1em'>" . str_replace("\n", "¶\n\n", htmlentities($theContent)) . "</textarea>";
-		exit;
-		} /* */
 			
 	// first strip out zoom links; this doesn't remove the </a>, but that will get stripped out later
 	$theContent = preg_replace("|<a href='.+?' target='_blank' title='Embiggen! Open larger version in new tab/window.'>\n*|", '', $theContent);
@@ -1187,11 +1185,6 @@ $theContent = str_replace("•\n", "<p class='separator'>•</p>\n", $theContent
 		},
 		$theContent); /**/
 
-/* // TESTING: to print the output for a given post for auditing, identify it with a distinct title substr:
-if (inStr('Adding injury', $thePost['title'])) {
-echo "<br><textarea cols=80 rows=100 style='font-size:1em'>" . str_replace("\n", "¶\n\n", htmlentities($theContent)) . "</textarea>";
-exit;
-} /* */
 
 	$theContent = str_replace('UNDERSCORE', '_', $theContent); // restore underscores to Buttondown template tags
 	$theContent = str_replace('UNDERSCORE', '_', $theContent); // restore underscores to Buttondown template tags
@@ -1341,9 +1334,9 @@ function makeHomepage()
 	$index_str = make_post_index();
 	$fn = 'guts/posts-all-index-links.html';
 	if (fileExistsNoChange($index_str, $fn)) {
-		journal("post link list unchanged, <em>not</em> writing file: $fn", 2, true);
+		journal("post link list unchanged, not writing file: $fn", 2, true);
 	} else {
-		journal("<strong>post list changed</strong>, writing file: $fn", 2, true);
+		journal("post list changed, writing file: $fn", 2, true);
 		saveAs($index_str, $fn);
 	}
 
@@ -1353,11 +1346,11 @@ function makeHomepage()
 
 	$fn = STAGE . '/index.html'; // `path
 	if (fileExistsNoChange($home_page_str, $fn)) {
-		journal("home page unchanged, <em>not</em> writing file: $fn", 2, true);
+		journal("home page unchanged, not writing file: $fn", 2, true);
 
 		return;
 	}
-	journal("<strong>home page changed</strong>, writing file: $fn", 2, true);
+	journal("home page changed, writing file: $fn", 2, true);
 	saveAs($home_page_str, $fn);
 }
 
@@ -1516,11 +1509,6 @@ function makeRSS($max = 30)
 		$content = preg_replace("@src\s*=\s*(['\"])assets/images@", "src=$1https://$domain/assets/images", $content); // covert src URLs from relative to absolute
 //		$content = preg_replace("@href=(['\"])/blog@", 'href=$1/blog', $content); // not sure what this was for, but removing it changes nothing
 
-// TESTING: to print the output for a given post for auditing, identify it with a distinct title substr:
-/*  if (inStr('Demo post', $thePost['title'])) {
-		echo "<br><textarea cols=80 rows=100 style='font-size:1em'>" . str_replace("\n", "¶\n\n", htmlentities($content)) . "</textarea>";
-		exit;
-		} /* */
 
 		// Managing captions and bylines is tricky because they are in the wrong order for the RSS format, and there may be one, the other, both, or neither.
 		$content = preg_replace("|<p class='capt .+?'><!--caption-->(.+?)<!--/caption--></p>|", ' <CAPTION>$1</CAPTION> ', $content);
@@ -1616,9 +1604,9 @@ function makeRSS($max = 30)
 		$fn = _ROOT . '/stage/rss.xml';
 	} //psmod, non-generic save location for rss, to match legacy location // `path
 	if (fileExistsNoChange($rss_str, $fn)) { //`path
-		journal("main RSS feed unchanged, <em>not</em> writing file: $fn", 2, true);
+		journal("main RSS feed unchanged, not writing file: $fn", 2, true);
 	} else {
-		journal("<strong>main RSS feed changed</strong>, writing file: $fn", 2, true);
+		journal("main RSS feed changed, writing file: $fn", 2, true);
 		saveAs($rss_str, $fn);
 		if ($GLOBALS['ps']) {
 			saveAs("This is a COPY of the main production feed file /stage/rss.xml, just saved in the same location as the member feed files (rss-member-tH7MvsD7.xml & rss-member-podcast-hg4v437k.xml), which is entirely for convenience (and the member feeds need to live in /incs). It’s just handy to have all in one place for easier comparison.\n\n" . $rss_str, _ROOT . '/incs/rss-main.xml');
@@ -1633,9 +1621,9 @@ function makeRSS($max = 30)
 		$fn = _ROOT . '/incs/rss-member-tH7MvsD7.xml';
 		$rss_str_premium = tidyRSS($rss_str_premium); // some tidying to make the file easier to audit
 		if (fileExistsNoChange($rss_str_premium, $fn)) { //`path
-			journal("member RSS feed unchanged, <em>not</em> writing file: $fn", 2, true);
+			journal("member RSS feed unchanged, not writing file: $fn", 2, true);
 		} else {
-			journal("<strong>member RSS feed changed</strong>, writing file: $fn", 2, true);
+			journal("member RSS feed changed, writing file: $fn", 2, true);
 			saveAs($rss_str_premium, $fn);
 		}
 	}
@@ -1701,9 +1689,9 @@ function makePodcast($max = 500)
 		$fn = _ROOT . '/' . $fn;
 	} //psmod, non-generic save location for rss, to match legacy location // `path
 	if (fileExistsNoChange($rss_str, $fn)) { //`path
-		journal("Podcast feed unchanged, <em>not</em> writing file: $fn", 2, true);
+		journal("Podcast feed unchanged, not writing file: $fn", 2, true);
 	} else {
-		journal("<strong>Podcast feed changed</strong>, writing file: $fn", 2, true);
+		journal("Podcast feed changed, writing file: $fn", 2, true);
 		saveAs($rss_str, $fn);
 	}
 }
@@ -1768,12 +1756,12 @@ function makeSitemap()
 		$fn = ROOT_TRUE . "/stage/sitemap-{$sitecode}-blog.xml";
 	} // # symod, adding -blog suffix, saved parallel to main sitemap-ps.xml, `path
 	if (fileExistsNoChange($sitemap_str, $fn)) {
-		journal("sitemap unchanged, <em>not</em> writing file: $fn", 2, true);
+		journal("sitemap unchanged, not writing file: $fn", 2, true);
 
 		return;
 	}
 
-	journal("<strong>sitemap changed</strong>, writing file: $fn", 2, true);
+	journal("sitemap changed, writing file: $fn", 2, true);
 	saveAs($sitemap_str, $fn);
 }
 
@@ -1788,10 +1776,14 @@ function remove_old_files($posts)
 		if (inStr('index.html', $fn)) {
 			continue;
 		} // ignore the index
+		if (basename($fn) === '404.html') {
+			continue;
+		} // ignore the not-found page: it's restored from guts/404.html by file_management() a few steps later, so deleting it here was a pointless delete-and-restore on every build, invisible until the changes report started listing deletions (Oct 2026)
 		if (in_array($fn, $GLOBALS['filenames'])) {
 			continue;
 		} // ignore pages matching a known good file
 		unlink($fn);
+		if (function_exists('buildRecordDelete')) buildRecordDelete($fn);
 		$x++;
 		journal("removing obsolete page [$fn]", 2, true);
 	}
@@ -1808,6 +1800,7 @@ function remove_old_files($posts)
 		if (! $found_match) {
 			journal("removing obsolete img: $fn_mod", 2, true);
 			unlink($fn);
+			if (function_exists('buildRecordDelete')) buildRecordDelete($fn);
 			$x++;
 		}
 	}
@@ -2248,7 +2241,7 @@ function make_current_microposts_alias()
 	link(STAGE . '/' . $most_recent_file, $hard_link);
 }
 
-/** returns @string, html: a simple table or list of all or some posts (see also make_post_matrix) */
+/** returns @string, html: a simple table or list of all or some posts */
 function make_post_index($posts = null, $type = 'table')
 { // default to table, otherwise list
 	if (! $posts) {
@@ -2612,154 +2605,6 @@ function deal_with_citekeys($md, $post)
 	return $post;
 }
 
-/** returns array (fields): blog post field names */
-function get_post_field_names()
-{
-	global $posts;
-	$fields = []; // an array for fields
-	foreach ($posts as $post) {
-		$fields = array_merge($fields, array_keys($post));
-	}
-	$fields = array_unique($fields); // strip (many) duplicates from fields array
-	asort($fields); // sort fields array
-	$fields = array_values($fields); // reset key order
-
-	return $fields;
-}
-
-/** returns @string(table) or file: a matrix of blog post data, echoed in an html table or saved in a TSV */
-function make_post_matrix($echo = true, $save = true)
-{
-	journal('making post data matrix', 1, true);
-	global $settings;
-	extract($settings);
-	global $posts, $prepMode;
-
-	$fields = get_post_field_names(); // #2do: this should be a globally available array
-
-	$posts_all_table = '';
-	$n=0; foreach ($posts as $post) {
-		if ($prepMode and $n++ > 10) {
-			break;
-		}
-		$postTemplateTsvRows = $tsvItems = '';
-		if ($save) { // harvest nearly all post data for TSV output
-			foreach ($fields as $key=>$field) {
-				if ($field == 'html' or $field == 'content') { // skip content and html fields (the only exclusions)
-					unset($fields[$key]); // they must be removed from the $fields array as well as the data, or the columns are thrown outta whack
-					continue;
-				}
-				$tsvItems .= ($post[$field]??null) . "\t";
-			}
-			$tsvItems = rtrim($tsvItems, '\t') . "\n"; // remove final comma, add lf
-			$postTemplateTsvRows .= $tsvItems; // add row to list of rows
-			unset($tsvItems);
-		}
-
-		// fine-tuning of variables for tabular output
-		$date_str = date('M j, y', parseDate($post['date'])); // format a standard simple date string
-		$prioritySort = 0 + ($post['priority'] ?? 0);
-		if (mb_strlen($post['title']) > 50) { // clip long titles... (mb_* because titles are prose and routinely contain curly quotes/dashes; byte-based substr() splits a multi-byte character in half and emits invalid UTF-8)
-			$title_clipped = mb_substr($post['title'], 0, 50) . " <span class='truncation_symbol'></span>";
-		} else {
-			$title_clipped = $post['title'];
-		}
-		$linked_title = "<a href='{$post['url_stage']}' title='{$post['title']}'>$title_clipped</a>";
-		$tags = str_replace(',', ', ', $post['tags']);
-		$src_file = $post['source_file'];
-		if (mb_strlen($src_file) > 40) { // clip long source_file names
-			$src_file = mb_substr($post['source_file'], 0, 40);
-		}
-		// #2do, maybe someday I can figure out how to build a link for opening files again
-		// $src_file_url = "file://localhost{$stage}/posts/" . rawurlencode($src_file);
-		// $src_file = "zzz <a href=\"{$src_file_url}\">$src_file_short</a>"; // alas, safari seems to strip localhost out of these URLs, probably for security reasons
-		if (($post['ftd_url']??null)) {
-			$featured_url = "<a href='{$post['ftd_url']}'>∞</a>";
-		}
-
-	$postImgTiny = '';
-	if (($post['post_img']??null)) { // if there is a post img …
-			$post_img_path = "/html/{$post['post_img']}"; // create a within-root path for legacy pubsys, which includes the html dir
-			global $ps; if ($ps) $post_img_path = str_replace('/html', '', $post_img_path); // remove the html for PainSci
-			if (file_exists(_ROOT . $post_img_path)) { // if it exists, build a linked image with a relative URL
-					$postImgTiny = "<a title='{$post['post_img']}' href='$post_img_path'><img src='$post_img_path' height='25px'></a>";
-			}
-			else { // if it doesn't exist, alert me to the missing-ness
-				echo "<p class='warning'>MISSING POST IMAGE: {$post_img_path}</p>"; // this should probably be done while building posts in the first place, not printing an index of them, but whatever, it’s minor and I’m right here
-			}
-		}
-
-		$draft = ($post['preview'] ?? false) ? 'DRAFT' : '';
-		$index = ($post['indexing'] ?? false) ? 'idx' : 'noidx';
-		$member = ($post['premium'] ?? false) ? '<strong>$</strong>' : '';
-		$post['words_exact'] ??= ''; $post['read_time'] ??= ''; $post['psid'] ??= ''; $post['slug'] ??= ''; // optional fields, often absent outside PS, defaulted so the heredoc interpolation below doesn't warn
-
-
-
-		$postTemplateTableRow = <<<ROW
-			<tr>
-				<td data-sort-value='{$post['timestamp']}' class='small' nowrap>{$date_str}</td>
-				<td nowrap><a href="{$post['url_live']}">LIVE</a> / <a href="{$post['url_stage']}">PREVIEW</a></td>
-				<td class='small ' class='light'>{$post['size']}</td>
-				<td class='small'>{$post['words_exact']}</td>
-				<td class='small'>{$post['read_time']}</td>
-				<td class='small'>$draft</td>
-				<td class='small'>$member</td>
-				<td>$postImgTiny</td>
-				<td data-sort-value='{$post['fn']}' nowrap>{$linked_title}</td>
-				<td class='small light'>{$post['fn']}</td>
-				<td class='small light'>{$post['psid']}</td>
-				<td>{$post['slug']}</td>
-				<td class='small light'>$tags</td>
-				<td class='small light' nowrap style='overflow:hidden'>$src_file</td>
-			</tr>
-			ROW;
-
-		$postTemplateTableRow = str_replace('micro-img', 'img', $postTemplateTableRow);
-		$posts_all_table .= $postTemplateTableRow;
-
-		unset($featured_url);
-		unset($postImgTiny);
-	}
-
-	if ($echo) {
-		echo '</div>'; // minor but hacky little thing, closing off the div containing the journal output before printing table
-		echo  <<<TABLE
-			<table id='matrix'>
-			<thead><tr>
-			<th data-sort="int">date<span class="char_sort_arrow">▼</span><!-- default sort --></th>
-			<th>links</th>
-			<th title='post size code' >•</th>
-			<th data-sort="int">words [time]</th>
-			<th data-sort="int">⏲️</th>
-			<th>draft</th>
-			<th>$</th>
-			<th>img</th>
-			<th data-sort="string">linked title</th>
-			<th data-sort="string">url</th>
-			<th data-sort="int">psid</th>
-			<th data-sort="string">slug</th>
-			<th>tags</th>
-			<th data-sort="string">post file</th>
-			</tr></thead>
-			$posts_all_table
-			</table>
-			TABLE;
-	}
-
-	return; // for years this function proceeded to save the table data, but I never actually used it, ever, so... meh
-
-	if ($save) {
-		$tsv = implode("\t", $fields) . "\n" . $postTemplateTsvRows;
-		$fn = 'guts/posts-matrix.tsv';
-		if (fileExistsNoChange($tsv, $fn)) {
-			journal("post matrix TSV file unchanged, <em>not</em> writing file: $fn", 2, true);
-		} else {
-			journal("<strong>post matrix TSV file changed</strong>, writing file: $fn", 2, true);
-			saveAs($tsv, $fn);
-		}
-	}
-} // end of make_post_matrix ƒ
 
 /** returns @string (citekey): gets a citekey extracted from a given PainScience.com URL */
 function extract_citekey($my_url)
@@ -2966,8 +2811,6 @@ function makeMemberPostLists()
 	$linksArr5 = array_slice($linksArr, 0, 5);
 	$linkList5 = "\n<ul>\n" . implode("\n", $linksArr5) . "</ul>\n";
 	checkSave($linkList5, _ROOT . '/incs/list-posts-member--links-5.html', 'all links in a list file');
-
-	echo $linkList5;
 }
 
 /** returns @string: bare display domain for a featured URL, e.g. "newyorker.com" — host only, lowercased, leading www stripped */
@@ -3210,7 +3053,7 @@ function auditPsids()
 			}
 			if (writePsidToSource($post, $candidate)) {
 				$psidsArr[] = $posts[$key]['psid'] = "$candidate"; // keep the in-memory data consistent with the source file we just modified: record the new psid in the dupe-prevention array (as a string, like all parsed psids) and in the post itself, so downstream rendering (RSS GUIDs etc) uses it
-				journal("⚠️ AUTO-PROVISIONED psid$candidate for '{$post['source_file']}' and WROTE IT TO THE SOURCE FILE — if that file is open in your editor with unsaved changes, reload it before saving, or the psid will be clobbered", 3, true);
+				journal("warning: auto-provisioned psid$candidate for '{$post['source_file']}' and WROTE IT TO THE SOURCE FILE — if that file is open in your editor with unsaved changes, reload it before saving, or the psid will be clobbered", 3, true);
 			} else { // couldn't safely write to the source; fall back to the legacy manual procedure
 				exit("<p class='warning' style='font-size:2em'>⚠️ No psid for '{$post['source_file']}', and auto-provisioning could not safely modify the source file. Add manually and re-run:<br><br><strong>psid$candidate</strong></p>");
 			}
@@ -3331,8 +3174,8 @@ function get_xref_metadata ($postPath, $psid) {
 			if (inStr($psid, $oldPostContent) and inStr('$articleId=', $oldPostContent)) { // if the content contains the current post's psid AND XM…
 				$oldPostLines = file($oldPostPath); // Capture the old file content as an array of lines, which makes it easy to extract the first line. (An "elegant" one-liner with preg_match should be able to check AND capture, but the regex was harder than expected and I decided this was just fine.)
 				// exit ("<br>psid $psid from new post '" . basename($postPath) . "' found in old file '" . basename($oldPostPath) . "' with Xref metadata, transplanting it: '" . htmlentities($oldPostLines[0]) . "'");
-				journal("Transplanting Xref metadata from old post file to new. (Psid $psid from post with new name '<strong>" . basename($postPath) . "</strong>' found in old file '<strong>" . basename($oldPostPath) . "</strong>').", 2, true);
-				unlink($oldPostPath); // delete the old file! note that this is doing at least part of the job of remove_old_files(), but not all (because it’s removing only files that contain XM)
+				journal("Transplanting Xref metadata from old post file to new. (Psid $psid from post with new name '" . basename($postPath) . "' found in old file '" . basename($oldPostPath) . "').", 2, true);
+				unlink($oldPostPath); if (function_exists('buildRecordDelete')) buildRecordDelete($oldPostPath); // delete the old file! note that this is doing at least part of the job of remove_old_files(), but not all (because it’s removing only files that contain XM)
 				return $oldPostLines[0]; // add the first line of the old file to the top of the new file contents
 			}
 		}

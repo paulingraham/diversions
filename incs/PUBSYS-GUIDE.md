@@ -29,14 +29,15 @@ A **build** reads every post file and rewrites the website in `html/`. Nothing y
 
 - **To build:** open `http://SITE.test/make-site.php` in a browser, where SITE is the site's local name (`ephemeral`, `diversions`, `writerly`). Each site folder has a `MAKE.webloc` bookmark that does this. From a terminal, `curl -s http://SITE.test/make-site.php` runs the same build and prints the same page as HTML.
 - **Quick vs full:** a normal build is *quick*: it only re-reads post files that changed since the last build. (The first build after an update to the PubSys code re-reads everything by itself.) Add `?full` (`make-site.php?full`) to re-read everything. Use a full build when a change doesn't seem to take effect.
-- **To preview a post:** open `http://SITE.test/html/ADDRESS.html`, where ADDRESS is the post's page address (§5). The build log links every page it writes. Browsers cache pages, so reload after building.
+- **To preview a post:** open `http://SITE.test/html/ADDRESS.html`, where ADDRESS is the post's page address (§5). The build log ends with a **Changed files** report that links every page it wrote. Browsers cache pages, so reload after building.
 - **The local web server** (Apache on the Mac) has to be running for any of this to work. If the build page won't load at all, the problem is the server, not PubSys.
 
 ### Reading the build page
 
-The build page is a numbered log of what the build did ("Making post file …", "Skipping locked post …"), followed by a big table of every post. Problems show up in two places:
+The build page is short plain text, and the important part comes first: a **Results** line, any **WARNINGS**, then a **Changed files** report listing every page the build wrote or deleted (with a link to each), grouped so that one change made to many pages at once appears as a single batch with a count. A page that didn't change isn't listed. Below all that is the step-by-step build log, which is rarely worth reading. The page appears all at once when the build finishes (a few seconds). Add `?verbose` to the build address (`make-site.php?verbose`) to see every post the build looked at, changed or not. Problems show up in three places:
 
-- **ABORT!** in large type means the build stopped partway. Nothing after that point was built. The message names the post and the problem; the most common cause is a missing image (§7). Fix it and build again.
+- **WARNING:** lines mean the build carried on but something is probably wrong with a post: a missing image or audio file, a post with no title, unbalanced HTML.
+- **ABORT!** means the build stopped partway. Nothing after that point was built. The message names the post and the problem; the most common cause is a missing image (§7). Fix it and build again.
 - **An error panel** at the very bottom ("2 errors on this page (0 failures, 2 warnings, 0 notices)") lists problems the build noticed but survived. Failures are serious; warnings usually mean something in a post will look wrong (unbalanced HTML, a mistyped shorthand); notices are informational.
 
 ## 3. Post files
@@ -114,7 +115,7 @@ A `slug:` (or `filename:`) setting overrides the title and is converted the same
 
 **Changing a title changes the address.** On the next build the old page is deleted and a new one appears under the new address, so links to the old address break, including links from other posts and from elsewhere on the web. To retitle a post that's already published, keep its address with a `slug:` or `filename:` setting that produces the old address. For a page that must move, add a redirect to `guts/_redirects`, one per line: `/old-address.html /new-address.html 301`.
 
-**Linking to another post:** use its address, with no folder: `[the previous part](lindbergh-puzzle-part-1.html)` or `<a href="lindbergh-puzzle-part-1.html">`. The build log and the big post table on the build page show every post's address.
+**Linking to another post:** use its address, with no folder: `[the previous part](lindbergh-puzzle-part-1.html)` or `<a href="lindbergh-puzzle-part-1.html">`. The build log's **Changed files** report shows the address of every post it wrote.
 
 ## 6. Writing the body: Markdown and HTML
 

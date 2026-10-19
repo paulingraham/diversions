@@ -140,11 +140,12 @@ function extract1stUrl($content) {
 function saveAs($str, $fn, $mode='w') {
 // sleep(1);
 	if ($str == NULL) $str = '';
+	if ($mode === 'w' && isset($GLOBALS['_buildChanges']) && function_exists('buildRecordChange')) buildRecordChange($fn, file_exists($fn) ? (string) file_get_contents($fn) : null, $str); // feed the build's changes report (util--build.php): this is the funnel every build artifact passes through; inert outside a tracked build, so standalone callers pay nothing
 	$fp = @fopen($fn, $mode);
 	if (!$fp) {
 		/* failure-severity by doctrine: every build artifact funnels through this function, and intended-output-not-produced is broken content — the old bare echo here matched none of make-all.command's failure scans, so a failed write shipped stale files under a green build (psErr* adoption audit, July 2026). Guarded because this file is family-blog shared code and also runs in standalone contexts (CLI scripts) without util--errors.php — same guard pattern as sql.php's no-connection reporter. */
 		if (function_exists('psErrFail')) psErrFail("saveAs() could not open '$fn' for writing (mode '$mode')");
-		else echo "<br><strong>warning</strong>: could not write file '$fn'<br>";
+		else echo "\nWARNING: could not write file '$fn'\n";
 		return;
 		}
 	// default w mode: open for writing only; truncate file to zero; create if needed
@@ -160,11 +161,11 @@ function saveAs($str, $fn, $mode='w') {
 function checkSave($output_str, $file, $label="", $jrnl=false) {
 	if ($label !== "") $label .= " ";
 	if (fileExistsNoChange($output_str, $file)) {
-		if ($jrnl) journal("{$label}file has not changed, <em>not</em> writing file: $file", 2);
+		if ($jrnl) journal("{$label}file has not changed, not writing file: $file", 2);
 		return;
 		}
 	else {
-		if ($jrnl) journal("<strong>{$label}file has changed</strong>, writing file: $file", 2, true);
+		if ($jrnl) journal("{$label}file has changed, writing file: $file", 2, true);
 		saveAs($output_str, $file);
 		}
 	}
@@ -746,46 +747,15 @@ function emUpperizer ($str, $max=40) {
 
 /** returns @echo, log: echoes a step in a script and adds it to a log */
 function journal($msg, $depth, $echo = false) {
-//	if (!MODE_DEV) return; // journalling is for dev only
-	$x = 0; $msg_class = '';
-	global $jrnl, $a, $b, $c;
-	if (stripos($msg, 'href=') === false) $msg = str_replace('posts/', '', $msg); // cosmetic: shorten "posts/2026-… " source paths in the journal — but never inside a link, where it silently mangled x-bbedit:// URLs into ../blog/<file> (found Aug 2026)
-	if (strpos($msg, "warning") === 0) { $warning = true; $msg_class = "warning"; }
-		else $warning = false;
-	$msg = ucfirst($msg);
-	$time = microtime(true);
-	if (!isset($jrnl)) { // first time here?  initialize!
-		$jrnl = array();
-		$a = 0; $b = 0; $c = 0;
-		}
-	if ($depth == 1) {
-		++$a; $no = $a; $b = 0; $c = 0;
-		$jrnl[$a]['msg'] = $msg;
-		$jrnl[$a]['time'] = $time;
-		if ($a > 1 and $b > 0) $jrnl[$a]['elapsed'] = $time - $jrnl[$a][$b-1]['time'];
-		}
-	if ($depth == 2) {
-		++$b; $no = "$a.$b"; $c = 0;
-		$jrnl[$a][$b]['msg'] = $msg;
-		$jrnl[$a][$b]['time'] = $time;
-		if ($b > 1) $jrnl[$a][$b]['elapsed'] = $time - $jrnl[$a][$b-1]['time'];
-		}		
-	if ($depth == 3) {
-		++$c; $no = "$a.$b.$c";
-		$jrnl[$a][$b][$c]['msg'] = $msg;
-		$jrnl[$a][$b][$c]['time'] = $time;
-		if ($c > 1) $jrnl[$a][$b][$c]['elapsed'] = $time - $jrnl[$a][$b][$c-1]['time'];
-		}		
-	if ($echo or $depth == 1 or $warning) {
-			if ($depth == 1) echo "<br><br>";
-				else echo "<br>";
-			while (++$x <= $depth) echo "&nbsp;&nbsp;";
-			echo "<span class='$msg_class'>$no → $msg</span> ";
-			}
-	else {
-		echo "<span class='step'>&thinsp;•</span>";
-		}
-	}
+	/* The build log, plain text since Oct 2026 (see the design note in util--build.php). Depth 1 is a phase heading (preceded by a blank line); deeper messages are indented. A message is printed when $echo is true, at depth 1, when it is a warning, or in a ?verbose build — silent messages exist for the verbose mode and cost nothing otherwise (until Oct 2026 each one printed a progress dot: 5,000+ per blog build). Warnings are any message beginning "warning", printed as "WARNING: …" — a contract with make-all.command's warning scan. Messages are plain text: no markup in the string, please. */
+	$warning = stripos($msg, 'warning') === 0;
+	$verbose = function_exists('buildVerbose') && buildVerbose();
+	if (!$echo && $depth != 1 && !$warning && !$verbose) return;
+	if ($warning) $msg = 'WARNING: ' . preg_replace('/^warning[:!,]?\s*/i', '', $msg);
+	$line = ($depth == 1 ? "\n" : str_repeat('  ', max(0, $depth - 1))) . $msg;
+	if (function_exists('buildOut')) buildOut($line);
+	else echo $line . "\n";
+}
 
 
 

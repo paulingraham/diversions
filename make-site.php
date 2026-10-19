@@ -132,7 +132,7 @@ require_once('PubSys.php'); // functions for blogging, currently used by either 
 require_once('content--tags.php'); // tag management functions
 require_once('easy-img.php'); // a large function for handling image markup, so it gets its own file
 require_once('util--core.php'); // many functions originally written for PainScience.com, but most are generic
-require_once('util--build.php'); // build-error tracking/reporting (buildErrorsMark & co.); PS already has it via env-runtime.php (require_once dedupes), but the blogs get it only from this line — it is NOT loaded by anything else outside the PS environment
+require_once('util--build.php'); // the build log, changes report, and error tracking (buildMark & co.); PS already has it via env-runtime.php (require_once dedupes), but the blogs get it only from this line — it is NOT loaded by anything else outside the PS environment
 
 
 
@@ -143,68 +143,34 @@ $md_syns = getArrFromFile("synonyms-post-metadata.txt",true);
 		
 // OK, that’s setup. Time for a little output.
 // !!! HEADER OUTPUT ====================
+// The build log is plain text in a <pre> (design note in util--build.php); from the CLI the same text will go to stdout (Phase 2)
+$isFullBuild = strpos($_SERVER['QUERY_STRING'] ?? '', 'full') !== false;
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <title>Make <?php echo $ps ? "BLOG" : "{$sitename} {$blog_str}"; ?></title>
-<link rel="stylesheet" type="text/css" 	href=	"/incs/css-tools.css" />
-<link rel="stylesheet" type="text/css" 	href=	"/incs/css-matrix.css" />
-<link rel="stylesheet" type="text/css" 	href=	"/incs/css-matrix-tools.css" />
+<style>body {font-family: Menlo, Consolas, monospace; font-size: 13px; color: #333; margin: 2%;} pre {white-space: pre-wrap;}</style>
+</head><body>
+<pre><?php
+buildMark(); // start the build-log plumbing: php-errors.log offset, current-doc tracker, changes collector, ?verbose flag
+buildOut("Make {$sitename} {$blog_str} — " . ($isFullBuild ? 'FULL build (post cache bypassed)' : 'quick build (add ?full to bypass the post cache)') . (buildVerbose() ? ', verbose' : '; add ?verbose for per-file detail'));
+buildOut("Source: $root_dev");
+buildOut('Output: ' . STAGE);
+buildOut('Preview: ' . buildLink("$urlbase_stage/index.html", $urlbase_stage) . '   Live: ' . buildLink($urlbase_prod, $urlbase_prod), true);
 
-<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
-<script src="/incs/table-sort.js"></script>
-<script src="/incs/table-sort-setup.js"></script>
-<script>
-function copy(obj) { /* primary #copy function, invoked by onclick of an inline element with HTML contents eg <span class='copyable' onClick="copy(this)"> */
-	var text = obj.textContent; // get the contents of the tapped object, assumed to be a simple string
-	var el = document.createElement('textarea'); // create a textarea element that we'll put the text in
-	el.value = text; // get the text from the copies object, while replacing the sciccors icon; regex because simple replace does not gracefully handle delims
-	el.setAttribute('readonly', ''); // make it a readonly textarea 
-	el.style.position = 'absolute';
-	el.style.left = '-9999px'; // set a position waaaay outside the window
-	document.body.appendChild(el); // add textarea to the DOM
-	el.select(); // select textarea contents
-	document.execCommand('copy'); // copy textarea contents
-	document.body.removeChild(el); // remove textarea from the DOM
-	tellUser('COPIED!'); // confirm the copy: briefly show a blue box with the confirmation message 
-	console.log('User copied to clipboard: "' + text + '"');
-	};
-</script>
-</head></body>
-<h1>Make <?php echo $sitename . " " . $blog_str; ?></h1>
-<?php $isFullBuild = strpos($_SERVER['QUERY_STRING'] ?? '', 'full') !== false; ?>
-<p><?php if ($isFullBuild): ?>This is a <strong>full</strong> build (<a href="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>">run a quick build</a>.)<?php else: ?>This is a <strong>quick</strong> build (<a href="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>?full">run a full build</a>.)<?php endif; ?></p>
-
-<p>You are here: <code><?php echo $root_dev ?></code></p>
-<p>Rendered posts (HTML) will go here: <code><?php echo STAGE ?></code></p>
-
-<p>View local preview: <a href="<?php echo $urlbase_stage ?>/index.html?rand=<?php echo mt_rand(1,10000) ?>" target="_blank"><?php echo $urlbase_stage ?></a><br>
-View live site: <a href="<?php echo $urlbase_prod ?>" target="_blank"><?php echo $urlbase_prod ?></a></p>
-
-<?php if (is_array($shared_drift)) { // shared-code status for the non-PS blogs: provenance stamp + drift notice (see the sync block near the top of this script)
+if (is_array($shared_drift)) { // shared-code status for the non-PS blogs: provenance stamp + drift notice (see the sync block near the top of this script)
 	$stamp_line = trim((string) (@file(ROOT_DEV . '/incs/shared-code-version.txt')[0] ?? 'No version stamp yet — run a ?sync build to create one.'));
-	if ($shared_drift) {
-		echo "<p style='border:2px solid #c66; padding:.5em'>⚠️ <strong>Shared-code drift:</strong> " . count($shared_drift) . " file(s) differ from canonical painscience (" . implode(", ", $shared_drift) . "). This build uses the local copies as-is — <a href='make-site.php?sync'>sync &amp; rebuild</a> to ingest canonical.</p>";
-		}
-	else echo "<p style='opacity:.6'>Shared code in sync with canonical painscience. {$stamp_line}</p>";
-	} ?>
+	if ($shared_drift) buildOut('Shared-code drift: ' . count($shared_drift) . ' file(s) differ from canonical painscience (' . implode(', ', $shared_drift) . '). This build uses the local copies as-is; add ?sync to the build URL to ingest canonical and rebuild.');
+	else buildOut("Shared code in sync with canonical painscience. {$stamp_line}");
+}
 
-
-
-
-
-<?php
-
-// logToFile("/Users/paul/Sites/logs/builds.log.txt", "Make $sitename $blog_str, PHP version " . phpversion());
+buildLogStart(); // from here on the step-by-step log is captured; buildFinish() prints the summary first, then the log
 
 // !!! PUBSYS BUILD ==========================
 // PubSys reads post files into a big array ($posts) containing all post metadata and rendered content. The cache makes getPosts() fast on unchanged posts; add ?full to the URL to bypass the cache and re-parse everything. After loading posts, PubSys renders HTML files, then regenerates indexes, RSS, sitemap, and more.
 
-buildErrorsMark(); // start tracking php-errors.log so buildErrorsReport() can summarize errors generated by this build, and register the fatal-culprit shutdown reporter (see util--build.php); PubSys calls buildTrackDoc() as it processes each post
-
-echo "<h2>Make Log: All Posts</h2><div style='font-size:.8em'>";
 tstart('getTags'); $tags = getTags(); tstop('getTags'); // #timing_code read tags into array
 $psidsArr = array();
 tstart('getPosts'); $posts = getPosts(); tstop('getPosts'); // #timing_code read posts into array
@@ -223,13 +189,8 @@ if ($ps) { tstart('makePodcast'); makePodcast(); tstop('makePodcast'); } // #tim
 tstart('makeSitemap'); makeSitemap(); tstop('makeSitemap'); // #timing_code make the sitemap
 tstart('file_management'); file_management(); tstop('file_management'); // #timing_code make some aliases, symlinks, etc
 tstart('makeMemberPostLists'); makeMemberPostLists(); tstop('makeMemberPostLists'); // #timing_code
-tstart('make_post_matrix'); make_post_matrix(); tstop('make_post_matrix'); // #timing_code make huge table of all post data
 
-echo "<br><h2>Raw post data</h2>";
-//	printArrTable2(array_slice($posts, 0, 50)); 			// print the first 50 posts in the post array
-//	printArrTable2($posts); 			// print entire array of post metadata /**/
-
-buildErrorsReport(); // journal a deduped summary of PHP errors logged during this build (both modes)
+buildFinish([count($posts) . ' posts']); // the summary (results, warnings, the changes report, the error-log delta), then the captured step-by-step log (util--build.php)
 
 echo tRenderInline(); // #timing_code — shows timing block inline when ?_timing=1 or PERFORMANCE_TIMING=on
 
