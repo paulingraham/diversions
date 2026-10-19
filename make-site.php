@@ -143,17 +143,9 @@ $md_syns = getArrFromFile("synonyms-post-metadata.txt",true);
 		
 // OK, that’s setup. Time for a little output.
 // !!! HEADER OUTPUT ====================
-// The build log is plain text in a <pre> (design note in util--build.php); from the CLI the same text will go to stdout (Phase 2)
+// The build log is plain text: in a <pre> from a browser, on stdout from the CLI (bin/build.php, PainSci only); design note in util--build.php
 $isFullBuild = strpos($_SERVER['QUERY_STRING'] ?? '', 'full') !== false;
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Make <?php echo $ps ? "BLOG" : "{$sitename} {$blog_str}"; ?></title>
-<style>body {font-family: Menlo, Consolas, monospace; font-size: 13px; color: #333; margin: 2%;} pre {white-space: pre-wrap;} strong {color: #000;} .warn {color: #b00;} .fatal {color: #b00; font-weight: bold;}</style>
-</head><body>
-<pre><?php
+buildHtmlHead('Make ' . ($ps ? 'BLOG' : trim("$sitename $blog_str"))); // the HTML wrapper, web mode only
 buildMark(); // start the build-log plumbing: php-errors.log offset, current-doc tracker, changes collector, ?verbose flag
 buildOut('Make ' . trim("$sitename $blog_str") . ' — ' . ($isFullBuild ? 'FULL build (post cache bypassed)' : 'quick build (add ?full to bypass the post cache)') . (buildVerbose() ? ', verbose' : '; add ?verbose for per-file detail'));
 buildOut("Source: $root_dev");
@@ -193,8 +185,4 @@ tstart('makeMemberPostLists'); makeMemberPostLists(); tstop('makeMemberPostLists
 buildFinish([buildPlural(count($posts), 'post')]); // the summary (results, warnings, the changes report, the error-log delta), then the captured step-by-step log (util--build.php)
 
 echo tRenderInline(); // #timing_code — shows timing block inline when ?_timing=1 or PERFORMANCE_TIMING=on
-
-?>
-
-</body>
-</html>
+buildHtmlFoot();

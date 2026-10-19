@@ -97,7 +97,7 @@ function getPosts()
 
 	if (! $posts) { // but if not, print the bad news and quit
 		echo "\nABORT! No posts found.\n";
-		exit;
+		exit(1);
 	}
 	//otherwise, carry on …
 
@@ -524,7 +524,7 @@ function abortIfPostHasErrorMarkers($post) {
 	foreach ($errorsArr as $error) {
 		if (strlen($error) > 5) journal(++$n . ". $error", 2, true);
 	}
-	exit;
+	exit(1); // non-zero for the CLI (bin/build.php): the build aborted
 }
 
 /** returns @void: gentle heads-up journal warning when a post's source content has unbalanced block-level HTML (unclosed <p>, missing </ul>, etc.). $srcFile is the source document path as known to the caller (used for the log line and the panel edit link); $srcLabel is the human-readable version; $rawLine is the micropost's raw source line, used to locate its true line number in the POSTS file for the edit link. */

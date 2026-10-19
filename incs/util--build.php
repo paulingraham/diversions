@@ -2,7 +2,7 @@
 
 /* BUILD LOG AND CHANGES REPORT — the output layer of the big build scripts (make-ps-site.php, make-ps-blog.php, shared with the family blogs via the PubSys sync).
 
-DESIGN (Oct 2026, build-pipeline Phase 1). The build log is PLAIN TEXT. In a browser the build script wraps it in a <pre>; from the CLI (Phase 2) the same text goes to stdout. Nothing in the build emits presentation markup any more — until Oct 2026 the log was rich HTML (numbered journal with per-step progress dots, clickable links, a 1.4MB sortable table of every post) that nobody read: the real audit of a build is the git diff of /stage, and the only things a human or a Claude session wants from the log are (1) that it finished, (2) warnings and aborts, and (3) WHAT CHANGED. The output is designed around those three, in that order of importance, and is deliberately short.
+DESIGN (Oct 2026, build-pipeline Phases 1–2). The build log is PLAIN TEXT. In a browser the build script wraps it in a <pre> (buildHtmlHead/Foot); from the CLI (bin/build.php, Phase 2) the same text goes to stdout, with exit codes. Nothing in the build emits presentation markup any more — until Oct 2026 the log was rich HTML (numbered journal with per-step progress dots, clickable links, a 1.4MB sortable table of every post) that nobody read: the real audit of a build is the git diff of /stage, and the only things a human or a Claude session wants from the log are (1) that it finished, (2) warnings and aborts, and (3) WHAT CHANGED. The output is designed around those three, in that order of importance, and is deliberately short.
 
 ORDER. The page leads with a one-line verdict (✅/⚠️, what changed, warnings, PHP errors, duration), then the header, then the summary sections — RESULTS, WARNINGS, CHANGED FILES, PHP ERRORS — and only then the step-by-step BUILD LOG. Everything after the verdict is known only when the build ends, so the log is streamed into an output buffer (buildMark() starts one for the header, buildLogStart() swaps to one for the log, buildFinish() prints it all in the right order). The cost is that nothing appears in the browser until the build finishes; a build that aborts or dies still shows everything, because PHP flushes open buffers at exit, after the shutdown handlers, so the BUILD FATAL banner and error panel land in order.
 
@@ -25,8 +25,21 @@ function buildMark() {
 	$GLOBALS['_buildChanges'] = [];
 	$GLOBALS['_buildVerbose'] = strpos($_SERVER['QUERY_STRING'] ?? '', 'verbose') !== false;
 	$GLOBALS['_buildHeader'] = '';
-	$GLOBALS['_buildLog'] = null;
+	$GLOBALS['_buildFinished'] = false;
 	ob_start(); // the header lines the script prints next are captured, to be printed after the verdict
+	register_shutdown_function('buildAbortFlush');
+}
+
+/** returns @void: shutdown hook for a build that never reached buildFinish() — an ABORT! exit or a fatal — so the page still leads with a verdict and keeps its header: prints '❌ BUILD ABORTED', the captured header, then the captured log (which by now holds the abort or BUILD FATAL banner: psShutdown() runs first, having been registered earlier), and closes the <pre>  */
+function buildAbortFlush() {
+	if (!empty($GLOBALS['_buildFinished'])) return;
+	$log = ob_get_level() ? (string) ob_get_clean() : '';
+	if (empty($GLOBALS['_buildLogBuffered'])) { $header = $log; $log = ''; } // died before buildLogStart(): the one buffer held the header
+	else $header = $GLOBALS['_buildHeader'] ?? '';
+	buildOut('❌ BUILD ABORTED — see the end of the log below — ' . date('Y-m-d H:i'));
+	$panelAt = buildIsCli() ? false : strpos($log, "<style id='ps-err-css'>"); // in web mode the error panel (psRenderErrorPanel) has already landed at the end of the buffer; it belongs after the </pre>, not inside it
+	if ($panelAt === false) { echo $header . $log; if (!buildIsCli()) echo "</pre>\n"; }
+	else echo $header . substr($log, 0, $panelAt) . "</pre>\n" . substr($log, $panelAt);
 }
 
 /** returns @boolean: true when the build was asked for per-file detail (?verbose); journal() then prints its normally-silent messages too  */
@@ -34,7 +47,7 @@ function buildVerbose() {
 	return !empty($GLOBALS['_buildVerbose']);
 }
 
-/** returns @boolean: true when running from the command line rather than a web request (the Phase 2 CLI entry; today always false in practice)  */
+/** returns @boolean: true when running from the command line (bin/build.php) rather than a web request  */
 function buildIsCli() {
 	return PHP_SAPI === 'cli';
 }
@@ -49,6 +62,19 @@ function buildOut($line = '', $html = false) {
 		elseif (preg_match('/^── .* ──$/u', $line) || strpos($line, 'BUILD DONE') !== false) $line = "<strong>$line</strong>";
 	}
 	echo $line . "\n";
+}
+
+/** returns @void: in web mode, prints the minimal HTML page head that wraps the build log in a <pre>; nothing from the CLI  */
+function buildHtmlHead($title) {
+	if (buildIsCli()) return;
+	echo '<!DOCTYPE html>' . "\n" . '<html lang="en">' . "\n" . '<head>' . "\n" . '<meta charset="utf-8">' . "\n" . '<title>' . htmlspecialchars($title) . '</title>' . "\n"
+		. '<style>body {font-family: Menlo, Consolas, monospace; font-size: 13px; color: #333; margin: 2%;} pre {white-space: pre-wrap;} strong {color: #000;} .warn {color: #b00;} .fatal {color: #b00; font-weight: bold;}</style>' . "\n"
+		. '</head><body>' . "\n" . '<pre>';
+}
+
+/** returns @void: in web mode, closes the HTML page (buildFinish() has already closed the <pre>); nothing from the CLI  */
+function buildHtmlFoot() {
+	if (!buildIsCli()) echo "</body>\n</html>\n";
 }
 
 /** returns @void: prints a section heading of the summary, e.g. "── RESULTS ──", preceded by a blank line  */
@@ -316,7 +342,7 @@ function buildChangesReport($p) {
 	}
 }
 
-/** returns @array|null: php-errors.log entries logged since buildMark(), grouped — ['total', 'unique', 'breakdown' (strings like "3 Warning"), 'tallies' (message => count, most frequent first)]; null when the log can't be read  */
+/** returns @array|null: php-errors.log entries logged since buildMark(), grouped — ['total', 'serious' (total minus app-level warnings/notices), 'unique', 'breakdown' (strings like "3 Warning"), 'tallies' (message => count, most frequent first)]; null when the log can't be read  */
 function buildErrorsTally() {
 	$log = $GLOBALS['_buildErrLog'] ?? null;
 	if (!$log or !file_exists($log)) return null;
@@ -337,7 +363,7 @@ function buildErrorsTally() {
 		fclose($fh);
 		arsort($tallies);
 	}
-	$severities = ['PHP Fatal' => 0, 'PHP Parse' => 0, 'PHP Warning' => 0, 'PHP Deprecated' => 0, 'other' => 0];
+	$severities = ['PHP Fatal' => 0, 'PHP Parse' => 0, 'PHP Warning' => 0, 'PHP Deprecated' => 0, 'PainSci failure' => 0, 'PainSci warning' => 0, 'PainSci notice' => 0, 'other' => 0]; // the PainSci ones are the psErr* family's log lines (util--errors.php)
 	$total = 0;
 	foreach ($tallies as $msg => $n) {
 		$total += $n;
@@ -349,7 +375,8 @@ function buildErrorsTally() {
 	}
 	$breakdown = [];
 	foreach ($severities as $sev => $n) if ($n > 0) $breakdown[] = "$n " . str_replace('PHP ', '', $sev);
-	return ['total' => $total, 'unique' => count($tallies), 'breakdown' => $breakdown, 'tallies' => $tallies];
+	$serious = $total - $severities['PainSci warning'] - $severities['PainSci notice']; // for the verdict: app-level warnings and notices are the permanent record of events the log already reports as WARNING: lines, so counting them again as errors double-counts (the missing-image check, Oct 2026)
+	return ['total' => $total, 'serious' => $serious, 'unique' => count($tallies), 'breakdown' => $breakdown, 'tallies' => $tallies];
 }
 
 /** returns @void: prints the PHP ERRORS section — a deduplicated severity summary of php-errors.log entries generated during the build  */
@@ -362,16 +389,17 @@ function buildErrorsReport($t) {
 		buildOut('  ×' . $n . ' — ' . mb_strimwidth($msg, 0, 300, '…'));
 }
 
-/** returns @string: the one-line verdict that leads the page, e.g. "✅ BUILD DONE — 1 page changed — 0 warnings, 0 PHP errors — 4.2s, 2026-10-19 14:02"; 'BUILD DONE' is a contract with make-all.command  */
+/** returns @string: the one-line verdict that leads the page, e.g. "✅ BUILD DONE — 1 page changed — 0 warnings, 0 errors — 4.2s, 2026-10-19 14:02"; errors = PHP's own log entries plus app-level failures (see buildErrorsTally); 'BUILD DONE' is a contract with make-all.command  */
 function buildVerdict($p, $nWarnings, $nErrors) {
 	$icon = ($nWarnings || $nErrors) ? '⚠️' : '✅';
 	$secs = isset($GLOBALS['_buildStart']) ? round(microtime(true) - $GLOBALS['_buildStart'], 1) : 0;
 	$flag = $nWarnings ? ' WITH ' . strtoupper(buildPlural($nWarnings, 'warning')) : '';
-	return "$icon BUILD DONE$flag — " . buildChangesHeadline($p, true) . ' — ' . buildPlural($nWarnings, 'warning') . ', ' . buildPlural($nErrors, 'PHP error') . " — {$secs}s, " . date('Y-m-d H:i');
+	return "$icon BUILD DONE$flag — " . buildChangesHeadline($p, true) . ' — ' . buildPlural($nWarnings, 'warning') . ', ' . buildPlural($nErrors, 'error') . " — {$secs}s, " . date('Y-m-d H:i');
 }
 
 /** returns @void: ends the build — prints the verdict, the captured header, the summary (the caller's result lines, warnings hoisted out of the log, the changes report, the PHP errors), then the captured process log, then closes the <pre>; the error panel, if any, renders after it at shutdown  */
 function buildFinish($resultLines = []) {
+	$GLOBALS['_buildFinished'] = true;
 	$log = '';
 	if (!empty($GLOBALS['_buildLogBuffered'])) {
 		$log = (string) ob_get_clean();
@@ -383,7 +411,7 @@ function buildFinish($resultLines = []) {
 	preg_match_all('/^(?:<span[^>]*>)?[ \t]*WARNING:.*$/m', $header . $log, $m); // the header can carry a warning too (the site build's prod-DB check)
 	$warnings = $m[0];
 
-	buildOut(buildVerdict($p, count($warnings), $t['total'] ?? 0));
+	buildOut(buildVerdict($p, count($warnings), $t['serious'] ?? 0));
 	echo $header;
 	buildHeading('RESULTS');
 	foreach ($resultLines as $line) buildOut('  ' . $line);
