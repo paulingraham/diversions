@@ -146,7 +146,7 @@ function getTags ($tag_fn = false) {
 
 	global $tag_fields;
 
-	if ($journalling) journal("reading tags from file: $tag_fn",1,true);
+	if ($journalling) journal("Reading tags from file: $tag_fn",1,true);
 
 	$tags_header = "";
 	$tags = []; // initialize (psErr* audit batch 3): a tag file whose body yields ZERO tags previously left $tags undefined and fatalled at the ksort() below; now it returns an empty array, and the downstream updateTags()/makeTagIndexes() guards report the skip
@@ -552,7 +552,7 @@ function getTagParentsNew ($tag_given, $tags_parents = array()) {
 
 /** returns @multi: builds the tags data file from PubSys posts and srcs.tags.bib and makes tag QRGs  */
 function updateTags() {
-	journal("looking for new tags in posts",1,true);
+	journal("Looking for new tags in posts",1,true);
 	global $tags; if (!$tags) { psErrWarn('updateTags() called with no tag data — the entire tag update (tallies, new-tag harvest, QRGs, canonicalized file) is being skipped this run'); return; } // silent skip until the psErr* audit (batch 2): downstream half of the missing-tag-file cascade reported by getTags()
 	global $sitecode; $tag_fn = "guts/tags-{$sitecode}.txt";
 	$tags = tallyTags($tags); // add ALL tags from srcs.bib, major step
@@ -577,10 +577,10 @@ function updateTags() {
 	$tags_str_qrg = "TAGS QUICK REFERENCE GUIDE\n\n" . $tags_str_qrg . "\n";
 	$tag_qrg_fn = "guts/tags-qrg-{$sitecode}.txt";
 	if (fileExistsNoChange($tags_str_qrg, $tag_qrg_fn)) {
-		journal("tags quick-reference guide has not changed, not writing file: $tag_qrg_fn",2,true);
+		journal("tags quick-reference guide has not changed, not writing file: $tag_qrg_fn", 2);
 		}
 	else {
-		journal("tags quick-reference guide has changed, writing file: $tag_qrg_fn", 2, true);
+		journal("tags quick-reference guide has changed, writing file: $tag_qrg_fn", 2);
 		saveAs($tags_str_qrg, $tag_qrg_fn);
 		}
 
@@ -603,19 +603,19 @@ function updateTags() {
 	$tags_str_json = json_encode(['simplify' => 'lowercase; strip spaces and the punctuation list in simplify() (util--core.php); plural/singular variants are pre-expanded in thesaurus', 'thesaurus' => $thesaurus, 'tags' => $records], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
 	$tag_json_fn = "guts/tags-{$sitecode}.json";
 	if (fileExistsNoChange($tags_str_json, $tag_json_fn)) {
-		journal("tags JSON export has not changed, not writing file: $tag_json_fn",2,true);
+		journal("tags JSON export has not changed, not writing file: $tag_json_fn", 2);
 		}
 	else {
-		journal("tags JSON export has changed, writing file: $tag_json_fn", 2, true);
+		journal("tags JSON export has changed, writing file: $tag_json_fn", 2);
 		saveAs($tags_str_json, $tag_json_fn);
 		}
 
 	$tags_canonicalized = $GLOBALS["tag_db_header"] . $tags_str_db;
 	if (fileExistsNoChange($tags_canonicalized, $tag_fn)) {
-		journal("tags file has not changed, not writing file: $tag_fn",2,true);
+		journal("tags file has not changed, not writing file: $tag_fn", 2);
 		}
 	else {
-		journal("tags file has changed, writing file: $tag_fn", 2, true);
+		journal("tags file has changed, writing file: $tag_fn", 2);
 		saveAs($tags_canonicalized, $tag_fn);
 		}	
 /* echo "<pre><span class='boogers'>!!!<br>";
@@ -626,7 +626,7 @@ echo "</span></pre>"; /* */
 /** returns @files: makes tag index pages and files */
 function makeTagIndexes () {
 	if ($GLOBALS['ps']) return; // exit ƒ if this is PS
-	journal("making tag index pages",2, true);
+	journal("making tag index pages", 2);
 	global $tags; if (!$tags) { psErrWarn('makeTagIndexes() called with no tag data — tag index pages are not being rebuilt this run'); return; } // same cascade as updateTags(), family-blog side
 	foreach ($tags as $tag) {
 		if ($tag['tally#'] < 6) continue; // exclude rare tags

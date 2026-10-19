@@ -151,11 +151,11 @@ $isFullBuild = strpos($_SERVER['QUERY_STRING'] ?? '', 'full') !== false;
 <head>
 <meta charset="utf-8">
 <title>Make <?php echo $ps ? "BLOG" : "{$sitename} {$blog_str}"; ?></title>
-<style>body {font-family: Menlo, Consolas, monospace; font-size: 13px; color: #333; margin: 2%;} pre {white-space: pre-wrap;}</style>
+<style>body {font-family: Menlo, Consolas, monospace; font-size: 13px; color: #333; margin: 2%;} pre {white-space: pre-wrap;} strong {color: #000;} .warn {color: #b00;} .fatal {color: #b00; font-weight: bold;}</style>
 </head><body>
 <pre><?php
 buildMark(); // start the build-log plumbing: php-errors.log offset, current-doc tracker, changes collector, ?verbose flag
-buildOut("Make {$sitename} {$blog_str} — " . ($isFullBuild ? 'FULL build (post cache bypassed)' : 'quick build (add ?full to bypass the post cache)') . (buildVerbose() ? ', verbose' : '; add ?verbose for per-file detail'));
+buildOut('Make ' . trim("$sitename $blog_str") . ' — ' . ($isFullBuild ? 'FULL build (post cache bypassed)' : 'quick build (add ?full to bypass the post cache)') . (buildVerbose() ? ', verbose' : '; add ?verbose for per-file detail'));
 buildOut("Source: $root_dev");
 buildOut('Output: ' . STAGE);
 buildOut('Preview: ' . buildLink("$urlbase_stage/index.html", $urlbase_stage) . '   Live: ' . buildLink($urlbase_prod, $urlbase_prod), true);
@@ -190,7 +190,7 @@ tstart('makeSitemap'); makeSitemap(); tstop('makeSitemap'); // #timing_code make
 tstart('file_management'); file_management(); tstop('file_management'); // #timing_code make some aliases, symlinks, etc
 tstart('makeMemberPostLists'); makeMemberPostLists(); tstop('makeMemberPostLists'); // #timing_code
 
-buildFinish([count($posts) . ' posts']); // the summary (results, warnings, the changes report, the error-log delta), then the captured step-by-step log (util--build.php)
+buildFinish([buildPlural(count($posts), 'post')]); // the summary (results, warnings, the changes report, the error-log delta), then the captured step-by-step log (util--build.php)
 
 echo tRenderInline(); // #timing_code — shows timing block inline when ?_timing=1 or PERFORMANCE_TIMING=on
 

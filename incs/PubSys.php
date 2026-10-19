@@ -34,7 +34,7 @@ $rss_only_posts = []; // initialize an array in the global scope for RSS-only po
 /* <##> returns a big post array, and generates a much light index array of posts; calls the other get_ functions repeatedly to parse many microposts, imgposts and macroposts */
 function getPosts()
 {
-	journal('reading post files', 1);
+	journal('Reading post files', 1);
 	// just a little prep to make sure we've got a folder here; it's a bit untidy for this to be here; it would make more sense for this to happen in the file_management function, but that needs to come after everything, and this needs to come BEFORE everything, so …
 	if (! file_exists(STAGE . '/imgs-auto')) {
 		mkdir(STAGE . '/imgs-auto');
@@ -110,7 +110,7 @@ function getPosts()
 			continue;
 		}
 		while (isset($posts[$post['timestamp']])) { // last-ditch collision guard: two posts with the same timestamp would otherwise silently overwrite each other here, and remove_old_files() would then delete the loser's rendered HTML (this actually happened — see the cache/registry note in getPosts, 2026-07-06)
-			journal("warning: timestamp collision for post '{$post['title']}' vs '{$posts[$post['timestamp']]['title']}' — bumping by 1s to avoid losing a post", 1, true);
+			journal("Warning: timestamp collision for post '{$post['title']}' vs '{$posts[$post['timestamp']]['title']}' — bumping by 1s to avoid losing a post", 1, true);
 			$post['timestamp']++;
 		}
 		$posts[$post['timestamp']] = $post; // duplicate the post, but now with a key equal to the timestamp
@@ -174,7 +174,7 @@ function getPosts()
 	}
 
 	$posts_count = count($posts);
-	journal("$posts_count posts found", 2, true);
+	journal("$posts_count posts found", 2);
 
 	$posts = $new_posts; // replace $posts array with $new_posts array
 
@@ -832,7 +832,7 @@ function makeWebVersions()
 	global $posts, $settings, $prepMode;
 	extract($settings);
 	$noLazyload = true;
-	journal('making post files', 1);
+	journal('Making post files', 1);
 
 	$n=0; foreach ($posts as $post) {
 		$n++;
@@ -953,9 +953,9 @@ function saveDerivative($thePost, $theContent, $kind, $label)
 	$p = derivativePaths($thePost, $kind);
 	if (!is_dir(dirname($p['draft']))) mkdir(dirname($p['draft']), 0755, true);
 	if (fileExistsNoChange($theContent, $p['draft'])) {
-		journal("skipping current post $label version (machine draft unchanged: {$p['name']})", 2, true);
+		journal("current post $label version unchanged: .derivatives/{$p['name']}", 2);
 	} else {
-		journal("making current post $label version of '{$thePost['title']}' (machine draft: .derivatives/{$p['name']})", 2, true);
+		journal("making current post $label version: .derivatives/{$p['name']}", 2);
 		saveAs($theContent, $p['draft']); // `path
 	}
 	if (!file_exists($p['working'])) {
@@ -1329,14 +1329,14 @@ function makeHomepage()
 	if ($ps) {
 		return;
 	} // #psmod: this ƒ is redundant for PS blog production, a trivial and slightly confusing difference: instead of generating an post-list in guts and index.html for the html folder, the make_sy_indexes ƒ creates a bunch of full inline posts in guts to be included by blog.php (which echoes the structure of articles.php and tutorials.php files in relationship to their respective subdirs)
-	journal('making home page', 1);
-	journal('making home page table of all posts', 2, true);
+	journal('Making home page', 1);
+	journal('making home page table of all posts', 2);
 	$index_str = make_post_index();
 	$fn = 'guts/posts-all-index-links.html';
 	if (fileExistsNoChange($index_str, $fn)) {
-		journal("post link list unchanged, not writing file: $fn", 2, true);
+		journal("post link list unchanged, not writing file: $fn", 2);
 	} else {
-		journal("post list changed, writing file: $fn", 2, true);
+		journal("post list changed, writing file: $fn", 2);
 		saveAs($index_str, $fn);
 	}
 
@@ -1346,11 +1346,11 @@ function makeHomepage()
 
 	$fn = STAGE . '/index.html'; // `path
 	if (fileExistsNoChange($home_page_str, $fn)) {
-		journal("home page unchanged, not writing file: $fn", 2, true);
+		journal("home page unchanged, not writing file: $fn", 2);
 
 		return;
 	}
-	journal("home page changed, writing file: $fn", 2, true);
+	journal("home page changed, writing file: $fn", 2);
 	saveAs($home_page_str, $fn);
 }
 
@@ -1472,13 +1472,13 @@ function prepareEasyImg($content)
 /* <##> make the main and member #RSS feeds */
 function makeRSS($max = 30)
 {
-	journal('making the RSS feeds (main + member)', 1);
+	journal('Making the RSS feeds (main + member)', 1);
 	/*	if (!isset($_GET["rss"])) {
-		journal("skipping the RSS feed", 1); return;
+		journal("Skipping the RSS feed", 1); return;
 		}
-		journal("making the RSS feed", 1); */
+		journal("Making the RSS feed", 1); */
 	/* Generates an RSS file using only $max of the most recent posts.  The original post array is not sorted, so this is a bit tricky.  The index array is sorted, so we use that, using the title_smpl to match it to the original, full post in the main posts array. This is important, because the searching is computationally expensive; using this method, we only ever do a small amount of searching through the big array.  */
-	journal("checking $max recent posts", 2, true);
+	journal("checking $max recent posts", 2);
 	global $posts, $rss_only_posts;
 	$postsWithRSS = $posts + $rss_only_posts; // merge the arrays (don’t use array_merge, because that fucks with all the keys)
 	krsort($postsWithRSS); // sort it again, and this is actually critical, because RSS only deals with recent posts and assumes dated post order!
@@ -1604,9 +1604,9 @@ function makeRSS($max = 30)
 		$fn = _ROOT . '/stage/rss.xml';
 	} //psmod, non-generic save location for rss, to match legacy location // `path
 	if (fileExistsNoChange($rss_str, $fn)) { //`path
-		journal("main RSS feed unchanged, not writing file: $fn", 2, true);
+		journal("main RSS feed unchanged, not writing file: $fn", 2);
 	} else {
-		journal("main RSS feed changed, writing file: $fn", 2, true);
+		journal("main RSS feed changed, writing file: $fn", 2);
 		saveAs($rss_str, $fn);
 		if ($GLOBALS['ps']) {
 			saveAs("This is a COPY of the main production feed file /stage/rss.xml, just saved in the same location as the member feed files (rss-member-tH7MvsD7.xml & rss-member-podcast-hg4v437k.xml), which is entirely for convenience (and the member feeds need to live in /incs). It’s just handy to have all in one place for easier comparison.\n\n" . $rss_str, _ROOT . '/incs/rss-main.xml');
@@ -1621,9 +1621,9 @@ function makeRSS($max = 30)
 		$fn = _ROOT . '/incs/rss-member-tH7MvsD7.xml';
 		$rss_str_premium = tidyRSS($rss_str_premium); // some tidying to make the file easier to audit
 		if (fileExistsNoChange($rss_str_premium, $fn)) { //`path
-			journal("member RSS feed unchanged, not writing file: $fn", 2, true);
+			journal("member RSS feed unchanged, not writing file: $fn", 2);
 		} else {
-			journal("member RSS feed changed, writing file: $fn", 2, true);
+			journal("member RSS feed changed, writing file: $fn", 2);
 			saveAs($rss_str_premium, $fn);
 		}
 	}
@@ -1632,9 +1632,9 @@ function makeRSS($max = 30)
 /*<##> make the #podcast (#rss feed for audio versions of posts, for members only)  */
 function makePodcast($max = 500)
 {
-	journal('making the podcast feed', 1);
+	journal('Making the podcast feed', 1);
 	/* Generates an RSS file using only $max of the most recent posts.  The original post array is not sorted, so this is a bit tricky.  The index array is sorted, so we use that, using the title_smpl to match it to the original, full post in the main posts array. This is important, because the searching is computationally expensive; using this method, we only ever do a small amount of searching through the big array.  */
-	journal("checking $max recent podcast episodes", 2, true);
+	journal("checking $max recent podcast episodes", 2);
 	global $posts, $rss_only_posts; // get the RSS-only posts (not many!)
 	$postsWithRSS = $posts + $rss_only_posts; // merge the arrays (don’t use array_merge, because that fucks with all the keys)
 	krsort($postsWithRSS); // sort it again, and this is actually critical, because RSS only deals with recent posts and assumes dated post order!
@@ -1689,9 +1689,9 @@ function makePodcast($max = 500)
 		$fn = _ROOT . '/' . $fn;
 	} //psmod, non-generic save location for rss, to match legacy location // `path
 	if (fileExistsNoChange($rss_str, $fn)) { //`path
-		journal("Podcast feed unchanged, not writing file: $fn", 2, true);
+		journal("Podcast feed unchanged, not writing file: $fn", 2);
 	} else {
-		journal("Podcast feed changed, writing file: $fn", 2, true);
+		journal("Podcast feed changed, writing file: $fn", 2);
 		saveAs($rss_str, $fn);
 	}
 }
@@ -1709,14 +1709,14 @@ function tidyRSS($rss_str)
 function makeSitemap()
 {
 	global $posts;
-	journal('making the sitemap', 1);
+	journal('Making the sitemap', 1);
 	$mostRecentPostDate = $posts[current(array_keys($posts))]['date']; // this references the first post in the posts array by its key, which is begotten with the incantation: current(array_keys($posts))
 	global $settings;
 	extract($settings);
 	$sitemap_str = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:image=\"http://www.sitemaps.org/schemas/sitemap-image/1.1\" xmlns:video=\"http://www.sitemaps.org/schemas/sitemap-video/1.1\">\n<url>\n<loc>http://{$domain}</loc>\n<lastmod>{$mostRecentPostDate}</lastmod>\n<changefreq>weekly</changefreq>\n<priority>1.0</priority></url>\n";
 	$sitemap_str = str_replace('http://www.painsci', 'https://www.painsci', $sitemap_str);
 	// note, lastmod must be equal to the most recent post, and will be subbed in after
-	journal('adding posts to sitemap', 2, true);
+	journal('adding posts to sitemap', 2);
 	$n=0; foreach ($posts as $post) {
 		if (!empty($post['preview']) or 					// do not include post previews
 			($post['indexing'] ?? null) === false or		// a noindexing directive is equivalent to exclusion from the sitemap
@@ -1756,18 +1756,18 @@ function makeSitemap()
 		$fn = ROOT_TRUE . "/stage/sitemap-{$sitecode}-blog.xml";
 	} // # symod, adding -blog suffix, saved parallel to main sitemap-ps.xml, `path
 	if (fileExistsNoChange($sitemap_str, $fn)) {
-		journal("sitemap unchanged, not writing file: $fn", 2, true);
+		journal("sitemap unchanged, not writing file: $fn", 2);
 
 		return;
 	}
 
-	journal("sitemap changed, writing file: $fn", 2, true);
+	journal("sitemap changed, writing file: $fn", 2);
 	saveAs($sitemap_str, $fn);
 }
 
 function remove_old_files($posts)
 { // called at the end of makeWebVersions()
-	journal('cleanup obsolete files', 1, true);
+	journal('Cleanup obsolete files', 1, true);
 	//	printArr($GLOBALS['filenames']);
 	//	echo "!!!!!!!!!<br><br>!!!!!!!!!!!!<br><br>";
 	//	printArr(glob(STAGE . "/*.html")); exit;
@@ -1785,7 +1785,7 @@ function remove_old_files($posts)
 		unlink($fn);
 		if (function_exists('buildRecordDelete')) buildRecordDelete($fn);
 		$x++;
-		journal("removing obsolete page [$fn]", 2, true);
+		journal("removing obsolete page: " . buildRelPath($fn), 2, true);
 	}
 	foreach (glob(STAGE . '/imgs-auto/*') as $fn) {
 		preg_match("@.*?/imgs-auto/(.*?)\.\w{3}@", $fn, $matches);
@@ -1805,7 +1805,7 @@ function remove_old_files($posts)
 		}
 	}
 	if ($x == 0) {
-		journal('no obsolete files found', 2, true);
+		journal('no obsolete files found', 2);
 	} else {
 		journal("$x obsolete files found", 2, true);
 	}
@@ -2175,7 +2175,7 @@ function file_management()
 
 	// alias to most current microposts file, a convenience
 	// make_current_microposts_alias($micropost_files);
-	journal('checking a few more critical files', 1);
+	journal('Checking htaccess, 404 page, favicon', 1);
 
 	// the contents of the "HTML" folder should be completely automatically managed/autogenerated; it should be possibel to wipe it clean, and then rebuilt in every detail; this requires checks for certain files
 	// @2do add checks to see if htaccess, favicon and other key files even exist in the first place (can't copy a favicon file that doesn't exist yet)
@@ -2184,43 +2184,43 @@ function file_management()
 	global $ps; if ($ps) {
 
 		// htaccess `path (irrelevant to the other blogs since migrating hosting to CFPages)
-		if (fileExistsNoChange(file_get_contents('guts/htaccess'), 'html/.htaccess')) {
-			journal("The 'htaccess' file is in place and unchanged", 2, true);
+		if (fileExistsNoChange(file_get_contents('guts/htaccess'), STAGE . '/.htaccess')) { // STAGE, not the family-blog literal 'html/': for PainSci that path never existed, so every build reported 'updating htaccess' and copied an identical file over itself (fixed Oct 2026, once the build log got short enough to read)
+			journal('htaccess in place and unchanged', 2);
 		} else {
 			copy('guts/htaccess', STAGE . '/.htaccess');
-			journal('restoring and/or updating htaccess file', 2, true);
+			journal('updating htaccess from guts/', 2);
 		}
 	}
 
 	global $ps; if (! $ps) {
 
 		// 404 handler `path
-		if (fileExistsNoChange(file_get_contents('guts/404.html'), 'html/404.html')) {
-			journal("The 'not-found' file is in place and unchanged", 2, true);
+		if (fileExistsNoChange(file_get_contents('guts/404.html'), STAGE . '/404.html')) {
+			journal('404 page in place and unchanged', 2);
 		} else {
 			copy('guts/404.html', STAGE . '/404.html');
-			journal('restoring and/or updating not-found file', 2, true);
+			journal('updating 404 page from guts/404.html', 2);
 		}
 
 		// _redirects files for cfpages
-		if (fileExistsNoChange(file_get_contents('guts/_redirects'), 'html/_redirects')) {
-			journal("The 'not-found' file is in place and unchanged", 2, true);
+		if (fileExistsNoChange(file_get_contents('guts/_redirects'), STAGE . '/_redirects')) {
+			journal('_redirects in place and unchanged', 2); // (until Oct 2026 this line was a copy-paste of the 404 message above)
 		} else {
 			copy('guts/_redirects', STAGE . '/_redirects');
-			journal('restoring and/or updating Pages _redirects file', 2, true);
+			journal('updating _redirects from guts/_redirects', 2);
 		}
 	}
 
 	// favicon `path
 	if (file_exists('guts/favicon.ico')) {
-		if (! file_exists('html/favicon.ico')) {
+		if (! file_exists(STAGE . '/favicon.ico')) {
 			copy('guts/favicon.ico', STAGE . '/favicon.ico');
-			journal('restoring favicon file to /stage', 2, true);
+			journal('copying favicon from guts/', 2);
 		} else {
-			journal('favicon file is in place', 2, true);
+			journal('favicon file is in place', 2);
 		}
 	} else {
-		journal('! no favicon file in /guts', 2, true);
+		journal('no favicon in guts/ (nothing to copy)', 2);
 	}
 }
 
@@ -2355,7 +2355,7 @@ function make_sy_indexes()
 	if (! $ps) {
 		return;
 	} // #psmod: this ƒ is for PS blog production only
-	journal('making custom indexes for PS', 1, true);
+	journal('Making custom indexes for PS', 1, true);
 	// A lot of output is idiosyncratic for a given format; for instance, a post's date of 2013-10-26 may be output as "Saturday, October 26, 2013" or "Oct 26".  In general, such trivial variations should be calculated from the post data when it’s time to output, and not at the time that the post is created.  But there is a large grey zone.  If idiosyncratic output is likely to be used in any of most output, should it then be calculated when the post is produced?  In general, this function is devoted to whatever formatted output was NOT calculated when the post was originally generated by a get_ function.
 	global $settings;
 	extract($settings);
@@ -2765,7 +2765,7 @@ function makeMemberPostLists()
 	if (! $ps) {
 		return;
 	} // #psmod: this ƒ is for PS blog production only
-	journal('making premium post lists', 1, true);
+	journal('Making premium post lists', 1, true);
 	global $settings;
 	extract($settings);
 	$links = [];
@@ -3192,9 +3192,9 @@ function makeTagUsageList ($posts) { // Save every single usage of every tag on 
 	$fn = 'tags.used.txt';
 	$path = $_SERVER['DOCUMENT_ROOT'] . '/guts';
 	if (fileExistsNoChange($tag_usage_list, "$path/$fn")) // NB: this checked an undefined variable ($file) for years, so the "unchanged" branch never ran and the file was saved on every build
-		journal("not saving tag usage list: $fn unchanged", 2, true);
+		journal("not saving tag usage list: $fn unchanged", 2);
 	else { // save sitemap files
-		journal("saving tag usage list", 2, true);
+		journal("saving tag usage list", 2);
 		saveAs($tag_usage_list, "$path/$fn");
 		}
 	}
@@ -3247,11 +3247,4 @@ function processPullQuotes_buttondown ($content) {
 	$content = str_replace("<p></p>", '', $content); // there might be a stray <p> element remaining?
 
 	return $content;
-}	
-?>
-	
-	
-	
-	
-	
-	
+}
