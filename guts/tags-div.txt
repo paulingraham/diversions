@@ -487,13 +487,13 @@ Tags preceded by a DOT are “admin” tags for your eyes only. They will never 
 
 » singing [0]
 
-» size L [16]
+» size L [17]
 
 » size M [5]
 
 » size S [5]
 
-» size XL [24]
+» size XL [26]
 
 » skeleton [0]
 

@@ -169,6 +169,8 @@ Susan has used PubSys less intensively and less "creatively" than Bob, mostly st
 
 The home page (`guts/template-home-page.php`) introduces Susan and links to the main sections: the two family-history hub pages (`family-history-home-page` for Susan's side, `ingraham-family-home-page` for Bob's) and the novel chapters. The hub pages are ordinary posts that link to the individual family pages, and many family pages end with a "Return to …" link back to their hub. A new family page usually needs a link from the right hub page.
 
+The home page also links to `fitness-articles`, a page listing Susan's fitness articles in alphabetical order. Each new article gets its own page, a line in that list in its alphabetical place, Susan's name at the top, and a "Return to Fitness Articles" link at the bottom.
+
 ### What's normal on this site
 
 Leave these habits alone. They work, and changing them isn't your job:

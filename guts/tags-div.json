@@ -1751,7 +1751,7 @@
         },
         "size L": {
             "key": "sizel",
-            "tally#": 16,
+            "tally#": 17,
             "true": "size L"
         },
         "size M": {
@@ -1766,7 +1766,7 @@
         },
         "size XL": {
             "key": "sizexl",
-            "tally#": 24,
+            "tally#": 26,
             "true": "size XL"
         },
         "skeleton": {

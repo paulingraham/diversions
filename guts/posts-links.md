@@ -1,3 +1,18 @@
+PainScience.com/four-learning-styles.html
+https://www.painscience.com/four-learning-styles.html
+[Four Learning Styles](https://www.painscience.com/four-learning-styles.html)
+<a href="https://www.painscience.com/four-learning-styles.html">Four Learning Styles</a>
+
+PainScience.com/four-health-issues.html
+https://www.painscience.com/four-health-issues.html
+[Four Health Issues Faced by the Older Adult](https://www.painscience.com/four-health-issues.html)
+<a href="https://www.painscience.com/four-health-issues.html">Four Health Issues Faced by the Older Adult</a>
+
+PainScience.com/aging-and-activity.html
+https://www.painscience.com/aging-and-activity.html
+[Aging and Activity](https://www.painscience.com/aging-and-activity.html)
+<a href="https://www.painscience.com/aging-and-activity.html">Aging and Activity</a>
+
 PainScience.com/arthritis-and-exercise-part-4.html
 https://www.painscience.com/arthritis-and-exercise-part-4.html
 [Arthritis and Exercise, Part 4: Exercise Guidelines and Considerations](https://www.painscience.com/arthritis-and-exercise-part-4.html)
