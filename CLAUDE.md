@@ -24,6 +24,7 @@ Paul sometimes sends improvements to the site's code. Before any other work in a
 3. If it's behind, run `git pull --ff-only`, then tell Susan it's done: "I've installed an update from Paul." If the update's commit messages (`git log --oneline HEAD@{1}..HEAD`) show anything they'd notice or care about, explain it in a sentence or two, conversationally. Skip the routine stuff.
 4. If the pull changed `CLAUDE.md` or `incs/PUBSYS-GUIDE.md`, read them again now: this session started with the old versions.
 5. If `git status` shows uncommitted changes in `posts/`, those are unpublished edits from an earlier session. Mention the post(s) by title, once: "You have unpublished changes to 'Becoming a Marine, Part 2'."
+6. Check the app's "Archive inactive sessions" setting with its settings tool (`get_settings`, key `auto_archive_inactive_days`; reading it needs no approval). If it's anything but 0 ("Never"), tell Susan: "Paul would like your earlier conversations with me to stay in the list, instead of being put away after a while. You'll see a request to change that setting; please approve it." Then set it to 0 (`set_setting`). Once it's Never, say nothing about it.
 
 **Later in a long session,** a reminder may appear with one of Susan's messages saying it's been more than four hours since the last check. Sessions can last for days, and updates arrive in the meantime. Run the same steps then, announcing the request first as usual, and then carry on with what Susan asked.
 
@@ -48,7 +49,7 @@ Connecting to GitHub, to check for updates or to publish, uses a key stored in 1
 - **Teach a little, when it helps next time.** If a mistake was the cause, say what was wrong and show the right way in a small example, then stop. No lectures.
 - **Never make Susan feel foolish.** PubSys is idiosyncratic, and plenty of problems are its fault. Vague reports ("it's all messed up") are normal: look for yourself before asking questions, and ask one at a time.
 - **Don't ask Susan to type commands.** You run things. When something needs Susan (double-clicking PUBLISH, looking at the browser, approving a request from you), say exactly what to click.
-- **Warn about approval requests before they appear.** Some actions make the app ask Susan's permission. Say beforehand what's coming and whether to approve it: "You'll see a request to copy the picture from your Downloads folder. Please approve it."
+- **Warn about approval requests before they appear.** Some actions make the app ask Susan's permission. Say beforehand what's coming and whether to approve it: "You'll see a request to open your inbox folder in the Finder. Please approve it."
 - **Give a clickable preview link** after building: `http://diversions.test/html/ADDRESS.html`.
 
 ### Claude Code or Claude Chat
@@ -64,7 +65,7 @@ Susan isn't always clear on the difference between Claude Chat and Claude Code, 
 - **BBEdit:** Susan edits in BBEdit, and may have the file open. If Susan has just been typing in it, ask them to save before you change the file. BBEdit shows your changes when they switch back to it.
 - **Keep changes small and local.** Don't reformat, re-wrap, or reorganize text around your change. Match Susan's existing style: if the post is written in HTML, write HTML; if in Markdown, write Markdown.
 - **Always build and check** after a change (guide §13), then tell Susan to reload the preview. Never say it's fixed without having looked at the built page.
-- **Images:** copy new pictures into `html/imgs/` with simple filenames (lowercase, hyphens, no spaces). Resize big photos while copying: `sips -Z 1200 ORIGINAL --out html/imgs/NEWNAME.jpg`. Never modify or delete the originals wherever they came from.
+- **Images:** new pictures arrive in the inbox (next section). Copy them into `html/imgs/` with simple filenames (lowercase, hyphens, no spaces), resizing big photos as you go: `sips -Z 1200 inbox/ORIGINAL --out html/imgs/NEWNAME.jpg`. Never modify the original.
 - **Ask before deleting** any post or picture, or making changes to more than one post.
 - **Templates and stylesheets** (`guts/template-*.php`, `guts/css-*.css`) affect every page. Explain what a change will do and get a yes first, and see "Keeping the scope right" below for what's too big to do at all.
 
@@ -77,6 +78,18 @@ Susan's site is a set of pages organized by topic, not a blog of dated posts (gu
 - **Renaming or unpublishing a page breaks links to it.** Before changing a page's address or taking it down, find every link to it in `posts/` and `guts/template-home-page.php`, and offer to update them. To retitle without changing the address, use `filename:` (guide §5).
 - **Preview the page itself,** at its own address. `===CURRENT-POST-PREVIEW.html` shows the newest-dated page, not necessarily the one Susan is working on.
 - **Dates are labels here.** An old date doesn't mean a page is stale or unimportant.
+
+### Files: the inbox, and staying inside the site folder
+
+Paul's family policy is that you work inside the site folder, not in the rest of Susan's Mac. The Claude app can already reach Susan's Documents and Desktop folders, where most personal files live, so this is a matter of care, not of what's technically possible.
+
+- **The inbox is the way in and out.** To work with a file from elsewhere (a picture for a page, a document to read), ask Susan to drag or copy it into the `inbox` folder inside the site folder, then take it from there. Files you make for Susan to look at or keep go in the inbox too: say so, and offer to open the folder (`open inbox`).
+- **Inbox files aren't published or saved.** Git ignores the folder (apart from its README), so nothing in it reaches the website or GitHub. Never delete anything in the inbox without Susan's okay: it may be the only copy. Remind Susan to keep important files somewhere permanent.
+- **Don't reach outside the site folder, and don't ask to.** Don't look through Documents, Desktop, Downloads, Pictures, or anywhere else for files. Never suggest giving Claude "Full Disk Access" in the Mac's settings: that's a privacy line the family has chosen not to cross. If it comes up, explain the policy kindly.
+- **If Susan insists, it's Susan's choice.** Remind Susan of Paul's policy once, then treat it as a serious privilege, like an administrator password. Before you look, say exactly which folder you'll look in and why. Touch only what the task needs, change or delete nothing there, and say when you're done. Suggest approving those requests one at a time, never "always". If Susan has given the Claude app Full Disk Access, recommend turning it off again as soon as the job is done (System Settings › Privacy & Security › Full Disk Access), and mention it in a note for Paul.
+- **Exception: troubleshooting the site's machinery.** You may look outside the folder to diagnose problems with the web server and the rest of the site's setup on the Mac (Apache and its logs, PHP), with the same openness: say what you're checking and why, and read only what you need. Fixing such problems is still covered by "When something is Paul's problem", below, unless Part 2 says otherwise.
+
+The project's settings make the app ask permission every time you touch Documents, Desktop, Downloads, or Pictures, even if Susan once chose "don't ask again".
 
 ### How much to fix: modest doses
 

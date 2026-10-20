@@ -6,3 +6,7 @@ profile
 
 # PubSys post-render cache (same rule as PainSci)
 /.cache
+
+# inbox: a temporary place for passing files between the writer and Claude; never committed or published
+/inbox/*
+!/inbox/README.md

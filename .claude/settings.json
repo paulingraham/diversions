@@ -1,11 +1,13 @@
 {
   "model": "opus",
+  "cleanupPeriodDays": 3650,
   "permissions": {
     "allow": [
       "Edit(/posts/**)",
       "Edit(/html/imgs/**)",
       "Edit(/guts/**)",
       "Edit(/for-paul/**)",
+      "Edit(/inbox/**)",
       "Edit(/CLAUDE.md)",
       "Bash(curl -s http://diversions.test/make-site.php)",
       "Bash(curl -s http://diversions.test/make-site.php?full)",
@@ -18,6 +20,16 @@
       "Bash(git stash push *)",
       "Bash(git stash list)",
       "Bash(sips *)"
+    ],
+    "ask": [
+      "Read(~/Documents/**)",
+      "Edit(~/Documents/**)",
+      "Read(~/Desktop/**)",
+      "Edit(~/Desktop/**)",
+      "Read(~/Downloads/**)",
+      "Edit(~/Downloads/**)",
+      "Read(~/Pictures/**)",
+      "Edit(~/Pictures/**)"
     ],
     "deny": [
       "Edit(/make-site.php)",
