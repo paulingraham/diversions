@@ -82,6 +82,8 @@ while(x=eval(x));
 
 <span class='red'>Adapted Fit</span> is a fitness class for older adults (usually 55 and older) who may have strength or mobility issues. Participants do many exercises in a chair and they stand up for some activities while using the chair for support. It meets on Mondays and Fridays from 11:00 a.m. to noon.</p>
 
+<p><a href="fitness-articles.html">Fitness Articles</a>: You will find here many articles about fitness and the older adult.</p>
+
 <li>MY FAMILY HISTORY: I have done research on my own family which includes: 
 <a href="family-history-home-page.html">Overturfs, Hansens, Mahoneys, and McDonalds.</a></li>
 

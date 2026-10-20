@@ -1,3 +1,28 @@
+PainScience.com/arthritis-and-exercise-part-4.html
+https://www.painscience.com/arthritis-and-exercise-part-4.html
+[Arthritis and Exercise, Part 4: Exercise Guidelines and Considerations](https://www.painscience.com/arthritis-and-exercise-part-4.html)
+<a href="https://www.painscience.com/arthritis-and-exercise-part-4.html">Arthritis and Exercise, Part 4: Exercise Guidelines and Considerations</a>
+
+PainScience.com/arthritis-and-exercise-part-3.html
+https://www.painscience.com/arthritis-and-exercise-part-3.html
+[Arthritis and Exercise, Part 3: Exercise Design](https://www.painscience.com/arthritis-and-exercise-part-3.html)
+<a href="https://www.painscience.com/arthritis-and-exercise-part-3.html">Arthritis and Exercise, Part 3: Exercise Design</a>
+
+PainScience.com/arthritis-and-exercise-part-2.html
+https://www.painscience.com/arthritis-and-exercise-part-2.html
+[Arthritis and Exercise, Part 2: How to Manage Arthritis](https://www.painscience.com/arthritis-and-exercise-part-2.html)
+<a href="https://www.painscience.com/arthritis-and-exercise-part-2.html">Arthritis and Exercise, Part 2: How to Manage Arthritis</a>
+
+PainScience.com/arthritis-and-exercise-part-1.html
+https://www.painscience.com/arthritis-and-exercise-part-1.html
+[Arthritis and Exercise, Part 1: Overview of Rheumatic Disease](https://www.painscience.com/arthritis-and-exercise-part-1.html)
+<a href="https://www.painscience.com/arthritis-and-exercise-part-1.html">Arthritis and Exercise, Part 1: Overview of Rheumatic Disease</a>
+
+PainScience.com/fitness-articles.html
+https://www.painscience.com/fitness-articles.html
+[Fitness Articles](https://www.painscience.com/fitness-articles.html)
+<a href="https://www.painscience.com/fitness-articles.html">Fitness Articles</a>
+
 PainScience.com/family-index.html
 https://www.painscience.com/family-index.html
 [Family Index: Who's Who on My Family History Pages](https://www.painscience.com/family-index.html)
