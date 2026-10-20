@@ -3,6 +3,11 @@ https://www.painscience.com/family-index.html
 [Family Index: Who's Who on My Family History Pages](https://www.painscience.com/family-index.html)
 <a href="https://www.painscience.com/family-index.html">Family Index: Who's Who on My Family History Pages</a>
 
+PainScience.com/sisters-chapter-6.html
+https://www.painscience.com/sisters-chapter-6.html
+[Book 2: Sarah Ann](https://www.painscience.com/sisters-chapter-6.html)
+<a href="https://www.painscience.com/sisters-chapter-6.html">Book 2: Sarah Ann</a>
+
 PainScience.com/sisters-chapter-5.html
 https://www.painscience.com/sisters-chapter-5.html
 [Book 1: Sarah Etta](https://www.painscience.com/sisters-chapter-5.html)
