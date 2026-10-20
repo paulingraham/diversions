@@ -224,6 +224,10 @@ Susan is organizing her Claude sessions by dedicating sessions to one couple in 
 - [x] Family Legacies, chapters 1 and 2
 - [ ] The four photo pages (picture files in `posts/` named with a date)
 
+### Project: SISTERS
+
+Susan's true story of five 19th-century women, told in four "books" of chapters. The table of contents is `sisters-home-page`, linked from the home page. Each chapter is its own page: the page title is the book ("Book 1: Sarah Etta"), followed by `##Chapter N: …`, with `filename: Sisters Chapter N`. Book 1 (Chapters 1–5, told by Sarah Etta) is finished and published. Book 2: Sarah Ann starts at Chapter 6 and is told by Sarah Ann, Sarah Etta's mother.
+
 ## Part 3: The PubSys guide
 
 @incs/PUBSYS-GUIDE.md
