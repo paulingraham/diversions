@@ -15,18 +15,23 @@ This folder is **Diversions** (SusanIngraham.net), Susan Ingraham's website. Sus
 
 <!-- Part 1 is the same in ephemeral/CLAUDE.md and diversions/CLAUDE.md except for the person's name and the site's local address. Keep the two in step. Part 2 is where the two files differ. -->
 
-### Every session: check for updates first
+### Checking for updates from Paul
 
-Paul sometimes sends improvements to the site's code. Before any other work in a session, install them:
+Paul sometimes sends improvements to the site's code. Check for them at these three times, and not at the start of every session:
 
-1. Tell Susan in a line or two: "First, I'll check whether Paul has sent any updates for the site. You'll see a 1Password request for that: it's from me, so please approve it."
+- **When a reminder says it's been a while.** Each time Susan sends a message, a small script in this project looks at when the last check was, without going online or asking 1Password. If it was more than four hours ago, a reminder arrives with Susan's message. Run the steps below, then carry on with what Susan asked. Sessions started close together therefore check only once between them.
+- **Always, just before suggesting PUBLISH** (see Publishing), however recent the last check. If an update has arrived in the meantime, publishing would fail.
+- **Whenever Susan asks** ("check for updates"). Paul may suggest that when he has sent something.
+
+The steps:
+
+1. Tell Susan in a line or two: "I'll quickly check whether Paul has sent any updates for the site. You'll see a 1Password request for that: it's from me, so please approve it."
 2. Run `git fetch`, then `git status -sb`. If the branch isn't behind, say nothing more about it and carry on.
 3. If it's behind, run `git pull --ff-only`, then tell Susan it's done: "I've installed an update from Paul." If the update's commit messages (`git log --oneline HEAD@{1}..HEAD`) show anything they'd notice or care about, explain it in a sentence or two, conversationally. Skip the routine stuff.
 4. If the pull changed `CLAUDE.md` or `incs/PUBSYS-GUIDE.md`, read them again now: this session started with the old versions.
 5. If `git status` shows uncommitted changes in `posts/`, those are unpublished edits from an earlier session. Mention the post(s) by title, once: "You have unpublished changes to 'Becoming a Marine, Part 2'."
-6. Check the app's "Archive inactive sessions" setting with its settings tool (`get_settings`, key `auto_archive_inactive_days`; reading it needs no approval). If it's anything but 0 ("Never"), tell Susan: "Paul would like your earlier conversations with me to stay in the list, instead of being put away after a while. You'll see a request to change that setting; please approve it." Then set it to 0 (`set_setting`). Once it's Never, say nothing about it.
 
-**Later in a long session,** a reminder may appear with one of Susan's messages saying it's been more than four hours since the last check. Sessions can last for days, and updates arrive in the meantime. Run the same steps then, announcing the request first as usual, and then carry on with what Susan asked.
+**Once per session, quietly:** check the app's "Archive inactive sessions" setting with its settings tool (`get_settings`, key `auto_archive_inactive_days`; reading it needs no approval). If it's anything but 0 ("Never"), tell Susan: "Paul would like your earlier conversations with me to stay in the list, instead of being put away after a while. You'll see a request to change that setting; please approve it." Then set it to 0 (`set_setting`). Once it's Never, say nothing about it.
 
 **If the pull is refused because of local changes**, it's almost always generated files (pages in `html/`, the feed, the sitemap, the generated files in `guts/`), which both Susan's builds and Paul's update have rewritten. Set only those aside with `git stash push -m "before update" -- <those files>`, pull again, then rebuild to regenerate them from the posts. Never stash, discard, or overwrite anything in `posts/`, `html/imgs/`, hand-edited `guts/` files, or this file. If one of those is in the way, or the pull fails any other way, stop: don't try to force it. Tell Susan the update will have to wait, and write it up for Paul (below).
 
@@ -135,7 +140,7 @@ These rules are also enforced by the project's settings; the reasons matter too.
 
 For now, Susan publishes the familiar way: by double-clicking `PUBLISH.command` in the site folder. It shows a summary of the changes and asks for a keypress (any key publishes; x cancels), then 1Password asks for approval to connect to GitHub. The site updates online a minute or two later.
 
-- When Susan is happy with the changes, build once more and check it's clean, then suggest publishing: "Ready to go. Double-click PUBLISH in your site folder, and press any key when it asks."
+- When Susan is happy with the changes, check for updates (always, at this point), then build once more and check it's clean, then suggest publishing: "Ready to go. Double-click PUBLISH in your site folder, and press any key when it asks."
 - Don't suggest publishing while the build shows ABORT! or new warnings.
 - If publishing fails, the error shows in the Terminal window PUBLISH opened, which you can't see. Ask Susan to copy and paste what it says, or check `git status -sb` yourself. The usual cause is an update from Paul arriving in the meantime: run the update steps, then ask Susan to publish again.
 - If Susan asks you to publish, say kindly that for now PUBLISH is still the way, and you'll get it ready.
