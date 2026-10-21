@@ -66,15 +66,7 @@ while(x=eval(x));
 <h2>Highlights</h2>
 
 <ul>
-<li>FITNESS</li>
-
-<p>After retirement from 32 years of public school teaching, at the age of 57, I started exercising for my own well being and found that I wanted to impart my knowledge to others. It took a year to earn my qualifications: several courses and a pretty tough exam from the British Columbia Parks and Recreation Association. Plus, I’m expected to update my qualifications every year, including CPR and First Aid. I have also had special training in teaching Older Adults and Adapted Fit. Today, at 80, I continue to teach four classes a week.</p>
-
-<p><span class='red'>Light Fit</span> encourages men and women of any age (though the emphasis is on the older adult) to get active: warmup, strength training, cardiovascular exercise, balance training, stretch and flexibility. If you have been away from exercise, had a recent injury, or you are just starting to exercise, you should find this class a good one to start with, but many participants are "regulars" who enjoy the general mood and tone of the class. It meets from 10:45 a.m. to 11:45 a.m. on Tuesdays and Thursdays at the West End Community Centre, 870 Denman Street, in Vancouver, BC. </p>
-
-<span class='red'>Adapted Fit</span> is a fitness class for older adults (usually 55 and older) who may have strength or mobility issues. Participants do many exercises in a chair and they stand up for some activities while using the chair for support. It meets on Mondays and Fridays from 11:00 a.m. to noon.</p>
-
-<p><a href="fitness-articles.html">Fitness Articles</a>: You will find here many articles about fitness and the older adult.</p>
+<li><a href="fitness-articles.html">FITNESS ARTICLES</a>: You will find here many articles about fitness and the older adult.</li>
 
 <li>MY FAMILY HISTORY: I have done research on my own family which includes: 
 <a href="family-history-home-page.html">Overturfs, Hansens, Mahoneys, and McDonalds.</a></li>
@@ -90,6 +82,14 @@ while(x=eval(x));
 <li><a href="sisters-home-page.html">SISTERS</a>: A true story of five women attempting to thrive in 19th Century America when women's rights were limited.</li>
 
 </ul>
+
+<h2>My Fitness Classes</h2>
+
+<p>After retirement from 32 years of public school teaching, at the age of 57, I started exercising for my own well being and found that I wanted to impart my knowledge to others. It took a year to earn my qualifications: several courses and a pretty tough exam from the British Columbia Parks and Recreation Association. Plus, I’m expected to update my qualifications every year, including CPR and First Aid. I have also had special training in teaching Older Adults and Adapted Fit. Today, at 80, I continue to teach four classes a week.</p>
+
+<p><span class='red'>Light Fit</span> encourages men and women of any age (though the emphasis is on the older adult) to get active: warmup, strength training, cardiovascular exercise, balance training, stretch and flexibility. If you have been away from exercise, had a recent injury, or you are just starting to exercise, you should find this class a good one to start with, but many participants are "regulars" who enjoy the general mood and tone of the class. It meets from 10:45 a.m. to 11:45 a.m. on Tuesdays and Thursdays at the West End Community Centre, 870 Denman Street, in Vancouver, BC. </p>
+
+<p><span class='red'>Adapted Fit</span> is a fitness class for older adults (usually 55 and older) who may have strength or mobility issues. Participants do many exercises in a chair and they stand up for some activities while using the chair for support. It meets on Mondays and Fridays from 11:00 a.m. to noon.</p>
 
 <h2>How I Create My Web Pages</h2>
 
