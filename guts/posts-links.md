@@ -1,12 +1,12 @@
 PainScience.com/four-learning-styles.html
 https://www.painscience.com/four-learning-styles.html
-[Four Learning Styles](https://www.painscience.com/four-learning-styles.html)
-<a href="https://www.painscience.com/four-learning-styles.html">Four Learning Styles</a>
+[Learning Styles](https://www.painscience.com/four-learning-styles.html)
+<a href="https://www.painscience.com/four-learning-styles.html">Learning Styles</a>
 
 PainScience.com/four-health-issues.html
 https://www.painscience.com/four-health-issues.html
-[Four Health Issues Faced by the Older Adult](https://www.painscience.com/four-health-issues.html)
-<a href="https://www.painscience.com/four-health-issues.html">Four Health Issues Faced by the Older Adult</a>
+[Health Issues Faced by the Older Adult](https://www.painscience.com/four-health-issues.html)
+<a href="https://www.painscience.com/four-health-issues.html">Health Issues Faced by the Older Adult</a>
 
 PainScience.com/aging-and-activity.html
 https://www.painscience.com/aging-and-activity.html
