@@ -41,15 +41,7 @@
 
 <body>
 
-<p>Diversions once explored ideas in the world of fitness for the older adult as well as the dynamics of family history, both real and fictional.  It was an eclectic mix of writing in two different, but sometimes related, categories. Many articles have been removed for various reasons which will not be discussed here. Suffice it to say that this page now only announces my fitness classes, has articles about my family and my husband’s family, and some excerpts from novels I have written:</p>
-
-<ul>
-<li>fitness for older adults, which I teach in downtown Vancouver, Canada</li>
-<li>the history of my family and my husband's family, particularly the Overturf, Hansen, Ingraham, and Herrick families</li>
-
-</ul>
-
-<p>Plus more diversions. In some ways these topics couldn’t be more different, and yet they have also inspired and informed each other.</p>
+<p>Diversions explores ideas in the world of fitness for the older adult as well as the dynamics of family history, both real and fictional. It is an eclectic mix of writing in two different, but sometimes related, categories. This page links to fitness articles for the older adult, family history stories, and chapters from my novels.</p>
 
 <img src="imgs/susan-131x146-web.jpg" width="131" height="146" style="float:left;margin-right:2em;">
 <div class="metadata">
