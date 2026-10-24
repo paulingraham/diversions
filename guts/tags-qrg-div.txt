@@ -219,7 +219,7 @@ singing	0
 size L	17						
 size M	5						
 size S	5						
-size XL	26						
+size XL	27						
 skeleton	0						
 sleep	0						
 small town	0						
