@@ -1751,17 +1751,17 @@
         },
         "size L": {
             "key": "sizel",
-            "tally#": 17,
+            "tally#": 18,
             "true": "size L"
         },
         "size M": {
             "key": "sizem",
-            "tally#": 5,
+            "tally#": 8,
             "true": "size M"
         },
         "size S": {
             "key": "sizes",
-            "tally#": 5,
+            "tally#": 4,
             "true": "size S"
         },
         "size XL": {

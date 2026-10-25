@@ -1,3 +1,18 @@
+PainScience.com/breathing-and-relaxation.html
+https://www.painscience.com/breathing-and-relaxation.html
+[Breathing & Relaxation Are Important to Our Health](https://www.painscience.com/breathing-and-relaxation.html)
+<a href="https://www.painscience.com/breathing-and-relaxation.html">Breathing & Relaxation Are Important to Our Health</a>
+
+PainScience.com/brain-exercises.html
+https://www.painscience.com/brain-exercises.html
+[Brain Exercises: A Few Ideas](https://www.painscience.com/brain-exercises.html)
+<a href="https://www.painscience.com/brain-exercises.html">Brain Exercises: A Few Ideas</a>
+
+PainScience.com/balancing-and-breathing-exercises.html
+https://www.painscience.com/balancing-and-breathing-exercises.html
+[Balancing & Breathing Exercises You Can Do at Home](https://www.painscience.com/balancing-and-breathing-exercises.html)
+<a href="https://www.painscience.com/balancing-and-breathing-exercises.html">Balancing & Breathing Exercises You Can Do at Home</a>
+
 PainScience.com/four-learning-styles.html
 https://www.painscience.com/four-learning-styles.html
 [Learning Styles](https://www.painscience.com/four-learning-styles.html)
