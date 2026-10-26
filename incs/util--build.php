@@ -10,6 +10,8 @@ The one piece of intelligence here is the CHANGES REPORT, which gives something 
 
 A lesson from the first week: once the report could be trusted, every "X unchanged, not writing" line in the log became redundant and was demoted to ?verbose — and once the log was short enough to actually read, a message that had been false on every build for years ("updating htaccess", comparing against a path that never existed for PainSci) was spotted within minutes. Keep the log short; the chatter was hiding things.
 
+TIER 3, SCOPED DOWN (Oct 2026). The programme's third tier was a shared build kernel with PROCESS-ISOLATED rendering: every site page rendered in a process of its own, so that no document could see another's variables — the site build renders ~300 documents in one global scope, historically the source of most of its glitches (the header of make-ps-site.php), which env-defaults.php exists to contain. Measured before deciding: a fresh PHP process costs ~870 ms to bootstrap the environment and 6–36 ms to render a page, so a process per page is a non-starter (299 pages: minutes, against 7.5 s for a full build); pcntl_fork() after bootstrap costs ~10 ms per child with byte-identical output, and works, with one trap — a forked child that exits normally sends MySQL QUIT on the inherited socket and kills the parent's prod-DB session ("server has gone away"), so children would have to SIGKILL themselves after writing their output. Paul decided AGAINST forking (2026-10-26): it is CLI-only (Apache can't fork), so the browser build would have to become a wrapper around the CLI build or keep a second, in-process scheduler, and that divergence plus the novel machinery (self-killing workers, temp-file harvesting, parallel abort semantics, timeouts for stuck children) is not justified when no leak has actually been observed in years. What landed instead: the per-page render moved out of the site loop into the include fragment incs/render-one-site-page.php — an include, not an eval, so errors name the real file and line — with buildTidyRender() and buildErrorMarkers() below doing the post-processing for it and for the bib-page loop; and bin/render-one-site-page-standalone.php, which renders one page in a process of its own and diffs it against /stage. Run that with --all to census every page for order-dependent output: a page that renders differently in isolation is the observed failure that would reopen the fork question. The kernel also runs warnIfUnbalancedHtml() (below; moved here from PubSys.php so both builds share one check) on every rendered page — the first run exposed 416 unbalanced tags on 144 pages, cleaned the same day (shared includes by hand, the per-document backlog by parallel agents, the eleven books via full customer renders), so from now on it should only ever report new instances. PubSys was left alone on purpose: a post is Markdown turned into a string, so there is no file to include, and its scoping problem is between its two loops (the PubSys.php header), a different refactor.
+
 Plumbing: saveAs() (util--core.php) is the single funnel every build artifact passes through, so it calls buildRecordChange() with the old and new contents; the deletion sites call buildRecordDelete(). Both are inert unless buildMark() ran, so standalone callers of saveAs() pay nothing. Content vs support is a path test: a .php/.html file under the stage dir is a content page; everything else (feeds, sitemaps, tag files, data files) is a support file, listed after.
 
 Presentation: buildOut() is the only place markup exists, and only in web mode — a span around WARNING/ABORT/FATAL lines and bold on headings and the verdict, by line pattern, so the text is identical in both modes and the browser gets colour for free. Also here: buildTrackDoc/buildErrorsReport (June 2026, originally with buildErrorsMark, now folded into buildMark) — the build renders nearly every page, so it doubles as a test suite, but PHP problems land in logs/php-errors.log, invisible in the build log, and fatals inside eval()'d renders blame "eval()'d code" without naming the document. buildTrackDoc() records the document being processed (psShutdown() in util--errors.php names it in the BUILD FATAL banner); buildErrorsReport() prints a deduplicated summary of error-log entries generated during the build.
@@ -425,4 +427,55 @@ function buildFinish($resultLines = []) {
 	buildOut('  (the process, step by step — everything that matters is above)');
 	echo $log;
 	if (!buildIsCli()) echo "</pre>\n";
+}
+
+/** returns @string: a rendered page tidied for /stage — runs of blank lines and of spaces collapsed, so trivial whitespace churn never shows in a diff, and the period added after "et al" where the citation templates leave none (CLAUDE.md § Source vs. rendered output)  */
+function buildTidyRender($html) {
+	$html = mb_ereg_replace("\r?\n{2,20}", "\n\n", $html);
+	$html = mb_ereg_replace(' {2,10}', ' ', $html);
+	$html = preg_replace('|et\&nbsp;al</em>([^\.])|', 'et&nbsp;al.</em>$1', $html); // adds a period to MOST instances of "et al" that don't already have one, but misses ones with other HTML in there, like </a>
+	return str_replace('al.</em></a>.', 'al</em></a>.', $html); // fix the exceptions that rule creates
+}
+
+/** returns @void: gentle heads-up journal warning when a post's source content has unbalanced block-level HTML (unclosed <p>, missing </ul>, etc.). $srcFile is the source document path as known to the caller (used for the log line and the panel edit link); $srcLabel is the human-readable version; $rawLine is the micropost's raw source line, used to locate its true line number in the POSTS file for the edit link. */
+function warnIfUnbalancedHtml($content, $srcLabel, $srcFile = null, $rawLine = null) {
+	/* Why this matters: MarkdownExtra's HTML-block hashing needs balanced block-level tags. Browsers silently auto-close bad nesting, so hand-written HTML that "looks fine" on an article page can explode when the same markup goes through a PubSys build — mildly (stray litter like "</ul></p>") or spectacularly (tags escaped to visible text: "<p>&lt;</p>"). Real incident: the 2026-07-10 pillow post, with markup copied from §crick where the imbalance had been invisible for who knows how long.
+
+	Deliberately gentle and cheap: warn and continue, never abort — the family blogs (especially ephemeral) contain plenty of imperfect hand-written HTML that renders fine in browsers, and a build must tolerate it. Count-based only, so crossed nesting with matching counts (e.g. a stray </p> compensating for an unclosed <p> elsewhere) slips through; in practice crossed pairs almost always travel with a count imbalance somewhere in the same post. */
+	/* Strip comment-only PHP blocks FIRST — the house format for private/AI draft content (see CLAUDE.md), and they routinely wrap draft HTML that carries its own inner PHP tags. The general strip below is non-greedy, so it would pair such a block's opening delimiter with an INNER closing delimiter and leave the rest of the commented block (e.g. a dangling closing blockquote tag) exposed to the counter — a real false positive (2023-03-10 "can the mind create pain?"). Matching through to the comment's closing star-slash is safe because PHP block comments do not nest, so the first one is always the true end of the block. */
+	$content = preg_replace('|<\?php\s*/\*.*?\*/\s*\?>|s', '', $content);
+	$content = preg_replace('|<\?php.*?\?>|s', '', $content); // ignore remaining (non-comment) PHP blocks — tags inside code aren't part of the source HTML structure
+	$content = preg_replace('|<!--.*?-->|s', '', $content); // ignore HTML comments, which can legitimately contain commented-out markup
+	$content = preg_replace('|```.*?```|s', '', $content); // ignore fenced code blocks and backtick code spans, where example tags are content, not structure
+	$content = preg_replace('|`[^`' . "\n" . ']*`|', '', $content);
+	$unbalanced = [];
+	foreach (['p', 'ul', 'ol', 'li', 'blockquote', 'div'] as $tag) {
+		$opens = preg_match_all('|<' . $tag . '[\s>]|i', $content); // opening pattern allows attributes; [\s>] keeps <p from matching <pre or <pq
+		$closes = preg_match_all('|</' . $tag . '>|i', $content);
+		if ($opens != $closes) {
+			$unbalanced[] = "$tag {$opens}:{$closes}";
+		}
+	}
+	if ($unbalanced) {
+		$msg = "unbalanced HTML in [$srcLabel] (open:close counts — " . implode(', ', $unbalanced) . ') … browsers repair it silently, and Markdown may mangle a post';
+		journal("warning: $msg", 2, true); // inline on the build page, at the point in the flow where it happened
+		/* Also on the permanent record via the unified error pipeline: log line + panel + severity counter. Markers became failure-only in July 2026 (this detector was one of the two cases that forced that policy), so psErrWarn($msg) would no longer abort and COULD replace this pair — but the hand-rolled psErrLog+psCollect stays deliberately, for the attribution finesse below: it points the panel's edit link at the post source file, where generic psErrWarn would attribute to this detector's own call site. */
+		/* Attribute the report to the post source document, not to this detector — that's what the panel's edit link should open. (The panel's own doc-substitution only rescues eval pseudo-paths, correctly; a real file passed here is linked as-is.) psDocPath resolves against both possible roots (painscience /blog and the family-blog roots); the posts/ prefix candidate matters because getMacroPost basenames $fn early (line ~597), so the caller may pass either form. Line 1 because the check is whole-post — a known limitation. */
+		$file = __FILE__; $line = __LINE__;
+		foreach ($srcFile ? [$srcFile, 'posts/' . basename($srcFile)] : [] as $cand) {
+			if ($abs = psDocPath($cand)) { $file = $abs; $line = 1; break; }
+		}
+		if ($rawLine !== null && $line === 1) { // micropost: find the post's true line number in the POSTS file, so the edit link jumps straight to it. Lazy — one file read, only when a warning actually fires. array_search needs the raw line verbatim; two byte-identical posts in one file would fool it, which is no realistic loss.
+			$idx = array_search($rawLine, file($file, FILE_IGNORE_NEW_LINES));
+			if ($idx !== false) $line = $idx + 1;
+		}
+		psErrLog('PainSci warning: ', $msg, $file, $line);
+		psCollect('app', 'warning', $msg, $file, $line);
+	}
+}
+
+/** returns @array: the messages of every "!!! ERROR !!! … -->" marker in a rendered page — the build marker psErrFail() leaves (psErrMarker() in util--errors.php; the format is a contract), meaning broken content that must not ship  */
+function buildErrorMarkers($html) {
+	preg_match_all('|!!! ERROR !!! (.+?)-->|', $html, $m);
+	return $m[1];
 }

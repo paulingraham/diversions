@@ -4,7 +4,7 @@ TAG ENGINE: making `tags easier to use, for PubSys originally, and PainSci more 
 
 Tagging is a powerful organizational tool, and yet a simple list of tags quickly becomes unwieldy as it grows. Just like the data they are applied to, tags themselves need organizing — there are different types and categories of tags, different types of tags, aliases for ease of data entry, and so on (and on and on).  Taxonomy is hard!  I’ve been tinkering with this since about 2015, and there's still no end in sight.
 
-This header documents how the tag engine WORKS. Semantics and usage doctrine — the record format and example entry, field meanings (including the full related/“synonyms for now” doctrine), shorthand syntaxes, meta tags, and usage rules — were consolidated into notes/tag-system.md (2026-08-26), out of this header and the tags-ps.txt header.
+This header documents how the tag engine WORKS. Semantics and usage doctrine — the record format and example entry, field meanings (including the full related/“synonyms for now” doctrine), shorthand syntaxes, meta tags, and usage rules — were consolidated into notes/content--tag-system.md (2026-08-26), out of this header and the tags-ps.txt header.
 
 Goals for this system:
 
@@ -50,7 +50,7 @@ TAG ENGINE GLOSSARY
 	STRAY TAG: tag created by usage in error or is never or very rarely used again
 	SORT PREFIX: a useful syntax for grouping tags alphabetically under a selected parent
 
-RELATED TAGS: the two purposes of the related field (notes-about-adjacent-topics vs “synonyms for now”) are doctrine, documented in notes/tag-system.md § The related field. The implementation gotcha:
+RELATED TAGS: the two purposes of the related field (notes-about-adjacent-topics vs “synonyms for now”) are doctrine, documented in notes/content--tag-system.md § The related field. The implementation gotcha:
 
 	Note that duplication of related tags can get confusing. If both #A and #B tags claim that they are "related" to "C" (not it’s own tag)... then C can't be used as synonym for both, and it ends up getting assigned to the last one processed by getTags while building the thesaurus.
 
@@ -109,12 +109,12 @@ The condensed syntax is more cryptic but clear enough, tidier, and saves real sp
 
 ⚠️ It’s still easy to acidentally declare an illegal parent this way, and I may have some debugging ahead.
 
-Why combo tags exist at all (the “content specifically about the relationship” rationale) is doctrine: notes/tag-system.md § Shorthand syntaxes.
+Why combo tags exist at all (the “content specifically about the relationship” rationale) is doctrine: notes/content--tag-system.md § Shorthand syntaxes.
 
 
 CATEGORIES
 
-A tag prefixed by an underscore is a “category.” The prefix is 100% non-functional in this code: stored but never used, parsed out of the input and put back when the tags are canonicalized (its sole purpose is data-entry convenience in BibDesk). What “category” actually means: notes/tag-system.md § Shorthand syntaxes.
+A tag prefixed by an underscore is a “category.” The prefix is 100% non-functional in this code: stored but never used, parsed out of the input and put back when the tags are canonicalized (its sole purpose is data-entry convenience in BibDesk). What “category” actually means: notes/content--tag-system.md § Shorthand syntaxes.
 
 
 HOW DOES TAG TALLYING WORK?
@@ -584,7 +584,7 @@ function updateTags() {
 		saveAs($tags_str_qrg, $tag_qrg_fn);
 		}
 
-	/* Machine-readable sibling of the QRG (added 2026-09-03). The QRG is for Paul's eyes and is lossy for code: synonyms/related are space-joined (multi-word terms can't be split back out), sort prefixes look like tags but may not be (getTag('lbp') is 'back pain'), and the real match contract — simplify() + auto-plurals + first-come precedence for related terms — is only visible in the built thesaurus. So export the resolved products directly: `thesaurus` maps every simplified lookup key to the TRUE tag name (what getTag() returns), and `tags` carries each record (public fields only; `notes` is private). Consumers (tools/image-index.py, future #tag harvesters) load this instead of re-parsing tags-ps.txt or the QRG — see notes/tag-system.md. No timestamp in the payload: a `generated` field defeated the write-if-changed guard below and made the file show as modified in git after every build (removed 2026-09-12); git history and mtime already say when it changed. Predecessors incs/tags.json + content--tags-thesaurus.txt were deleted with the old articles page (d19f038cb8) and had gone stale because they weren't regenerated on build; this one is written on every blog build, same as the QRG. */
+	/* Machine-readable sibling of the QRG (added 2026-09-03). The QRG is for Paul's eyes and is lossy for code: synonyms/related are space-joined (multi-word terms can't be split back out), sort prefixes look like tags but may not be (getTag('lbp') is 'back pain'), and the real match contract — simplify() + auto-plurals + first-come precedence for related terms — is only visible in the built thesaurus. So export the resolved products directly: `thesaurus` maps every simplified lookup key to the TRUE tag name (what getTag() returns), and `tags` carries each record (public fields only; `notes` is private). Consumers (tools/image-index.py, future #tag harvesters) load this instead of re-parsing tags-ps.txt or the QRG — see notes/content--tag-system.md. No timestamp in the payload: a `generated` field defeated the write-if-changed guard below and made the file show as modified in git after every build (removed 2026-09-12); git history and mtime already say when it changed. Predecessors incs/tags.json + content--tags-thesaurus.txt were deleted with the old articles page (d19f038cb8) and had gone stale because they weren't regenerated on build; this one is written on every blog build, same as the QRG. */
 	$trueByKey = []; // by this point $tags has been re-keyed for sorting (restoreSortPrefixes), so index by each record's own simplified key, which is what the thesaurus values are
 	foreach ($tags as $td) if (isset($td['key'], $td['true'])) $trueByKey[$td['key']] = $td['true'];
 	$thesaurus = [];
