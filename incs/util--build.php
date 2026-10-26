@@ -457,7 +457,9 @@ function warnIfUnbalancedHtml($content, $srcLabel, $srcFile = null, $rawLine = n
 		}
 	}
 	if ($unbalanced) {
-		$msg = "unbalanced HTML in [$srcLabel] (open:close counts — " . implode(', ', $unbalanced) . ') … browsers repair it silently, and Markdown may mangle a post';
+		$where = buildLocateUnbalancedHtml($content); // only when the counts are off, so clean pages pay nothing (Oct 2026): the counts say a page is broken, this says where
+		$msg = "unbalanced HTML in [$srcLabel] (open:close counts — " . implode(', ', $unbalanced) . ') … browsers repair it silently, and Markdown may mangle a post'
+			. ($where ? '. Where: ' . implode('; ', array_slice($where, 0, 3)) . (count($where) > 3 ? '; +' . (count($where) - 3) . ' more' : '') : '');
 		journal("warning: $msg", 2, true); // inline on the build page, at the point in the flow where it happened
 		/* Also on the permanent record via the unified error pipeline: log line + panel + severity counter. Markers became failure-only in July 2026 (this detector was one of the two cases that forced that policy), so psErrWarn($msg) would no longer abort and COULD replace this pair — but the hand-rolled psErrLog+psCollect stays deliberately, for the attribution finesse below: it points the panel's edit link at the post source file, where generic psErrWarn would attribute to this detector's own call site. */
 		/* Attribute the report to the post source document, not to this detector — that's what the panel's edit link should open. (The panel's own doc-substitution only rescues eval pseudo-paths, correctly; a real file passed here is linked as-is.) psDocPath resolves against both possible roots (painscience /blog and the family-blog roots); the posts/ prefix candidate matters because getMacroPost basenames $fn early (line ~597), so the caller may pass either form. Line 1 because the check is whole-post — a known limitation. */
@@ -472,6 +474,36 @@ function warnIfUnbalancedHtml($content, $srcLabel, $srcFile = null, $rawLine = n
 		psErrLog('PainSci warning: ', $msg, $file, $line);
 		psCollect('app', 'warning', $msg, $file, $line);
 	}
+}
+
+/** returns @array: where the block-level HTML of $content (already stripped of PHP, comments, and code, as warnIfUnbalancedHtml() does) goes wrong — one line per problem, "line N: <p> never closed (closed over by </li>) …context…", in document order. $strictP also applies HTML's implicit-close rule for <p>, which flags block elements inside a paragraph — a stricter class than the builds check, for ad hoc sweeps only  */
+function buildLocateUnbalancedHtml($content, $strictP = false) {
+	/* The counts in warnIfUnbalancedHtml() say THAT a page is unbalanced; this says WHERE, which is what the author needs — "p 209:210" in a 12,000-line book is not a finding, "line 4342, after 'experience with them:'" is. It walks the same six tags in order with a stack, the way a browser's parser would: a close with no matching open is stray; a close that matches an open further down the stack has closed over everything above it, so those are reported as never closed; whatever is left open at the end is reported too. Line numbers and context are positions in the RENDERED page (the only text this function sees), so for a site page they are greppable in the source; for a post they are positions in the rendered post content. Built in the Oct 2026 cleanup, when a scratch version of exactly this found the 416 problems the counts could only tally. Crossed nesting that happens to leave the counts equal (an unclosed <p> early plus a stray </p> late) escapes the counts, and so escapes this — it runs only when the counts are off. */
+	$tags = ['p', 'ul', 'ol', 'li', 'blockquote', 'div'];
+	preg_match_all('#<(/?)(' . implode('|', $tags) . ')(?=[\s>/])[^>]*>#i', $content, $m, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+	$stack = []; $problems = [];
+	foreach ($m as $t) {
+		$close = $t[1][0] === '/'; $tag = strtolower($t[2][0]); $pos = $t[0][1];
+		if (!$close) {
+			if ($strictP && $stack && end($stack)[0] === 'p' && ($tag === 'p' || in_array($tag, ['ul', 'ol', 'blockquote', 'div']))) {
+				$open = array_pop($stack);
+				$problems[] = ["<p> never closed (a <$tag> opened inside it; browsers close the <p> there)", $open[1]];
+			}
+			$stack[] = [$tag, $pos];
+			continue;
+		}
+		for ($i = count($stack) - 1; $i >= 0; $i--) if ($stack[$i][0] === $tag) break;
+		if ($i < 0) { $problems[] = ["stray </$tag>", $pos]; continue; }
+		foreach (array_splice($stack, $i) as $k => $open) if ($k > 0) $problems[] = ["<{$open[0]}> never closed (closed over by </$tag>)", $open[1]];
+	}
+	foreach ($stack as $open) $problems[] = ["<{$open[0]}> never closed (end of page)", $open[1]];
+	usort($problems, fn ($a, $b) => $a[1] <=> $b[1]);
+	$out = [];
+	foreach ($problems as [$what, $pos]) {
+		$line = substr_count(substr($content, 0, $pos), "\n") + 1;
+		$out[] = "line $line: $what …" . preg_replace('/\s+/', ' ', substr($content, max(0, $pos - 60), 120)) . '…';
+	}
+	return $out;
 }
 
 /** returns @array: the messages of every "!!! ERROR !!! … -->" marker in a rendered page — the build marker psErrFail() leaves (psErrMarker() in util--errors.php; the format is a contract), meaning broken content that must not ship  */
