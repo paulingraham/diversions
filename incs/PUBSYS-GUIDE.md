@@ -148,7 +148,7 @@ PubSys doesn't change quotation marks, so curly quotes stay curly and straight q
 
 1. **Start block-level HTML on its own line, with a blank line before and after it.** Block-level elements include `<div>`, `<p>`, `<table>`, `<blockquote>`, `<ul>`, `<ol>`, and headings.
 2. **Markdown isn't processed inside block-level HTML** unless the opening tag says `markdown="1"`. In `<div class="sidebar">*Note*</div>` the asterisks show up literally; `<div class="sidebar" markdown="1">` makes them italics.
-3. **Every opening block tag needs its closing tag** (`<p>` … `</p>`, `<div>` … `</div>`). A missing one produces the build warning "unbalanced HTML … Markdown may mangle this post". It can also produce visible junk: in testing, one unclosed `<p>` put a stray "p>" into the text of the page.
+3. **Every opening block tag needs its closing tag** (`<p>` … `</p>`, `<div>` … `</div>`). A missing one produces the build warning "unbalanced HTML … Markdown may mangle a post", which names the line; so does a list, quote, or `<div>` opened inside a `<p>` (browsers end the paragraph there). The warning can also come with visible junk: in testing, one unclosed `<p>` put a stray "p>" into the text of the page.
 4. **Inline HTML works inside ordinary paragraphs:** `<em>`, `<strong>`, `<a>`, `<span>`, `<br>`, `<img>`, `<sup>`.
 5. **Only real HTML elements do anything.** A made-up tag like `<bigger>` is ignored by browsers. Old elements like `<font>` and `<center>` still work but are outdated; for new work, prefer the classes in §9.
 
