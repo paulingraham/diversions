@@ -66,7 +66,7 @@ while(x=eval(x));
 <h2>Highlights</h2>
 
 <ul>
-<li><a href="fitness-articles.html">FITNESS ARTICLES</a>: You will find here many articles about fitness and the older adult.</li>
+<li><a href="fitness-articles.html">FITNESS ARTICLES</a>: Topics include exercise suggestions, activities to keep the brain sharp, and arthritis and other medical issues which older adults face.</li>
 
 <li>MY FAMILY HISTORY: I have done research on my own family which includes: 
 <a href="family-history-home-page.html">Overturfs, Hansens, Mahoneys, and McDonalds.</a></li>
