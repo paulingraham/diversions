@@ -1,3 +1,8 @@
+PainScience.com/healthy-fit-adult.html
+https://www.painscience.com/healthy-fit-adult.html
+[Characteristics of a Healthy, Fit Adult](https://www.painscience.com/healthy-fit-adult.html)
+<a href="https://www.painscience.com/healthy-fit-adult.html">Characteristics of a Healthy, Fit Adult</a>
+
 PainScience.com/breathing-and-relaxation.html
 https://www.painscience.com/breathing-and-relaxation.html
 [Breathing & Relaxation Are Important to Our Health](https://www.painscience.com/breathing-and-relaxation.html)

@@ -228,7 +228,7 @@ Susan is organizing her Claude sessions by dedicating sessions to one couple in 
 
 ### Project: SISTERS
 
-Susan's true story of five 19th-century women, told in four "books" of chapters. The table of contents is `sisters-home-page`, linked from the home page. Each chapter is its own page: the page title is the book ("Book 1: Sarah Etta"), followed by `##Chapter N: …`, with `filename: Sisters Chapter N`. Book 1 (Chapters 1–5, told by Sarah Etta) is finished and published. Book 2: Sarah Ann starts at Chapter 6 and is told by Sarah Ann, Sarah Etta's mother.
+Susan's true story of five 19th-century women, told in four "books" of chapters. The table of contents is `sisters-home-page`, linked from the home page. Each chapter is its own page: the page title is the book ("Book 1: Sarah Etta"), followed by `##Chapter N: …`, with `filename: Sisters Chapter N`. Book 1 (Chapters 1–5, told by Sarah Etta) and Book 2 (Chapters 6–8, told by Sarah Ann, Sarah Etta's mother) are finished and published. Book 3: Julia (Chapters 9–12) is next.
 
 ## Part 3: The PubSys guide
 
