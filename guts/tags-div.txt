@@ -493,7 +493,7 @@ Tags preceded by a DOT are “admin” tags for your eyes only. They will never 
 
 » size S [4]
 
-» size XL [32]
+» size XL [33]
 
 » skeleton [0]
 

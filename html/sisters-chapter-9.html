@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<!-- Book 3: Julia
+#size XL -->
+
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width">
+
+<link rel="shortcut icon" href="favicon.ico" />
+
+<title>Book 3: Julia</title>
+
+<link rel="canonical"						href="https://susaningraham.net/sisters-chapter-9.html">
+
+<meta name='title' 						content='Book 3: Julia'>
+
+<meta name='og:url' 						content='http://susaningraham.net/sisters-chapter-9.html'>
+
+<meta name='twitter:url' 				content='http://susaningraham.net/sisters-chapter-9.html'>
+
+<meta property='og:type' 				content='article'>
+
+<meta name='description' 				content='Julia begins her story: a childhood in West Turin and Rice County, Minnesota, the death of her sister Bessie, her parents’ divorce, an early marriage, and the move to Kansas City with Sarah Etta.'>
+
+<meta property='og:description' 	content='Julia begins her story: a childhood in West Turin and Rice County, Minnesota, the death of her sister Bessie, her parents’ divorce, an early marriage, and the move to Kansas City with Sarah Etta.'>
+
+<!-- default page image -->
+<meta property='og:image' 			content='http://susaningraham.net/imgs/diversions-logo-250px.jpg'>
+
+<meta property='og:site_name' 		content='Diversions'>
+
+<style>
+
+/* CSS defaults for PubSys */
+
+.next_prev_links {margin:5em 2em 2em 2em; font-size:.9em; text-align:center; font-style:italic;}
+.next_prev_links img {margin-left:-1%;}
+.next_prev_links .arrow {font-size:.8em; color:#CCC; vertical-align:.1em;font-style:normal;padding: 0 .6em;}
+.prev_link {float:left; width:40%; text-align: right; margin-top:.4em;line-height:1.2}
+.next_link {float:right; width:40%; text-align:left; margin-top:.4em; line-height:1.2}
+
+div.ytemb {
+margin: 3em auto 3em auto;
+text-align:center;
+max-width: 100%;
+}
+
+iframe.ytemb {
+width:500px;
+height:315px;
+max-width: 100%;
+}
+
+.preamble {color: gray; font-size: .9em}
+
+body { /* defaults for the main text */
+margin:10px;
+font-family:HelveticaNeue-Light,Arial,Helvetica,sans;
+line-height:1.5;
+font-size:16pt;
+}
+
+.sidebar {
+width:90%;
+margin: 1.5em auto;
+font-size: .7em;
+line-height: 1.4;
+color:#666;
+}
+
+.micropost article {font-size:18pt}
+
+time {
+font-size:.8em;
+color:gray;
+}
+
+nav {
+position:absolute;
+top:10px;
+font-size:.7em;
+color:#666;
+}
+
+nav a {
+font-family:HelveticaNeue-CondensedBold,Tahoma,Tahoma,Arial Black;
+}
+
+.footer_nav {
+position: relative;
+text-align: center;
+}
+
+header { /* article header, including title, subtitle and metadata */
+line-height:1.2;
+}
+
+h1, h2, h3 {
+text-rendering:optimizeLegibility;
+font-family:HelveticaNeue-CondensedBold,Tahoma,Tahoma,Arial Black;
+line-height:1;
+}
+
+
+
+article {
+margin-top:4em;
+}
+
+article header h1 {
+margin:0;
+font-size:2em;
+}
+article.micropost header h1 {font-size:1.2em} /* micropost title sizes are much smaller! */
+
+#subtitle {
+color:#999;
+font-size:.8em;
+}
+.micropost #subtitle {display:none}
+
+h2, h3 {
+margin-top:2em;
+font-size:1.2em;
+}
+
+article header .metadata {
+color:#666;
+font-weight:lighter;
+font-size:.9em;
+margin-top:1em;
+margin-bottom:3em;
+}
+
+.micropost .metadata {font-size:.6em}
+
+address {
+display:inline;
+font-style:normal;
+}
+
+
+#byline-bottom {
+margin-top:5em;
+text-align:center;
+}
+
+footer.bio {
+margin: 8em 6% 3em 6%;
+text-align: center;
+font-weight:lighter;
+font-size:.8em;
+line-height:1.5;
+color:#666;
+}
+
+.micropost footer.bio { /* it’s kind of weird, but in a micropost my bio needs to be much more separated from the content, because it’s actually BIGGER than a lot of microposts … if it’s not quite well separated, and in smaller type, it looks too much like the content itself */
+margin-top: 10em;
+font-size:.8em;
+}
+
+
+footer.bio img {
+float:none;
+display:block;
+margin: 0 auto 1em auto;
+}
+
+
+a {text-decoration:none}
+a:link {color:#0080FF}
+a:hover {color:#FF6666; text-decoration:underline}
+a:active {color:red; text-decoration:underline}
+a:visited {color:#4A73A5}
+.post_index a:visited {color:#999}
+
+.featured_link {
+font-size: .8em;
+line-height:1.2;
+font-family:
+	Avenir Next Condensed,
+	HelveticaNeue-CondensedBold,
+	Arial Narrow,
+	Avenir Next,
+	HelveticaNeue,		
+	Tahoma,
+	Verdana,
+	DejaVu Sans,
+	Arial Black,
+	sans-serif;	
+}
+
+.color_dark_gray {color:#666}
+.color_light_gray {color:#AAA}
+.color_med_gray {color:#888}
+
+
+
+
+ul, ol, blockquote {line-height:1.4;font-size:.9em}
+
+ul {padding-left:1em}
+
+li {margin-bottom: 1em}
+
+code {
+font-family:Monaco,Consolas,Droid Sans Mono,Liberation Mono,mono;
+font-size:.8em;
+color:green;
+}
+
+.separator {color:gray;text-align:center;margin:2em 4% 3em 0;}
+
+.separator.bullet:after {content:"•"}
+
+.separator.stars {font-size: 1.2em}
+
+span.img_container {display:inline-block}
+
+.img_container {text-align:center; line-height:1}
+
+img.ds {box-shadow: 3px 3px 8px 0px #555}
+
+.img_container.centre {margin: 2em auto}
+
+.img_container.right {
+float: right;
+margin: 1em 0 2em 2em;
+}
+
+.img_container.left {
+float: left;
+margin: 1em 2em 2em 0;
+}
+
+img, .img_container {
+max-width:100% !important;
+height:auto;
+}
+
+figure {text-align:center}
+
+span.img_container, span.caption, figcaption {display:inline-block}
+
+.img_container .caption, figcaption {
+margin: .8em 1% 0 1%;
+font-size:.7em;
+color:#888;
+font-weight:100;
+}
+
+.img_container.centre .caption, figcaption {margin-top:1em 6% 0em 6%}
+
+.post_index {margin:2em 0; padding:0;}
+.post_index li {
+list-style-type:none;
+margin:1em 0;
+padding-left:10px;
+line-height:1.3
+}
+
+.post_index {
+font-size:.9em;
+}
+
+.post_index td, .post_index th {
+padding:8px;
+line-height:1.1;
+}
+
+.post_index th {
+cursor: pointer; 
+}
+
+.post_index td.tdsize {
+width:50px;
+background-repeat:no-repeat;
+background-origin:content-box;
+background-position: center;
+}
+
+.post_index td.tddate {
+white-space:nowrap;
+font-size:.7em;
+color:#BBB;
+}
+
+.char_arrow, .char_sort_arrow { /* for sort arrows based on ▲ (9650) & ▼ (9660) … 
+The glyph is available in every single web safe font (probably damn near every font period), but be aware that Arial Unicode MS is unusually SMALL, and there are only a few that have a NARROW shape. This font-stack simply chooses a few of the narrower, smaller for consistency:  */
+font-family: Courier New, Impact, Times New Roman, Lucida Sans Unicode, DejaVu Sans}
+
+.char_arrow2 { /* for sort arrows based on ↑ */
+font-family: Impact, Times New Roman, Arial}
+
+.char_sort_arrow {
+	color: #A9CAF0;
+	vertical-align:-.6em;
+	line-height:0;
+	}
+
+.thtitle {
+text-align:left;
+}
+
+.thtitle .char_sort_arrow { 
+	margin-left:.3em;
+	}
+
+.char_sort_arrow.off {
+	color: #f5f5f5;
+	}
+
+ul.tag_list {
+display:inline;
+margin:0; padding:0;
+}
+
+ul.tag_list li {
+list-style-type:none;
+margin: .2em 6px 0 0;
+padding: 2px 4px;
+border: 1px solid #CCC;
+border-radius:3px;
+display:inline-block;
+text-transform:uppercase;
+font-size: .7em;
+letter-spacing: 0px;
+color: #AAA;
+font-weight:bold;
+}
+
+.metadata a:link {color:#4A73A5}
+
+/* `QUOTATIONS (QT) 
+
+blockquote (ordinary passage quoting, indented paragraph)
+qt (featured quote)
+qt.short (featured short quote, decorative styling, large print) */
+
+blockquote {
+margin:1.2em 1em; 
+font-size:.95em;
+color:#555;
+}
+
+blockquote.featured { /* for longer featured quotes */
+text-rendering: optimizeLegibility;
+margin:2em 10% 2em 10%;
+font-size:1.2em;
+color: #777;
+}
+
+blockquote.short {
+/* Completely different, decorative styling for shorter featured quotes */
+text-rendering: optimizeLegibility;
+margin:2.5em 15% 2.5em 10%;
+font-style:italic;
+font-size:1.4em;
+color: #555;
+}
+
+
+blockquote .attr {
+font-size: .6em;
+color: #999;
+margin: -.5em 10% 0 30%;
+text-indent: -.2em;
+}
+
+blockquote .chartild {
+display:none;
+font-weight:bold;
+color: #CCC;
+font-size:1.2em;
+margin-right:.2em;
+}
+
+
+/* <##> ======= ↓ `big window styles ↓ ======= */
+
+@media screen and (min-width: 550px) {
+
+
+.sidebar {
+width:35%;
+margin: 1em 0 1em 2em;
+float: right;
+font-size: .8em;
+line-height: 1.4;
+color:#666;
+}
+
+
+ul.tag_list li {
+opacity: 0.7;
+font-size: .7em;
+border-radius:4px;
+letter-spacing: 1px;
+}
+
+.img_container.centre {
+margin: 3.5em auto;
+text-align:center;
+}
+
+
+img, .img_container {
+max-width:100% !important;
+height:auto;
+}
+
+.img_container .caption, figcaption {
+margin: 1.5em 10% 0 10%;
+font-size:.8em;
+line-height:1.3;
+}
+
+
+body {
+margin: 2em auto;
+width: 70%;
+line-height:1.7em;
+font-size:18pt;
+}
+
+.micropost article {font-size:20pt}
+
+
+article header h1 {font-size:2.4em}
+.micropost header h1 {font-size:1.6em} /* micropost title sizes are much smaller! */
+
+h2, h3 {
+margin-top:3em;
+font-size:1.6em;
+}
+
+ul, ol {padding-left:2em}
+
+blockquote {margin:2em 2.5em}
+
+article header .metadata {font-size:.8em}
+
+footer.bio {
+margin: 5em 6% 4em 8%;
+padding-left:100px;
+text-align:left;
+font-weight:lighter;
+font-size:.8em;
+line-height:1.5;
+color:#666;
+}
+
+.micropost footer.bio { /* it’s kind of weird, but in a micropost my bio needs to be much more separated from the content, because it’s actually BIGGER than a lot of microposts … if it’s not quite well separated, and in smaller type, it looks too much like the content itself */
+margin-top: 10em;
+font-size:.7em;
+}
+
+
+footer.bio img {
+float:left;
+margin: .4em 0 0 -100px;
+}
+
+/* `QUOTATIONS (QT) */
+
+.qt {
+/* Completely different, decorative styling for short quotes */
+/* set in prenton */
+margin:3em 10% 2em 8%;
+line-height:1.3;
+font-size:1.2em;
+text-indent: -.2em;
+}
+
+.qt .char_open_qt {
+font-size:1.2em;
+margin-right:.1em;
+}
+
+blockquote .attr {
+font-size:.7em;
+margin:0 10% 0 20%;
+text-indent: -.2em;
+}
+
+blockquote .chartild {
+font-weight:bold;
+color: #CCC;
+font-size:1.2em;
+margin-right:.2em;
+}
+
+blockquote.short {
+/* Completely different, decorative styling for shorter featured quotes */
+text-rendering: optimizeLegibility;
+margin:3em 20% 3em 15%;
+font-style:italic;
+font-size:1.5em;
+color: #555;
+}
+
+
+} /* end of larger window CSS */
+
+.red {color:red}
+.blue {color:blue}
+.green {color:green}
+.orange {color:orange}
+.purple {color:#d4237a} /* women's names: pink since Oct 2026 (was purple) */
+.brown {color:brown}
+.gray{color:gray}
+body {font-family:"Trebuchet MS",Helvetica,sans}
+h1 {color: #0080FF}
+.sidebar {
+border:1px solid #999;
+padding:8px;
+}
+.separator {content:"";}
+/* 3px 3px 5px 0px #555
+horizontal shadow, vertical shadow, blur, spread, colour
+img.ds{box-shadow:5px 5px 8px 3px #555} */
+
+.separator {color:gray;text-align:center;margin:2em 4% 3em 0;}
+
+.separator.stars {font-size: 1.2em}
+
+.thsize, .tdsize {display:none}
+
+.footnote-button {
+  position: relative;
+  z-index: 5;
+  top: -0.15em;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  display: inline-block;
+  padding: 0.34em;
+  margin: 0 0.1em 0 0.2em;
+  border: none;
+  border-radius: 0.3em;
+  cursor: pointer;
+  opacity: 0.3;
+  background-color: #464646;
+  -webkit-backface-visibility: hidden;
+  line-height: 0;
+  vertical-align: middle;
+  text-decoration: none;
+  font-smoothing: antialiased;
+  -webkit-transition: opacity;
+  -moz-transition: opacity;
+  -ms-transition: opacity;
+  transition: opacity;
+  -webkit-transition-duration: 0.25s;
+  -moz-transition-duration: 0.25s;
+  transition-duration: 0.25s;
+}
+.footnote-button:hover {
+  opacity: 0.6;
+}
+.footnote-button:active {
+  opacity: 0.6;
+}
+.footnote-button.active {
+  opacity: 0.9;
+  -webkit-transition-delay: 0.15s;
+  -moz-transition-delay: 0.15s;
+  transition-delay: 0.15s;
+}
+
+.footnote-circle {
+  display: inline-block;
+  width: 0.32em;
+  height: 0.32em;
+  margin-right: 0.224em;
+  border-radius: 100%;
+  background-color: #e6e6e6;
+  border: none;
+}
+.footnote-circle:last-child {
+  margin-right: 0;
+}
+
+@media not print {
+  .footnote-print-only {
+    display: none !important;
+  }
+}
+@media print {
+  .footnote-button {
+    display: none !important;
+  }
+}
+.footnote-content {
+  position: fixed;
+  z-index: 10;
+  bottom: auto;
+  left: auto;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  max-width: 90%;
+  margin: 1.21924em auto;
+  display: inline-block;
+  background: #fafafa;
+  opacity: 0;
+  border-radius: 0.5em;
+  border: 1px solid #c3c3c3;
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+  -webkit-transition: opacity, -webkit-transform;
+  -moz-transition: opacity, -moz-transform;
+  -ms-transition: opacity, -ms-transform;
+  transition: opacity, transform;
+  -webkit-transition-duration: 0.25s;
+  -moz-transition-duration: 0.25s;
+  transition-duration: 0.25s;
+}
+.footnote-content:not(.fixed-bottom) {
+  -webkit-transform: scale(0.1) translateZ(0);
+  -moz-transform: scale(0.1) translateZ(0);
+  -ms-transform: scale(0.1) translateZ(0);
+  -o-transform: scale(0.1) translateZ(0);
+  transform: scale(0.1) translateZ(0);
+  -webkit-transform-origin: 50% 0;
+  -moz-transform-origin: 50% 0;
+  -ms-transform-origin: 50% 0;
+  -o-transform-origin: 50% 0;
+  transform-origin: 50% 0;
+}
+.footnote-content.active:not(.fixed-bottom) {
+  -webkit-transform: scale(1) translateZ(0);
+  -moz-transform: scale(1) translateZ(0);
+  -ms-transform: scale(1) translateZ(0);
+  -o-transform: scale(1) translateZ(0);
+  transform: scale(1) translateZ(0);
+  opacity: 0.97;
+}
+.footnote-content.bottom {
+  -webkit-transform-origin: top;
+  -moz-transform-origin: top;
+  -ms-transform-origin: top;
+  -o-transform-origin: top;
+  transform-origin: top;
+}
+.footnote-content.top {
+  -webkit-transform-origin: bottom;
+  -moz-transform-origin: bottom;
+  -ms-transform-origin: bottom;
+  -o-transform-origin: bottom;
+  transform-origin: bottom;
+}
+.footnote-content.fixed-bottom {
+  bottom: 0 !important;
+  top: auto !important;
+  left: 0 !important;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  -webkit-transform: translateY(105%);
+  -moz-transform: translateY(105%);
+  -ms-transform: translateY(105%);
+  -o-transform: translateY(105%);
+  transform: translateY(105%);
+  border-radius: 0;
+  opacity: 1;
+  -webkit-transition: -webkit-transform;
+  -moz-transition: -moz-transform;
+  -ms-transition: -ms-transform;
+  transition: transform;
+  -webkit-transition-duration: 0.25s;
+  -moz-transition-duration: 0.25s;
+  transition-duration: 0.25s;
+}
+.footnote-content.fixed-bottom.active {
+  -webkit-transform: translateY(0);
+  -moz-transform: translateY(0);
+  -ms-transform: translateY(0);
+  -o-transform: translateY(0);
+  transform: translateY(0);
+}
+.footnote-content.fixed-bottom .footnote-main-wrapper {
+  max-width: 90%;
+  width: 22em;
+  margin: 0 auto;
+}
+.footnote-content.fixed-bottom .tooltip {
+  display: none;
+}
+.footnote-content.scrollable:after {
+  content: '...';
+  position: fixed;
+  bottom: 0.45em;
+  right: 50%;
+  z-index: 20;
+  width: 1.5em;
+  margin-right: -0.75em;
+  opacity: 1;
+  background-color: #fafafa;
+  font-family: Georgia;
+  font-weight: bold;
+  font-size: 1.8em;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.08);
+  line-height: 0;
+  -webkit-transition: opacity;
+  -moz-transition: opacity;
+  -ms-transition: opacity;
+  transition: opacity;
+  -webkit-transition-duration: 0.25s;
+  -moz-transition-duration: 0.25s;
+  transition-duration: 0.25s;
+  -webkit-transition-delay: 0.4s;
+  -moz-transition-delay: 0.4s;
+  transition-delay: 0.4s;
+}
+.footnote-content.scrollable.fully-scrolled:after {
+  opacity: 0;
+  -webkit-transition-delay: 0s;
+  -moz-transition-delay: 0s;
+  transition-delay: 0s;
+}
+.footnote-content.scrollable .footnote-main-wrapper:before, .footnote-content.scrollable .footnote-main-wrapper:after {
+  content: ' ';
+  position: absolute;
+  width: 100%;
+  z-index: 12;
+}
+.footnote-content.scrollable .footnote-main-wrapper:before {
+  top: -1px;
+  left: 0;
+  height: 1.1em;
+  border-radius: 0.5em 0.5em 0 0;
+  background: #fafafa;
+  background: -moz-linear-gradient(top, #fafafa 0%, #fafafa 50%, rgba(250, 250, 250, 0) 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fafafa), color-stop(50%, #fafafa), color-stop(100%, rgba(250, 250, 250, 0)));
+  background: -webkit-linear-gradient(top, #fafafa 0%, #fafafa 50%, rgba(250, 250, 250, 0) 100%);
+  background: -o-linear-gradient(top, #fafafa 0%, #fafafa 50%, rgba(250, 250, 250, 0) 100%);
+  background: -ms-linear-gradient(top, #fafafa 0%, #fafafa 50%, rgba(250, 250, 250, 0) 100%);
+  background: linear, to bottom, #fafafa 0%, #fafafa 50%, rgba(250, 250, 250, 0) 100%;
+}
+.footnote-content.scrollable .footnote-main-wrapper:after {
+  bottom: -1px;
+  left: 0;
+  height: 1.2em;
+  border-radius: 0 0 0.5em 0.5em;
+  background: #fafafa;
+  background: -moz-linear-gradient(bottom, #fafafa 0%, #fafafa 50%, rgba(250, 250, 250, 0) 100%);
+  background: -webkit-gradient(linear, left bottom, left top, color-stop(0%, #fafafa), color-stop(50%, #fafafa), color-stop(100%, rgba(250, 250, 250, 0)));
+  background: -webkit-linear-gradient(bottom, #fafafa 0%, #fafafa 50%, rgba(250, 250, 250, 0) 100%);
+  background: -o-linear-gradient(bottom, #fafafa 0%, #fafafa 50%, rgba(250, 250, 250, 0) 100%);
+  background: -ms-linear-gradient(bottom, #fafafa 0%, #fafafa 50%, rgba(250, 250, 250, 0) 100%);
+  background: linear, to top, #fafafa 0%, #fafafa 50%, rgba(250, 250, 250, 0) 100%;
+}
+.footnote-content ::-webkit-scrollbar {
+  display: none;
+}
+
+.footnote-main-wrapper {
+  position: relative;
+  z-index: 14;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  overflow: hidden;
+  margin: 0;
+  max-width: 22em;
+  background-color: #fafafa;
+  border-radius: 0.5em;
+  -webkit-transition: max-height;
+  -moz-transition: max-height;
+  -ms-transition: max-height;
+  transition: max-height;
+  -webkit-transition-duration: 0.25s;
+  -moz-transition-duration: 0.25s;
+  transition-duration: 0.25s;
+}
+
+.footnote-content-wrapper {
+  position: relative;
+  z-index: 8;
+  max-height: 15em;
+  padding: 1.1em 1.3em 1.2em;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #fafafa;
+  border-radius: 0.5em;
+  -webkit-font-smoothing: subpixel-antialiased;
+}
+.footnote-content-wrapper img {
+  max-width: 100%;
+}
+.footnote-content-wrapper *:last-child {
+  margin-bottom: 0;
+}
+.footnote-content-wrapper *:first-child {
+  margin-top: 0;
+}
+
+.tooltip {
+  position: absolute;
+  z-index: 12;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  margin-left: -0.65em;
+  width: 1.3em;
+  height: 1.3em;
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  transform: rotate(45deg);
+  background: #fafafa;
+  border: 1px solid #c3c3c3;
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+  border-top-left-radius: 0;
+}
+
+.bottom .tooltip {
+  top: -0.65em;
+  bottom: auto;
+}
+
+.top .tooltip {
+  bottom: -0.65em;
+  top: auto;
+}
+
+</style>
+
+<script>$.bigfoot();</script>
+
+
+</head><body><!-- <##> -->
+
+<nav><strong><a href="index.html">Diversions</a></strong> <img src="imgs/diversions-logo-30px.jpg" height="15" width="15" style="vertical-align:-2px"> Fitness, family, fiction</nav>
+
+<article><!--  article start -->
+
+<header>
+
+<h1 id='title'>Book 3: Julia</h1>
+
+<div class="metadata">
+<address class="author"><a rel="author" href="index.html#about" title="Susan Ingraham">Susan Ingraham</a></address> &nbsp; <time pubdate datetime="2026-10-14" title="Oct 14, 2026">Oct 14, 2026</time> &nbsp; <ul class='tag_list'><li class='tag'><a href='tag-size-xl.html'>size XL</a></li></ul></div>
+
+</header>
+
+<style>.img_container img { border: 3px solid black; }</style>
+
+<h2>Chapter 9: My Childhood</h2>
+
+<p>I have always felt that my childhood was almost idyllic. That may seem odd, considering what my mother went through while giving birth to eleven children — one more child than even her own mother had given birth to — as well as the nightmare she lived through with her older sister, Clarinda, and the difficulties with my father.</p>
+
+<p>I was born on 20 October 1861, just a year after my Aunt Clarinda met her death at Sing Sing Prison for Women. My mother had already given birth to six children before me: Samuel, Lafayette, Sarah Etta, Leonard, Susan, and Cassius. Before I arrived, Mother had already lost a son, Lafayette, and a daughter, Susan, and she lost Cassius in December 1862, when I was just a baby. After my birth, she had four more babies — all girls — Bessie, Clarria, Effie, and Flora. Clarria and Flora died as infants, while Bessie and Effie would face much more difficult endings.</p>
+
+<p>I was just four years old when my parents decided that we had to leave West Turin and find a new life in another place. I have little memory of West Turin, though by the time we moved I had been out and about with my older sister, Sarah Etta, many times. For me, Sarah Etta was almost my mother. She once told me that she was given the responsibility of taking care of me almost from the time I was born. She certainly taught me about all that the family had endured before I came along, including a great deal of detail about Aunt Clarinda’s story.</p>
+
+<p>Because of these reminders of what had happened to Aunt Clarinda, I knew from an early age that, even though I was a girl, I had a right to live my life the way I wanted to live it. My father, Baker Brand, was not in my life very much. He was a carpenter and he worked for other people, making them furniture or helping them to build a house. He wasn’t around a lot, and Mother never talked about him with any great love or affection. I found him hard to talk to and somewhat distant throughout the time he lived with us before my parents got a divorce. Basically, I think my mother just felt that he didn’t know how to take care of and support a family.</p>
+
+<p>Before we left West Turin, my mother gave birth to my younger sister, Bessie, when I was not much older than a year. We were just a year apart in age, so we truly grew up together with a close bond. Because I was the older, I sometimes took on a motherly role with her, but mostly we just played together.</p>
+
+<p>I have some memories of the train and boat rides we took to get to Minnesota. Sarah Etta, Bessie and I tended to stick together with Sarah Etta taking on the motherly role with her two younger sisters. It became a “grand adventure” for the three of us.</p>
+
+<p>Clarria was still a baby when we left, and we stopped first in Wisconsin, where my parents had once considered staying. But Clarria died there in October 1865, not long after we arrived, and Mother did not want to remain in Wisconsin, so we moved on to Faribault, Minnesota. Once there, we seemed to settle down a little bit. Mother gave birth to two more girls — Effie Bee and Flora Emma — but Flora only lived for six months. My mother had been 41 years old when Flora was born and after Flora’s death I think she decided that enough was enough.</p>
+
+<p>Therefore, by October of 1872, after the death of little Flora, our family was not going to grow any more. I had two older brothers — Samuel Perkins and Leonard William — and one older sister — Sarah Etta. Younger than me was Effie; we had lost Bessie only two months before.</p>
+
+<p>I looked up to Sarah Etta and we often talked about some day going to a big city and making a lot of money. Sometimes it seemed like that was all my mother and father argued about: money. There was never enough, according to my mother, and my father never seemed to have the spirit to argue with her. He liked doing his carpentry and he was a quiet man, but he didn’t truly support us. Sarah Etta and Mother were always talking about ways that they could make money — and going to a big city to do it was the definite plan. They had watched Grandpa Higby buy and sell land often in West Turin, and it made him pretty wealthy. They thought they might be able to do the same thing. But they had to find a way to make money first in order to buy land.</p>
+
+<p>We lived in Richland in Rice County, Minnesota. I was too young to remember West Turin as well as Sarah Etta could, but Richland became the town that I considered my childhood home. Nearby Faribault was the county seat, and we often went there for shopping and getting other necessities. But it was quiet in Richland and I liked that. Richland is also close to Waseca which is where my oldest brother, Samuel, and his wife, Martha, lived after they were married. Waseca was about 25 miles south of us in Richland, but we didn’t see them often.</p>
+
+<p>The saddest and most difficult part of my life in Richland was when my little sister, Bessie, died so suddenly in a tragic accident on the farm. Mother blamed my father for Bessie’s death because he had allowed Bessie to ride a horse in front of the reaper. This happened in August of 1872, and I think it was clearly the moment when my mother decided that she could not tolerate my father any longer. Still, it took another two years to accomplish that.</p>
+
+<p>In 1874, after 26 years of marriage, my parents divorced. This was something that my mother had wanted to do for many years. After Aunt Clarinda’s impossible situation, my mother was determined she would not go down the same path. She bided her time and waited for some of the laws to change — which they did. Aunt Clarinda would not have been able to get a divorce except if her husband had committed adultery, but by 1874 the laws allowed other reasons, and my mother could finally divorce my father. My father immediately left the area after their divorce, and my mother was now free, but Sarah Etta and I knew that she would need help to keep us all fed and dressed.</p>
+
+<p>On 23 January 1876, I got married to William T. Larraman. He was my first love. Although he was older than me by six years, he had been the big brother of a friend of mine, and we loved each other so much that we enjoyed a close relationship and I suddenly found myself pregnant. I was 14 and William was 20. My mother was very upset when she learned I was pregnant but she felt strongly that we should marry so that the child would be legitimate. And so we married. I did love Bill, but I was quite young to have a child and, unfortunately, my little boy died on the same day he was born.</p>
+
+<p>Bill was pretty devastated by the loss of our child, and so he left for a while, trying to find work, but he always came back. By then, my sister, Sarah Etta, had already gone to Kansas City to begin to find a way to earn money for herself and for the family. She wrote letters back to us and I was mesmerized by those letters, telling us about all that she was doing in Kansas City. I wanted to go there, too, and not only work with her, but also see if I could find out what I wanted to do to also earn a living. But before I could do that, Sarah Etta found herself in a difficult predicament, one that she couldn’t fix.</p>
+
+<p>In late 1878, my beautiful and talented sister became pregnant, and unlike my situation she was unable to marry the father of her child. She wrote to Mother and told her what had happened. I know that Mother was angry, but she adored Sarah Etta, so she was prepared to help her in any way that she could. Sarah Etta remained in Kansas City until she could no longer hide her pregnancy. Then she came to live with us. As her time grew near, she and Mother went down to our older brother’s place in Waseca, and her little girl, Gracie, was born there. Samuel and his wife, Martha, were willing to take in Gracie. They already had one child, Alline, but Martha welcomed Gracie as her own.</p>
+
+<p>After leaving the baby with Sam and Martha, Sarah Etta and I headed for Kansas City. Sarah Etta was anxious to get back to work and to attend to her financial situation. I wanted to be there to help whenever I could — and also earn money for myself and my family, especially Mother. It was the beginning of a very different life for me. I was a grown-up with major responsibilities and I was ever so excited to go to Kansas City.</p>
+
+<p><center><a href="sisters-home-page.html">Return to the SISTERS table of contents</a></center></p>
+
+<div class='separator stars'>&#9733; &#9733; &#9733;</div>
+
+
+</article>
+
+<footer class="bio"><img data-src="imgs/susan-75x87-web.jpg" class="lazyimg" width="75" height="87" class='lazyimg'>I taught in the public schools for 32 years. After retirement, I trained to become a fitness instructor for older adults. I enjoy working on family history, writing novels, and researching the latest fitness news for my class participants.</footer>
+
+<nav class="footer_nav">
+<a href="https://susaningraham.net">Susan&thinsp;Ingraham<span class='color_light_gray'>&#8202;.&#8202;net</span></a>
+</nav>
+
+<script type='text/javascript' src='https://code.jquery.com/jquery-3.4.1.min.js' ></script>
+
+<script type="text/javascript">
+
+!function(a){a.bigfoot=function(b){var c,d=a.extend({actionOriginalFN:"hide",activateCallback:function(){},activateOnHover:!1,allowMultipleFN:!1,appendPopoversTo:void 0,breakpoints:{},deleteOnUnhover:!1,hoverDelay:250,numberResetSelector:void 0,popoverDeleteDelay:300,popoverCreateDelay:100,positionNextToBlock:!0,positionContent:!0,preventPageScroll:!0,scope:!1,useFootnoteOnlyOnce:!0,contentMarkup:'<aside class="footnote-content bottom"data-footnote-number="{{FOOTNOTENUM}}" data-footnote-identifier="{{FOOTNOTEID}}" alt="Footnote {{FOOTNOTENUM}}"><div class="footnote-main-wrapper"><div class="footnote-content-wrapper">{{FOOTNOTECONTENT}}</div></div><div class="tooltip"></div></aside>',buttonMarkup:'<a href="#" class="footnote-button" id="{{SUP:data-footnote-backlink-ref}}" data-footnote-number="{{FOOTNOTENUM}}" data-footnote-identifier="{{FOOTNOTEID}}" alt="See Footnote {{FOOTNOTENUM}}" rel="footnote"data-footnote-content="{{FOOTNOTECONTENT}}"><span class="footnote-circle" data-footnote-number="{{FOOTNOTENUM}}"></span><span class="footnote-circle"></span><span class="footnote-circle"></span></a>'},b),e=function(){var b;b=d.scope?d.scope+' a[href*="#"]':'a[href*="#"]';var c,e,j=a(b).filter(function(){var b=a(this),c=b.attr("rel");return c&&"null"!=c||(c=""),(b.attr("href")+c).match(/(fn|footnote|note)[:\-_\d]/gi)&&b.closest("[class*=footnote]:not(a):not(sup)").length<1}),k=[],l=[],m=[];f(j,l),a(l).each(function(){c=a(this).attr("data-footnote-ref").replace(/[:.+~*\]\[]/g,"\\$&"),d.useFootnoteOnlyOnce&&(c+=":not(.footnote-processed)"),e=a(c).closest("li"),e.length>0&&(k.push(e.first().addClass("footnote-processed")),m.push(this))});for(var n,o,p,q,r,s,t,u,v=1,w=0;w<k.length;w++){p=h(a(k[w]).html().trim(),a(m[w]).data("footnote-backlink-ref")).replace(/"/g,"&quot;").replace(/&lt;/g,"&ltsym;").replace(/&gt;/g,"&gtsym;"),q=+(w+1),t="",r=a(m[w]),s=a(k[w]),d.numberResetSelector?(o=r.closest(d.numberResetSelector),o.is(n)?v+=1:v=1,n=o):v=q,0!==p.indexOf("<")&&(p="<p>"+p+"</p>"),t=d.buttonMarkup.replace(/\{\{FOOTNOTENUM\}\}/g,v).replace(/\{\{FOOTNOTEID\}\}/g,q).replace(/\{\{FOOTNOTECONTENT\}\}/g,p),t=i(t,"SUP",r),t=i(t,"FN",s),u=a(t).insertBefore(r);var x=s.parent();switch(d.actionOriginalFN.toLowerCase()){case"delete":r.remove(),s.remove(),g(x);break;case"hide":r.addClass("footnote-print-only"),s.addClass("footnote-print-only"),g(x);break;case"ignore":r.addClass("footnote-print-only")}}},f=function(b,c){var d,e,f,g;b.each(function(){var b=a(this);f="#"+b.attr("href").split("#")[1],d=b.closest("sup"),e=b.find("sup"),d.length>0?(g=(d.attr("id")||"")+(b.attr("id")||""),c.push(d.attr({"data-footnote-backlink-ref":g,"data-footnote-ref":f}))):e.length>0?(g=(e.attr("id")||"")+(b.attr("id")||""),c.push(b.attr({"data-footnote-backlink-ref":g,"data-footnote-ref":f}))):(g=b.attr("id")||"",c.push(b.attr({"data-footnote-backlink-ref":g,"data-footnote-ref":f})))})},g=function(a){var b;a.is(":empty")||0===a.children(":not(.footnote-print-only)").length?(b=a.parent(),"delete"===d.actionOriginalFN.toLowerCase()?a.remove():a.addClass("footnote-print-only"),g(b)):a.children(":not(.footnote-print-only)").length==a.children("hr:not(.footnote-print-only)").length&&(b=a.parent(),"delete"===d.actionOriginalFN.toLowerCase()?a.remove():(a.children("hr").addClass("footnote-print-only"),a.addClass("footnote-print-only")),g(b))},h=function(a,b){b.indexOf(" ")>=0&&(b=b.trim().replace(/ +/g,"|").replace(/(.*)/g,"($1)"));var c=new RegExp("(\\s|&nbsp;)*<\\s*a[^#<]*#"+b+"[^>]*>(.*?)<\\s*/\\s*a>","g");return a.replace(c,"").replace("[]","")},i=function(a,b,c){var d,e,f=new RegExp("\\{\\{"+b+":([^\\}]*)\\}\\}","g");for(d=f.exec(a);d;)d[1]&&(e=c.attr(d[1])||"",a=a.replace("{{"+b+":"+d[1]+"}}",e)),d=f.exec(a);return a},j=function(b){if(d.activateOnHover){var c=a(b.target).closest(".footnote-button"),e='[data-footnote-identifier="'+c.attr("data-footnote-identifier")+'"]';if(c.hasClass("active"))return;if(c.addClass("hover-instantiated"),!d.allowMultipleFN){var f=".footnote-content:not("+e+")";p(f)}m(".footnote-button"+e).addClass("hover-instantiated")}},k=function(b){var c=a(b.target),d=c.closest(".footnote-button");$nearFootnote=c.closest(".footnote-content"),d.length>0?(b.preventDefault(),l(d)):$nearFootnote.length<1&&a(".footnote-content").length>0&&p()},l=function(a){a.blur();var b='data-footnote-identifier="'+a.attr("data-footnote-identifier")+'"';a.hasClass("changing")||(a.hasClass("active")?d.allowMultipleFN?p(".footnote-content["+b+"]"):p():(a.addClass("changing"),setTimeout(function(){a.removeClass("changing")},d.popoverCreateDelay),m(".footnote-button["+b+"]"),a.addClass("click-instantiated"),d.allowMultipleFN||p(".footnote-content:not(["+b+"])")))},m=function(b){b=b||".footnote-button";var c;c="string"!=typeof b&&d.allowMultipleFN?b:"string"!=typeof b?b.first():d.allowMultipleFN?a(b).closest(".footnote-button"):a(b+":first").closest(".footnote-button");var e=a();return c.each(function(){var b,c=a(this);try{b=d.contentMarkup.replace(/\{\{FOOTNOTENUM\}\}/g,c.attr("data-footnote-number")).replace(/\{\{FOOTNOTEID\}\}/g,c.attr("data-footnote-identifier")).replace(/\{\{FOOTNOTECONTENT\}\}/g,c.attr("data-footnote-content").replace(/&gtsym;/,"&gt;").replace(/&ltsym;/,"&lt;")),b=i(b,"BUTTON",c)}finally{$content=a(b);try{d.activateCallback($content)}catch(f){}d.appendPopoversTo?$content.appendTo(d.appendPopoversTo+":first"):($nearestBlock=c.closest("p, div, pre, li, ul, section, article, main, aside"),$siblingFootnote=$nearestBlock.siblings(".footnote-content:last"),$siblingFootnote.length>0?$content.insertAfter($siblingFootnote):$content.insertAfter($nearestBlock)),$content.attr("data-bigfoot-max-height",$content.height()),q(),c.addClass("active"),$content.find(".footnote-content-wrapper").bindScrollHandler(),e=e.add($content)}}),setTimeout(function(){e.addClass("active")},d.popoverCreateDelay),e};a.fn.bindScrollHandler=function(){d.preventPageScroll&&a(this).on("DOMMouseScroll mousewheel",function(b){var c=a(this),d=c.scrollTop(),e=c[0].scrollHeight,f=parseInt(c.css("height")),g=c.closest(".footnote-content");if(c.scrollTop()>0&&c.scrollTop()<10&&g.addClass("scrollable"),g.hasClass("scrollable")){var h="DOMMouseScroll"==b.type?-40*b.originalEvent.detail:b.originalEvent.wheelDelta,i=h>0,j=function(){return b.stopPropagation(),b.preventDefault(),b.returnValue=!1,!1};return!i&&-h>e-f-d?(c.scrollTop(e),g.addClass("fully-scrolled"),j()):i&&h>d?(c.scrollTop(0),g.removeClass("fully-scrolled"),j()):(g.removeClass("fully-scrolled"),void 0)}})};var n=function(b){d.deleteOnUnhover&&d.activateOnHover&&setTimeout(function(){a(b.target).closest(".footnote-content, .footnote-button");a(".footnote-button:hover, .footnote-content:hover").length<1&&p()},d.hoverDelay)},o=function(a){27==a.keyCode&&p()},p=function(b,c){b=b||".footnote-content",c=c||d.popoverDeleteDelay;var e,f,g,h=a();return a(b).each(function(){g=a(this),e=g.attr("data-footnote-identifier"),f=a('.footnote-button[data-footnote-identifier="'+e+'"]'),f.hasClass("changing")||(h=h.add(f),f.removeClass("active hover-instantiated click-instantiated").addClass("changing"),g.removeClass("active").addClass("disapearing"),setTimeout(function(){g.remove(),f.removeClass("changing")},c))}),h},q=function(){d.positionContent&&a(".footnote-content").each(function(){var b=a(this),c='data-footnote-identifier="'+b.attr("data-footnote-identifier")+'"',d=(b.find(".footnote-content-wrapper"),a(".footnote-button["+c+"]")),e=s(d),f=parseFloat(b.css("width")),g=parseFloat(b.css("margin-top")),h=+b.attr("data-bigfoot-max-height"),i=2*g+h,j=1e4;e.bottomRoom<i&&e.topRoom>e.bottomRoom?(b.css({top:"auto",bottom:e.bottomRoom+"px"}).addClass("top").removeClass("bottom"),j=e.topRoom-g-15,b.css({"transform-origin":100*e.leftRelative+"% 100%"})):(b.css({bottom:"auto",top:e.topRoom+"px"}).addClass("bottom").removeClass("top"),j=e.bottomRoom-g-15,b.css({"transform-origin":100*e.leftRelative+"% 0%"})),b.find(".footnote-content-wrapper").css({"max-height":Math.min(j,h)+"px"}),b.css({left:e.leftRoom-e.leftRelative*f+"px"}),r(b,e.leftRelative),parseInt(b.css("height"))<b.find(".footnote-content-wrapper")[0].scrollHeight&&b.addClass("scrollable")})},r=function(a,b){b=b||.5;var c=a.find(".tooltip");c.length>0&&c.css({left:100*b+"%"})},s=function(b){var c=parseFloat(b.outerWidth()),d=parseFloat(b.outerHeight()),e=t(),f=b.offset().top-a(window).scrollTop()+d/2,g=b.offset().left+c/2;return{topRoom:f,bottomRoom:e.height-f,leftRoom:g,rightRoom:e.width-g,leftRelative:g/e.width,topRelative:f/e.height}},t=function(){var a=document.createElement("div");a.style.cssText="position: fixed;top: 0;left: 0;bottom: 0;right: 0;",document.documentElement.insertBefore(a,document.documentElement.firstChild);var b={width:a.offsetWidth,height:a.offsetHeight};return document.documentElement.removeChild(a),b},u=function(a,b,e,f,g){b=b||d.popoverDeleteDelay,(null===e||e!==!1)&&(e=!0);var h,i,j;if("string"==typeof a){j="iphone"===a.toLowerCase()?"<320px":"ipad"===a.toLowerCase()?"<768px":a,i=">"===j.charAt(0)?"min":"<"===j.charAt(0)?"max":null;var k=i?"("+i+"-width: "+j.substring(1)+")":j;h=window.matchMedia(k)}else h=a;if(h.media&&"invalid"===h.media)return{added:!1,mq:h,listener:null};var l="min"===i,m="max"===i;f=f||v(e,b,l,function(a){a.addClass("fixed-bottom")}),g=g||v(e,b,m,function(){});var n=function(a){a.matches?f(e,c):g(e,c)};return h.addListener(n),n(h),d.breakpoints[a]={added:!0,mq:h,listener:n},d.breakpoints[a]},v=function(a,b,c,d){return function(a,e){var f;a&&(f=e.close(),e.updateSetting("activateCallback",d)),setTimeout(function(){e.updateSetting("positionContent",c),a&&e.activate(f)},b)}},w=function(a,b){var c;if("string"==typeof a)mqFound=void 0!==d.breakpoints[a];else for(c in d.breakpoints)if(d.breakpoints.hasOwnProperty(c)&&d.breakpoints[c].mq===a){mqFound=!0;break}if(mqFound){var e=d.breakpoints[c||a];b?b({matches:!1}):e.listener({matches:!1}),e.mq.removeListener(e.listener),delete d.breakpoints[c||a]}return mqFound},x=function(a,b){var c;if("string"==typeof a)c=d[a],d[a]=b;else{c={};for(var e in a)a.hasOwnProperty(e)&&(c[e]=d[e],d[e]=a[e])}return c},y=function(a){return d[a]};return a(document).ready(function(){e(),a(document).on("mouseenter",".footnote-button",j),a(document).on("touchend click",k),a(document).on("mouseout",".hover-instantiated",n),a(document).on("keyup",o),a(window).on("scroll resize",q)}),c={close:function(a,b){return p(a,b)},activate:function(a){return m(a)},reposition:function(){return q()},addBreakpoint:function(a,b,c,d,e){return u(a,b,c,d,e)},removeBreakpoint:function(a,b){return w(a,b)},getSetting:function(a){return y(a)},updateSetting:function(a,b){return x(a,b)}}}}(jQuery);
+$.bigfoot();
+
+document.addEventListener("DOMContentLoaded", function() {
+  var lazyloadImages;    
+
+console.log ('LAZY LOADER gittin bizzy');
+
+  if ("IntersectionObserver" in window) {
+    lazyloadImages = document.querySelectorAll(".lazyimg");
+    var imageObserver = new IntersectionObserver(function(entries, observer) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          var image = entry.target;
+          image.src = image.dataset.src;
+          // image.classList.remove("lazyimg"); // I don't want to remove the class; it's useful!
+          imageObserver.unobserve(image);
+        }
+      });
+    });
+
+    lazyloadImages.forEach(function(image) {
+      imageObserver.observe(image);
+    });
+  } 
+  
+else 
+    
+  {  
+    var lazyloadThrottleTimeout;
+    lazyloadImages = document.querySelectorAll(".lazyimg");
+    
+    function lazyload () { 
+      if(lazyloadThrottleTimeout) {
+        clearTimeout(lazyloadThrottleTimeout);
+      }    
+
+      lazyloadThrottleTimeout = setTimeout(function() {
+        var scrollTop = window.pageYOffset;
+        lazyloadImages.forEach(function(img) {
+            if(img.offsetTop < (window.innerHeight + scrollTop)) {
+              img.src = img.dataset.src;
+			  // image.classList.remove("lazyimg"); // I don't want to remove the class; it's useful!
+            }
+        });
+        if(lazyloadImages.length == 0) { 
+          document.removeEventListener("scroll", lazyload);
+          window.removeEventListener("resize", lazyload);
+          window.removeEventListener("orientationChange", lazyload);
+        }
+      }, 20);
+    }
+
+    document.addEventListener("scroll", lazyload);
+    window.addEventListener("resize", lazyload);
+    window.addEventListener("orientationChange", lazyload);
+  }
+})
+</script>
+
+
+</body></html>

@@ -93,6 +93,11 @@ https://www.painscience.com/family-index.html
 [Family Index: Who's Who on My Family History Pages](https://www.painscience.com/family-index.html)
 <a href="https://www.painscience.com/family-index.html">Family Index: Who's Who on My Family History Pages</a>
 
+PainScience.com/sisters-chapter-9.html
+https://www.painscience.com/sisters-chapter-9.html
+[Book 3: Julia](https://www.painscience.com/sisters-chapter-9.html)
+<a href="https://www.painscience.com/sisters-chapter-9.html">Book 3: Julia</a>
+
 PainScience.com/sisters-chapter-8.html
 https://www.painscience.com/sisters-chapter-8.html
 [Book 2: Sarah Ann](https://www.painscience.com/sisters-chapter-8.html)
