@@ -216,10 +216,10 @@ shins	0
 shoulder	0						
 Silver City	0						
 singing	0						
-size L	18						
+size L	21						
 size M	8						
 size S	4						
-size XL	29						
+size XL	32						
 skeleton	0						
 sleep	0						
 small town	0						

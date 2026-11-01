@@ -1,3 +1,33 @@
+PainScience.com/exercising-as-we-age.html
+https://www.painscience.com/exercising-as-we-age.html
+[Exercising as We Age](https://www.painscience.com/exercising-as-we-age.html)
+<a href="https://www.painscience.com/exercising-as-we-age.html">Exercising as We Age</a>
+
+PainScience.com/physical-activity-for-the-older-adult.html
+https://www.painscience.com/physical-activity-for-the-older-adult.html
+[Physical Activity for the Older Adult](https://www.painscience.com/physical-activity-for-the-older-adult.html)
+<a href="https://www.painscience.com/physical-activity-for-the-older-adult.html">Physical Activity for the Older Adult</a>
+
+PainScience.com/exercise-and-viruses.html
+https://www.painscience.com/exercise-and-viruses.html
+[Exercise and Viruses: Exercise Immunology](https://www.painscience.com/exercise-and-viruses.html)
+<a href="https://www.painscience.com/exercise-and-viruses.html">Exercise and Viruses: Exercise Immunology</a>
+
+PainScience.com/menopause-and-physical-activity.html
+https://www.painscience.com/menopause-and-physical-activity.html
+[Menopause and the Merits of Physical Activity](https://www.painscience.com/menopause-and-physical-activity.html)
+<a href="https://www.painscience.com/menopause-and-physical-activity.html">Menopause and the Merits of Physical Activity</a>
+
+PainScience.com/exercise-and-lifespan.html
+https://www.painscience.com/exercise-and-lifespan.html
+[Exercise and Lifespan](https://www.painscience.com/exercise-and-lifespan.html)
+<a href="https://www.painscience.com/exercise-and-lifespan.html">Exercise and Lifespan</a>
+
+PainScience.com/exercise-and-circulation.html
+https://www.painscience.com/exercise-and-circulation.html
+[Exercise and Circulation: Keeping the Blood Moving](https://www.painscience.com/exercise-and-circulation.html)
+<a href="https://www.painscience.com/exercise-and-circulation.html">Exercise and Circulation: Keeping the Blood Moving</a>
+
 PainScience.com/healthy-fit-adult.html
 https://www.painscience.com/healthy-fit-adult.html
 [Characteristics of a Healthy, Fit Adult](https://www.painscience.com/healthy-fit-adult.html)
