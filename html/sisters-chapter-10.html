@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<!-- Book 3: Julia
+#size XL -->
+
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width">
+
+<link rel="shortcut icon" href="favicon.ico" />
+
+<title>Book 3: Julia</title>
+
+<link rel="canonical"						href="https://susaningraham.net/sisters-chapter-10.html">
+
+<meta name='title' 						content='Book 3: Julia'>
+
+<meta name='og:url' 						content='http://susaningraham.net/sisters-chapter-10.html'>
+
+<meta name='twitter:url' 				content='http://susaningraham.net/sisters-chapter-10.html'>
+
+<meta property='og:type' 				content='article'>
+
+<meta name='description' 				content='Julia joins Sarah Etta in Kansas City: work in the resorts, Barnum’s circus, Oscar Wilde, the Inter-State Fair, and the new cable cars, then the losses of the years that followed.'>
+
+<meta property='og:description' 	content='Julia joins Sarah Etta in Kansas City: work in the resorts, Barnum’s circus, Oscar Wilde, the Inter-State Fair, and the new cable cars, then the losses of the years that followed.'>
+
+<!-- default page image -->
+<meta property='og:image' 			content='http://susaningraham.net/imgs/diversions-logo-250px.jpg'>
+
+<meta property='og:site_name' 		content='Diversions'>
+
+<style>
+
+/* CSS defaults for PubSys */
+
+.next_prev_links {margin:5em 2em 2em 2em; font-size:.9em; text-align:center; font-style:italic;}
+.next_prev_links img {margin-left:-1%;}
+.next_prev_links .arrow {font-size:.8em; color:#CCC; vertical-align:.1em;font-style:normal;padding: 0 .6em;}
+.prev_link {float:left; width:40%; text-align: right; margin-top:.4em;line-height:1.2}
+.next_link {float:right; width:40%; text-align:left; margin-top:.4em; line-height:1.2}
+
+div.ytemb {
+margin: 3em auto 3em auto;
+text-align:center;
+max-width: 100%;
+}
+
+iframe.ytemb {
+width:500px;
+height:315px;
+max-width: 100%;
+}
+
+.preamble {color: gray; font-size: .9em}
+
+body { /* defaults for the main text */
+margin:10px;
+font-family:HelveticaNeue-Light,Arial,Helvetica,sans;
+line-height:1.5;
+font-size:16pt;
+}
+
+.sidebar {
+width:90%;
+margin: 1.5em auto;
+font-size: .7em;
+line-height: 1.4;
+color:#666;
+}
+
+.micropost article {font-size:18pt}
+
+time {
+font-size:.8em;
+color:gray;
+}
+
+nav {
+position:absolute;
+top:10px;
+font-size:.7em;
+color:#666;
+}
+
+nav a {
+font-family:HelveticaNeue-CondensedBold,Tahoma,Tahoma,Arial Black;
+}
+
+.footer_nav {
+position: relative;
+text-align: center;
+}
+
+header { /* article header, including title, subtitle and metadata */
+line-height:1.2;
+}
+
+h1, h2, h3 {
+text-rendering:optimizeLegibility;
+font-family:HelveticaNeue-CondensedBold,Tahoma,Tahoma,Arial Black;
+line-height:1;
+}
+
+
+
+article {
+margin-top:4em;
+}
+
+article header h1 {
+margin:0;
+font-size:2em;
+}
+article.micropost header h1 {font-size:1.2em} /* micropost title sizes are much smaller! */
+
+#subtitle {
+color:#999;
+font-size:.8em;
+}
+.micropost #subtitle {display:none}
+
+h2, h3 {
+margin-top:2em;
+font-size:1.2em;
+}
+
+article header .metadata {
+color:#666;
+font-weight:lighter;
+font-size:.9em;
+margin-top:1em;
+margin-bottom:3em;
+}
+
+.micropost .metadata {font-size:.6em}
+
+address {
+display:inline;
+font-style:normal;
+}
+
+
+#byline-bottom {
+margin-top:5em;
+text-align:center;
+}
+
+footer.bio {
+margin: 8em 6% 3em 6%;
+text-align: center;
+font-weight:lighter;
+font-size:.8em;
+line-height:1.5;
+color:#666;
+}
+
+.micropost footer.bio { /* it’s kind of weird, but in a micropost my bio needs to be much more separated from the content, because it’s actually BIGGER than a lot of microposts … if it’s not quite well separated, and in smaller type, it looks too much like the content itself */
+margin-top: 10em;
+font-size:.8em;
+}
+
+
+footer.bio img {
+float:none;
+display:block;
+margin: 0 auto 1em auto;
+}
+
+
+a {text-decoration:none}
+a:link {color:#0080FF}
+a:hover {color:#FF6666; text-decoration:underline}
+a:active {color:red; text-decoration:underline}
+a:visited {color:#4A73A5}
+.post_index a:visited {color:#999}
+
+.featured_link {
+font-size: .8em;
+line-height:1.2;
+font-family:
+	Avenir Next Condensed,
+	HelveticaNeue-CondensedBold,
+	Arial Narrow,
+	Avenir Next,
+	HelveticaNeue,		
+	Tahoma,
+	Verdana,
+	DejaVu Sans,
+	Arial Black,
+	sans-serif;	
+}
+
+.color_dark_gray {color:#666}
+.color_light_gray {color:#AAA}
+.color_med_gray {color:#888}
+
+
+
+
+ul, ol, blockquote {line-height:1.4;font-size:.9em}
+
+ul {padding-left:1em}
+
+li {margin-bottom: 1em}
+
+code {
+font-family:Monaco,Consolas,Droid Sans Mono,Liberation Mono,mono;
+font-size:.8em;
+color:green;
+}
+
+.separator {color:gray;text-align:center;margin:2em 4% 3em 0;}
+
+.separator.bullet:after {content:"•"}
+
+.separator.stars {font-size: 1.2em}
+
+span.img_container {display:inline-block}
+
+.img_container {text-align:center; line-height:1}
+
+img.ds {box-shadow: 3px 3px 8px 0px #555}
+
+.img_container.centre {margin: 2em auto}
+
+.img_container.right {
+float: right;
+margin: 1em 0 2em 2em;
+}
+
+.img_container.left {
+float: left;
+margin: 1em 2em 2em 0;
+}
+
+img, .img_container {
+max-width:100% !important;
+height:auto;
+}
+
+figure {text-align:center}
+
+span.img_container, span.caption, figcaption {display:inline-block}
+
+.img_container .caption, figcaption {
+margin: .8em 1% 0 1%;
+font-size:.7em;
+color:#888;
+font-weight:100;
+}
+
+.img_container.centre .caption, figcaption {margin-top:1em 6% 0em 6%}
+
+.post_index {margin:2em 0; padding:0;}
+.post_index li {
+list-style-type:none;
+margin:1em 0;
+padding-left:10px;
+line-height:1.3
+}
+
+.post_index {
+font-size:.9em;
+}
+
+.post_index td, .post_index th {
+padding:8px;
+line-height:1.1;
+}
+
+.post_index th {
+cursor: pointer; 
+}
+
+.post_index td.tdsize {
+width:50px;
+background-repeat:no-repeat;
+background-origin:content-box;
+background-position: center;
+}
+
+.post_index td.tddate {
+white-space:nowrap;
+font-size:.7em;
+color:#BBB;
+}
+
+.char_arrow, .char_sort_arrow { /* for sort arrows based on ▲ (9650) & ▼ (9660) … 
+The glyph is available in every single web safe font (probably damn near every font period), but be aware that Arial Unicode MS is unusually SMALL, and there are only a few that have a NARROW shape. This font-stack simply chooses a few of the narrower, smaller for consistency:  */
+font-family: Courier New, Impact, Times New Roman, Lucida Sans Unicode, DejaVu Sans}
+
+.char_arrow2 { /* for sort arrows based on ↑ */
+font-family: Impact, Times New Roman, Arial}
+
+.char_sort_arrow {
+	color: #A9CAF0;
+	vertical-align:-.6em;
+	line-height:0;
+	}
+
+.thtitle {
+text-align:left;
+}
+
+.thtitle .char_sort_arrow { 
+	margin-left:.3em;
+	}
+
+.char_sort_arrow.off {
+	color: #f5f5f5;
+	}
+
+ul.tag_list {
+display:inline;
+margin:0; padding:0;
+}
+
+ul.tag_list li {
+list-style-type:none;
+margin: .2em 6px 0 0;
+padding: 2px 4px;
+border: 1px solid #CCC;
+border-radius:3px;
+display:inline-block;
+text-transform:uppercase;
+font-size: .7em;
+letter-spacing: 0px;
+color: #AAA;
+font-weight:bold;
+}
+
+.metadata a:link {color:#4A73A5}
+
+/* `QUOTATIONS (QT) 
+
+blockquote (ordinary passage quoting, indented paragraph)
+qt (featured quote)
+qt.short (featured short quote, decorative styling, large print) */
+
+blockquote {
+margin:1.2em 1em; 
+font-size:.95em;
+color:#555;
+}
+
+blockquote.featured { /* for longer featured quotes */
+text-rendering: optimizeLegibility;
+margin:2em 10% 2em 10%;
+font-size:1.2em;
+color: #777;
+}
+
+blockquote.short {
+/* Completely different, decorative styling for shorter featured quotes */
+text-rendering: optimizeLegibility;
+margin:2.5em 15% 2.5em 10%;
+font-style:italic;
+font-size:1.4em;
+color: #555;
+}
+
+
+blockquote .attr {
+font-size: .6em;
+color: #999;
+margin: -.5em 10% 0 30%;
+text-indent: -.2em;
+}
+
+blockquote .chartild {
+display:none;
+font-weight:bold;
+color: #CCC;
+font-size:1.2em;
+margin-right:.2em;
+}
+
+
+/* <##> ======= ↓ `big window styles ↓ ======= */
+
+@media screen and (min-width: 550px) {
+
+
+.sidebar {
+width:35%;
+margin: 1em 0 1em 2em;
+float: right;
+font-size: .8em;
+line-height: 1.4;
+color:#666;
+}
+
+
+ul.tag_list li {
+opacity: 0.7;
+font-size: .7em;
+border-radius:4px;
+letter-spacing: 1px;
+}
+
+.img_container.centre {
+margin: 3.5em auto;
+text-align:center;
+}
+
+
+img, .img_container {
+max-width:100% !important;
+height:auto;
+}
+
+.img_container .caption, figcaption {
+margin: 1.5em 10% 0 10%;
+font-size:.8em;
+line-height:1.3;
+}
+
+
+body {
+margin: 2em auto;
+width: 70%;
+line-height:1.7em;
+font-size:18pt;
+}
+
+.micropost article {font-size:20pt}
+
+
+article header h1 {font-size:2.4em}
+.micropost header h1 {font-size:1.6em} /* micropost title sizes are much smaller! */
+
+h2, h3 {
+margin-top:3em;
+font-size:1.6em;
+}
+
+ul, ol {padding-left:2em}
+
+blockquote {margin:2em 2.5em}
+
+article header .metadata {font-size:.8em}
+
+footer.bio {
+margin: 5em 6% 4em 8%;
+padding-left:100px;
+text-align:left;
+font-weight:lighter;
+font-size:.8em;
+line-height:1.5;
+color:#666;
+}
+
+.micropost footer.bio { /* it’s kind of weird, but in a micropost my bio needs to be much more separated from the content, because it’s actually BIGGER than a lot of microposts … if it’s not quite well separated, and in smaller type, it looks too much like the content itself */
+margin-top: 10em;
+font-size:.7em;
+}
+
+
+footer.bio img {
+float:left;
+margin: .4em 0 0 -100px;
+}
+
+/* `QUOTATIONS (QT) */
+
+.qt {
+/* Completely different, decorative styling for short quotes */
+/* set in prenton */
+margin:3em 10% 2em 8%;
+line-height:1.3;
+font-size:1.2em;
+text-indent: -.2em;
+}
+
+.qt .char_open_qt {
+font-size:1.2em;
+margin-right:.1em;
+}
+
+blockquote .attr {
+font-size:.7em;
+margin:0 10% 0 20%;
+text-indent: -.2em;
+}
+
+blockquote .chartild {
+font-weight:bold;
+color: #CCC;
+font-size:1.2em;
+margin-right:.2em;
+}
+
+blockquote.short {
+/* Completely different, decorative styling for shorter featured quotes */
+text-rendering: optimizeLegibility;
+margin:3em 20% 3em 15%;
+font-style:italic;
+font-size:1.5em;
+color: #555;
+}
+
+
+} /* end of larger window CSS */
+
+.red {color:red}
+.blue {color:blue}
+.green {color:green}
+.orange {color:orange}
+.purple {color:#d4237a} /* women's names: pink since Oct 2026 (was purple) */
+.brown {color:brown}
+.gray{color:gray}
+body {font-family:"Trebuchet MS",Helvetica,sans}
+h1 {color: #0080FF}
+.sidebar {
+border:1px solid #999;
+padding:8px;
+}
+.separator {content:"";}
+/* 3px 3px 5px 0px #555
+horizontal shadow, vertical shadow, blur, spread, colour
+img.ds{box-shadow:5px 5px 8px 3px #555} */
+
+.separator {color:gray;text-align:center;margin:2em 4% 3em 0;}
+
+.separator.stars {font-size: 1.2em}
+
+.thsize, .tdsize {display:none}
+
+.footnote-button {
+  position: relative;
+  z-index: 5;
+  top: -0.15em;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  display: inline-block;
+  padding: 0.34em;
+  margin: 0 0.1em 0 0.2em;
+  border: none;
+  border-radius: 0.3em;
+  cursor: pointer;
+  opacity: 0.3;
+  background-color: #464646;
+  -webkit-backface-visibility: hidden;
+  line-height: 0;
+  vertical-align: middle;
+  text-decoration: none;
+  font-smoothing: antialiased;
+  -webkit-transition: opacity;
+  -moz-transition: opacity;
+  -ms-transition: opacity;
+  transition: opacity;
+  -webkit-transition-duration: 0.25s;
+  -moz-transition-duration: 0.25s;
+  transition-duration: 0.25s;
+}
+.footnote-button:hover {
+  opacity: 0.6;
+}
+.footnote-button:active {
+  opacity: 0.6;
+}
+.footnote-button.active {
+  opacity: 0.9;
+  -webkit-transition-delay: 0.15s;
+  -moz-transition-delay: 0.15s;
+  transition-delay: 0.15s;
+}
+
+.footnote-circle {
+  display: inline-block;
+  width: 0.32em;
+  height: 0.32em;
+  margin-right: 0.224em;
+  border-radius: 100%;
+  background-color: #e6e6e6;
+  border: none;
+}
+.footnote-circle:last-child {
+  margin-right: 0;
+}
+
+@media not print {
+  .footnote-print-only {
+    display: none !important;
+  }
+}
+@media print {
+  .footnote-button {
+    display: none !important;
+  }
+}
+.footnote-content {
+  position: fixed;
+  z-index: 10;
+  bottom: auto;
+  left: auto;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  max-width: 90%;
+  margin: 1.21924em auto;
+  display: inline-block;
+  background: #fafafa;
+  opacity: 0;
+  border-radius: 0.5em;
+  border: 1px solid #c3c3c3;
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+  -webkit-transition: opacity, -webkit-transform;
+  -moz-transition: opacity, -moz-transform;
+  -ms-transition: opacity, -ms-transform;
+  transition: opacity, transform;
+  -webkit-transition-duration: 0.25s;
+  -moz-transition-duration: 0.25s;
+  transition-duration: 0.25s;
+}
+.footnote-content:not(.fixed-bottom) {
+  -webkit-transform: scale(0.1) translateZ(0);
+  -moz-transform: scale(0.1) translateZ(0);
+  -ms-transform: scale(0.1) translateZ(0);
+  -o-transform: scale(0.1) translateZ(0);
+  transform: scale(0.1) translateZ(0);
+  -webkit-transform-origin: 50% 0;
+  -moz-transform-origin: 50% 0;
+  -ms-transform-origin: 50% 0;
+  -o-transform-origin: 50% 0;
+  transform-origin: 50% 0;
+}
+.footnote-content.active:not(.fixed-bottom) {
+  -webkit-transform: scale(1) translateZ(0);
+  -moz-transform: scale(1) translateZ(0);
+  -ms-transform: scale(1) translateZ(0);
+  -o-transform: scale(1) translateZ(0);
+  transform: scale(1) translateZ(0);
+  opacity: 0.97;
+}
+.footnote-content.bottom {
+  -webkit-transform-origin: top;
+  -moz-transform-origin: top;
+  -ms-transform-origin: top;
+  -o-transform-origin: top;
+  transform-origin: top;
+}
+.footnote-content.top {
+  -webkit-transform-origin: bottom;
+  -moz-transform-origin: bottom;
+  -ms-transform-origin: bottom;
+  -o-transform-origin: bottom;
+  transform-origin: bottom;
+}
+.footnote-content.fixed-bottom {
+  bottom: 0 !important;
+  top: auto !important;
+  left: 0 !important;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  -webkit-transform: translateY(105%);
+  -moz-transform: translateY(105%);
+  -ms-transform: translateY(105%);
+  -o-transform: translateY(105%);
+  transform: translateY(105%);
+  border-radius: 0;
+  opacity: 1;
+  -webkit-transition: -webkit-transform;
+  -moz-transition: -moz-transform;
+  -ms-transition: -ms-transform;
+  transition: transform;
+  -webkit-transition-duration: 0.25s;
+  -moz-transition-duration: 0.25s;
+  transition-duration: 0.25s;
+}
+.footnote-content.fixed-bottom.active {
+  -webkit-transform: translateY(0);
+  -moz-transform: translateY(0);
+  -ms-transform: translateY(0);
+  -o-transform: translateY(0);
+  transform: translateY(0);
+}
+.footnote-content.fixed-bottom .footnote-main-wrapper {
+  max-width: 90%;
+  width: 22em;
+  margin: 0 auto;
+}
+.footnote-content.fixed-bottom .tooltip {
+  display: none;
+}
+.footnote-content.scrollable:after {
+  content: '...';
+  position: fixed;
+  bottom: 0.45em;
+  right: 50%;
+  z-index: 20;
+  width: 1.5em;
+  margin-right: -0.75em;
+  opacity: 1;
+  background-color: #fafafa;
+  font-family: Georgia;
+  font-weight: bold;
+  font-size: 1.8em;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.08);
+  line-height: 0;
+  -webkit-transition: opacity;
+  -moz-transition: opacity;
+  -ms-transition: opacity;
+  transition: opacity;
+  -webkit-transition-duration: 0.25s;
+  -moz-transition-duration: 0.25s;
+  transition-duration: 0.25s;
+  -webkit-transition-delay: 0.4s;
+  -moz-transition-delay: 0.4s;
+  transition-delay: 0.4s;
+}
+.footnote-content.scrollable.fully-scrolled:after {
+  opacity: 0;
+  -webkit-transition-delay: 0s;
+  -moz-transition-delay: 0s;
+  transition-delay: 0s;
+}
+.footnote-content.scrollable .footnote-main-wrapper:before, .footnote-content.scrollable .footnote-main-wrapper:after {
+  content: ' ';
+  position: absolute;
+  width: 100%;
+  z-index: 12;
+}
+.footnote-content.scrollable .footnote-main-wrapper:before {
+  top: -1px;
+  left: 0;
+  height: 1.1em;
+  border-radius: 0.5em 0.5em 0 0;
+  background: #fafafa;
+  background: -moz-linear-gradient(top, #fafafa 0%, #fafafa 50%, rgba(250, 250, 250, 0) 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fafafa), color-stop(50%, #fafafa), color-stop(100%, rgba(250, 250, 250, 0)));
+  background: -webkit-linear-gradient(top, #fafafa 0%, #fafafa 50%, rgba(250, 250, 250, 0) 100%);
+  background: -o-linear-gradient(top, #fafafa 0%, #fafafa 50%, rgba(250, 250, 250, 0) 100%);
+  background: -ms-linear-gradient(top, #fafafa 0%, #fafafa 50%, rgba(250, 250, 250, 0) 100%);
+  background: linear, to bottom, #fafafa 0%, #fafafa 50%, rgba(250, 250, 250, 0) 100%;
+}
+.footnote-content.scrollable .footnote-main-wrapper:after {
+  bottom: -1px;
+  left: 0;
+  height: 1.2em;
+  border-radius: 0 0 0.5em 0.5em;
+  background: #fafafa;
+  background: -moz-linear-gradient(bottom, #fafafa 0%, #fafafa 50%, rgba(250, 250, 250, 0) 100%);
+  background: -webkit-gradient(linear, left bottom, left top, color-stop(0%, #fafafa), color-stop(50%, #fafafa), color-stop(100%, rgba(250, 250, 250, 0)));
+  background: -webkit-linear-gradient(bottom, #fafafa 0%, #fafafa 50%, rgba(250, 250, 250, 0) 100%);
+  background: -o-linear-gradient(bottom, #fafafa 0%, #fafafa 50%, rgba(250, 250, 250, 0) 100%);
+  background: -ms-linear-gradient(bottom, #fafafa 0%, #fafafa 50%, rgba(250, 250, 250, 0) 100%);
+  background: linear, to top, #fafafa 0%, #fafafa 50%, rgba(250, 250, 250, 0) 100%;
+}
+.footnote-content ::-webkit-scrollbar {
+  display: none;
+}
+
+.footnote-main-wrapper {
+  position: relative;
+  z-index: 14;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  overflow: hidden;
+  margin: 0;
+  max-width: 22em;
+  background-color: #fafafa;
+  border-radius: 0.5em;
+  -webkit-transition: max-height;
+  -moz-transition: max-height;
+  -ms-transition: max-height;
+  transition: max-height;
+  -webkit-transition-duration: 0.25s;
+  -moz-transition-duration: 0.25s;
+  transition-duration: 0.25s;
+}
+
+.footnote-content-wrapper {
+  position: relative;
+  z-index: 8;
+  max-height: 15em;
+  padding: 1.1em 1.3em 1.2em;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #fafafa;
+  border-radius: 0.5em;
+  -webkit-font-smoothing: subpixel-antialiased;
+}
+.footnote-content-wrapper img {
+  max-width: 100%;
+}
+.footnote-content-wrapper *:last-child {
+  margin-bottom: 0;
+}
+.footnote-content-wrapper *:first-child {
+  margin-top: 0;
+}
+
+.tooltip {
+  position: absolute;
+  z-index: 12;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  margin-left: -0.65em;
+  width: 1.3em;
+  height: 1.3em;
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  transform: rotate(45deg);
+  background: #fafafa;
+  border: 1px solid #c3c3c3;
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+  border-top-left-radius: 0;
+}
+
+.bottom .tooltip {
+  top: -0.65em;
+  bottom: auto;
+}
+
+.top .tooltip {
+  bottom: -0.65em;
+  top: auto;
+}
+
+</style>
+
+<script>$.bigfoot();</script>
+
+
+</head><body><!-- <##> -->
+
+<nav><strong><a href="index.html">Diversions</a></strong> <img src="imgs/diversions-logo-30px.jpg" height="15" width="15" style="vertical-align:-2px"> Fitness, family, fiction</nav>
+
+<article><!--  article start -->
+
+<header>
+
+<h1 id='title'>Book 3: Julia</h1>
+
+<div class="metadata">
+<address class="author"><a rel="author" href="index.html#about" title="Susan Ingraham">Susan Ingraham</a></address> &nbsp; <time pubdate datetime="2026-10-14" title="Oct 14, 2026">Oct 14, 2026</time> &nbsp; <ul class='tag_list'><li class='tag'><a href='tag-size-xl.html'>size XL</a></li></ul></div>
+
+</header>
+
+<style>.img_container img { border: 3px solid black; }</style>
+
+<h2>Chapter 10: Life in Kansas City with Sarah Etta</h2>
+
+<p>I was so excited to go with Sarah Etta to Kansas City. She had written letters often when she had been away, and when she came home to have her darling little baby, Gracie, she talked and talked about her life there. After Gracie was born, Sarah Etta stayed with us for a while in order to nurse her. But Sarah Etta knew that she couldn’t stay with Gracie forever. She had to return to Kansas City and make sure her businesses were still running well and making a profit. Mother, Sarah Etta, and I went together to Waseca to leave little Gracie with my oldest brother, Samuel, and his wife, Martha. They had a small daughter, Alline, and they were willing to take in Gracie. Sarah Etta had plans for Gracie to some day come to Kansas City and learn who her real mother was.</p>
+
+<p>We said good-bye to everyone — Samuel, Martha, Alline, Gracie, and Mother — and boarded the train for the ride to Kansas City. I was lucky I was going with my sister because she had done all of this already and thus I felt safe and secure when I was with her. Although Sarah Etta was sad to leave Gracie behind with Sam and Martha, she was excited to get back to Kansas City and her businesses. She wanted to teach me a lot of things and I was looking forward to every minute.</p>
+
+<p>My marriage to Bill had not ended, but he was not a well man. He had been living in Kansas City before Sarah Etta and I got there late in 1879. Like Sarah Etta, I took a pseudonym for my work: Daisy Brown. I worked in Sarah Etta’s resorts, both the one on Grand Avenue and the one on Third Street. But, I have to confess that I didn’t enjoy it as much as my sister did and Bill preferred that I find something else to do with my time to earn a living.</p>
+
+<p>So while I was busy working for Sarah Etta, still known as Kitty Brown, I also looked for work as a seamstress (I happen to think I was as good as my sister — perhaps even better). I was also a good stenographer so I began to look for work in that field as well. I liked to keep my life private, so I had fun changing Bill’s name and mine and giving the City Directory people a lot of silly names. I changed Larraman to Lamore and used that as my official name for many years to come. For a few years, however, I was running Sarah Etta’s resort for her on Grand Avenue. Bill and I sometimes got together, but he was busy with his work and I certainly didn’t see him every day. Besides, he didn’t really like what I was doing for a living.</p>
+
+<p>Here are the entries in some of the city directories when I first went to Kansas City. I deliberately made it unclear who I was and what I did for a living, but in nearly all entries there is a certain amount of accuracy.</p>
+
+<ul>
+<li>1883 and 1884: Daisy Brown, living at 125 Grand Avenue (Kitty Brown’s resort)</li>
+<li>1888: Julia Lamore, Alamo Building, stenographer</li>
+<li>1889: H Jsiorejulia, 1011 Main Street</li>
+<li>1890: Julia H. LaMore, 1011 Main Street, stenographer</li>
+<li>1891: Jails La More, Occupation: Far Rtniiu</li>
+<li>1892: Ji Julia, 918 Woodland</li>
+<li>1893: J.H. Lamore, 918 Woodland, draughtsman and dressmaker.</li>
+</ul>
+
+<div class='img_container right' style='position:relative;width:350px;'>
+<img src='imgs/barnum-circus-parade-1886.jpg' width='350' height='253' class=' ds' alt='' loading='lazy'><div class='caption'>Barnum’s circus parade at 8th and Main, 1886</div></div>
+
+<p>From 1880 to 1885, Sarah Etta and I enjoyed the sights and sounds of the city. Sometimes I was left breathless by the noise and the bustle, and there were so many activities to go to. Perhaps the best thing we ever attended was Barnum’s circus. They came to Kansas City in October of 1884 and there was a big parade down Main Street when they arrived. P.T. Barnum named his circus the “Greatest Show on Earth” and I have to admit that it was pretty spectacular. I had never seen an elephant before, and they had two as their star attractions: a white elephant — which they said was sacred because he was white — that had come from Burma, and Jumbo, the biggest elephant anyone had ever seen. I could not believe how large Jumbo was. I was a bit concerned about how he was being treated, though. He had been in the London Zoo for many years and given many children a ride, but P.T. Barnum bought him for $10,000 — a truly princely sum. While he drew large crowds everywhere he went, I couldn’t help but think that he might have preferred a bit more privacy. Unfortunately, Jumbo was killed by a train in St. Thomas, Ontario, Canada, the following year. We couldn’t believe it. He was being loaded onto a train with his handler when they were hit by an unscheduled freight train! Such a tragedy!</p>
+
+<p>Sarah Etta and I watched the parade together with a lot of the other girls from the resorts, and Sarah Etta and I got tickets to actually see the show. It was wonderful; we both loved it. Sarah Etta challenged me to ride Jumbo, so we both went together and rode that huge animal. I was nervous, but Sarah Etta laughed the whole time.</p>
+
+<p>Both Sarah Etta and I wanted to educate ourselves. Our childhood educations had not been perfect — and I think I got a better education in Minnesota than Sarah Etta did when we were still in West Turin. But Sarah Etta had a burning desire to read, to learn as much as she could, and I didn’t disagree with that. So, whenever we had the time, we tried to go to events that would improve our knowledge of the world.</p>
+
+<p>One of those events was on Monday, 17 April 1882. We went to listen to Oscar Wilde, the famous Irish writer, talk about “The Decorative Arts.” We weren’t sure just what that would be about but we knew we might learn something if we went and listened. He was speaking at the Coates Opera House which I think I heard seated about 1800 people, but a lot of things were going on in Kansas City at the time and he drew a small crowd, but we were glad we went. Sarah Etta and I got so many great ideas about how to decorate our homes and the resorts. He talked about the philosophy of aestheticism (I had to learn that word) which focused on interior design. He offered real, practical advice on how to decorate your home. He was opposed to mass-produced furniture and objects. Since our father had been a carpenter, we fully understood what he meant, although I am not sure I agreed with his idea that industrial furniture actually damaged people’s souls. I did agree with his comment, though, that industrial furniture could eliminate beauty from every life. Another interesting twist to his talk: The man was quite the dresser. He wore a velvet, cutaway coat, knee breeches, a Byron collar, and a diamond pin. Considering how much Sarah Etta loved clothes, she was very fascinated by this man’s attire. I think we both liked him because he was a bit of a rebel — and so were we.</p>
+
+<p>Another event we really enjoyed was the Inter-State Fair which began in 1882 and lasted until 1887. This event was always held in the fall at some new fairgrounds near Westport. Special trains left downtown every half hour, but you could also get there by horsecar, carriage, and wagon. We thought at first about just going in Sarah Etta’s carriage with Prince, but Sarah Etta became concerned about leaving Prince in a somewhat strange place. So we opted to take one of the trains.</p>
+
+<p>It was a very large area and featured a half-mile racetrack. This was perhaps the best part — especially for Sarah Etta. There were bookmakers and you could bet — which Sarah Etta did — but I was much more likely to just watch. The grandstand was three decks high and had a cupola to cover us if it rained. Of course, there was lots of food and drink, including beer, whiskey, and soda pop, as well as cigars, of course. There were livestock and produce exhibits, but it was the horse racing, pacing, trotting, and Roman-style chariot racing that Sarah Etta truly loved. I think it was 1883 when a pacer named Daisy D won every single race — and my sister had bet on her every time. We went to that fair at least three times before Sarah Etta had her terrible accident in late 1885. (Eventually, the fair was moved to a different site, but that was after Sarah Etta’s accident when, of course, we weren’t going to many activities at all.)</p>
+
+<p>Living in Kansas City meant there was constant change and incredible improvements such as a new newspaper, the <em>Kansas City Evening Star</em>, electric lights used in about a dozen stores on Main Street in 1882, and the first cable cars in June of 1885. Those cable cars were very handy for the steep 9th Street hill from the Union Depot, for instance, although Sarah Etta still preferred to drive up that hill with Prince pulling her. Sadly, she might not have been injured so badly if she had chosen to take a cable car rather than her own carriage with Prince pulling her. The cable cars and horses often had conflicts.</p>
+
+<div class='img_container left' style='position:relative;width:350px;'>
+<img src='imgs/mule-streetcar-1870.jpg' width='350' height='209' class=' ds' alt='' loading='lazy'><div class='caption'>A mule-drawn streetcar on the Kansas City &amp; Westport line, 1870 (Missouri Valley Special Collections, Kansas City Public Library)</div></div>
+
+<p>At first, there were streetcars pulled by mules, but the new cable car system had no animal in front of it and it could move much faster. It disrupted the city’s horse-and-carriage traffic immensely. It was a major undertaking as they had to lay down a large infrastructure which meant digging deep trenches through major thoroughfares to bury the steam-powered pulleys and cables. The horses’ hooves did not like the car’s mechanism which latched on the moving underground rope. As well, cable cars moved rapidly without an animal in front. There was a loud, continuous mechanical humming of the underground cable which terrified horses, causing frequent runaways, horrendous throws, and street collisions. As well, there are some very steep hills in Kansas City, and these cable cars occasionally broke and sometimes would even come flying down the hill on their own. Those cable cars began operating with regularity by June of 1885 and Sarah Etta had her accident in the fall of that year.</p>
+
+<div class='img_container right' style='position:relative;width:350px;'>
+<img src='imgs/courthouse-tornado-1886.jpg' width='350' height='251' class=' ds' alt='' loading='lazy'><div class='caption'>Crowds view the wrecked Jackson County Courthouse, at 2nd and Main, after the tornado of 11 May 1886 (Missouri Valley Special Collections, Kansas City Public Library)</div></div>
+
+<p>I lived in Kansas City from 1880 to 1927, occasionally living elsewhere but always returning to Kansas City. During that time, there were several tornadoes. I was always able to get to safety, but they could be frightening, especially when you huddled inside and could hear the noise of roofs being ripped off their buildings.</p>
+
+<p>After Sarah Etta’s terrible accident, I nursed her, despite how mean and cruel she became as she attempted to deal with the horrendous pain which would never go away. After her death in early 1890, we all fought the will which she had written while completely out of her mind on morphine because of the pain from the accident. We made sure Gracie had a lawyer so that her rights would be protected.</p>
+
+<p>Then after all of that was resolved, I lost Bill, too, who died unexpectedly in 1892. I concentrated on taking care of Sarah Etta’s daughter, Gracie (more discussion about that in the next chapter).</p>
+
+<p>However, Mother and I both managed to find love and marriage in the 1890s. I married James Alan Ham on 5 June 1893, and we eventually adopted a little boy from Scotland whom we named James Alan Ham, Jr. Mother actually managed to marry before me — 10 November 1892, to John Kell. They lived together happily until Mother died on 29 February 1904.</p>
+
+<p>In June 1896, we also lost my little sister, Effie, who had married well and then became very ill with tuberculosis. When she was told by the doctor she would not live more than another day, she decided to end it herself. While her husband was in the back of the house, she found his revolver and shot herself.<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup> My mother had suffered some terrible losses but the deaths of Bessie and Effie were the most difficult for her to handle. I stayed close by and tried to get her through it.</p>
+
+<div class='img_container centre' style='position:relative;width:1147px;'>
+<img src='imgs/effie-pierpont-death-1896.jpg' width='1147' height='834' class=' ds' alt='' loading='lazy'><div class='caption'>Effie’s death, as reported in the <em>Arizona Daily Star</em>, Tucson, June 1896</div></div>
+
+<p>From the moment Sarah Etta died, I made it my mission to take care of Gracie. To show her the love and affection that I knew Sarah Etta wanted to give her. I had never been a mother before and I didn’t know if I was up to the task, but I was certainly going to try as hard as I could to make Gracie know that she was loved and protected.</p>
+
+<hr style="width:40%; margin:2.5em auto 1em auto;">
+
+<p style="font-size:0.85em; font-style:italic;"><strong>Author’s Note:</strong> The women in <span style="font-style:normal;">Sisters</span> were real people, and I have told their story as accurately as I can for lives lived in the 19th century. I can prove and support many of the facts with records from the time. But no record can tell me exactly what someone said, and for some events I know only portions of the story. So I have also had to use my imagination, to put you, the reader, inside the head of each woman as she tells her own story.</p>
+
+<p><center><a href="sisters-home-page.html">Return to the SISTERS table of contents</a></center></p>
+
+<div class='separator stars'>&#9733; &#9733; &#9733;</div>
+
+<div class="footnotes" role="doc-endnotes">
+<hr />
+<ol>
+
+<li id="fn:1" role="doc-endnote">
+<p>The <em>Arizona Daily Star</em> said Effie was “about 23 years old,” but she was 28. She was born on 26 October 1867.&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#8617;&#xFE0E;</a></p>
+</li>
+
+</ol>
+</div>
+
+
+</article>
+
+<footer class="bio"><img data-src="imgs/susan-75x87-web.jpg" class="lazyimg" width="75" height="87" class='lazyimg'>I taught in the public schools for 32 years. After retirement, I trained to become a fitness instructor for older adults. I enjoy working on family history, writing novels, and researching the latest fitness news for my class participants.</footer>
+
+<nav class="footer_nav">
+<a href="https://susaningraham.net">Susan&thinsp;Ingraham<span class='color_light_gray'>&#8202;.&#8202;net</span></a>
+</nav>
+
+<script type='text/javascript' src='https://code.jquery.com/jquery-3.4.1.min.js' ></script>
+
+<script type="text/javascript">
+
+!function(a){a.bigfoot=function(b){var c,d=a.extend({actionOriginalFN:"hide",activateCallback:function(){},activateOnHover:!1,allowMultipleFN:!1,appendPopoversTo:void 0,breakpoints:{},deleteOnUnhover:!1,hoverDelay:250,numberResetSelector:void 0,popoverDeleteDelay:300,popoverCreateDelay:100,positionNextToBlock:!0,positionContent:!0,preventPageScroll:!0,scope:!1,useFootnoteOnlyOnce:!0,contentMarkup:'<aside class="footnote-content bottom"data-footnote-number="{{FOOTNOTENUM}}" data-footnote-identifier="{{FOOTNOTEID}}" alt="Footnote {{FOOTNOTENUM}}"><div class="footnote-main-wrapper"><div class="footnote-content-wrapper">{{FOOTNOTECONTENT}}</div></div><div class="tooltip"></div></aside>',buttonMarkup:'<a href="#" class="footnote-button" id="{{SUP:data-footnote-backlink-ref}}" data-footnote-number="{{FOOTNOTENUM}}" data-footnote-identifier="{{FOOTNOTEID}}" alt="See Footnote {{FOOTNOTENUM}}" rel="footnote"data-footnote-content="{{FOOTNOTECONTENT}}"><span class="footnote-circle" data-footnote-number="{{FOOTNOTENUM}}"></span><span class="footnote-circle"></span><span class="footnote-circle"></span></a>'},b),e=function(){var b;b=d.scope?d.scope+' a[href*="#"]':'a[href*="#"]';var c,e,j=a(b).filter(function(){var b=a(this),c=b.attr("rel");return c&&"null"!=c||(c=""),(b.attr("href")+c).match(/(fn|footnote|note)[:\-_\d]/gi)&&b.closest("[class*=footnote]:not(a):not(sup)").length<1}),k=[],l=[],m=[];f(j,l),a(l).each(function(){c=a(this).attr("data-footnote-ref").replace(/[:.+~*\]\[]/g,"\\$&"),d.useFootnoteOnlyOnce&&(c+=":not(.footnote-processed)"),e=a(c).closest("li"),e.length>0&&(k.push(e.first().addClass("footnote-processed")),m.push(this))});for(var n,o,p,q,r,s,t,u,v=1,w=0;w<k.length;w++){p=h(a(k[w]).html().trim(),a(m[w]).data("footnote-backlink-ref")).replace(/"/g,"&quot;").replace(/&lt;/g,"&ltsym;").replace(/&gt;/g,"&gtsym;"),q=+(w+1),t="",r=a(m[w]),s=a(k[w]),d.numberResetSelector?(o=r.closest(d.numberResetSelector),o.is(n)?v+=1:v=1,n=o):v=q,0!==p.indexOf("<")&&(p="<p>"+p+"</p>"),t=d.buttonMarkup.replace(/\{\{FOOTNOTENUM\}\}/g,v).replace(/\{\{FOOTNOTEID\}\}/g,q).replace(/\{\{FOOTNOTECONTENT\}\}/g,p),t=i(t,"SUP",r),t=i(t,"FN",s),u=a(t).insertBefore(r);var x=s.parent();switch(d.actionOriginalFN.toLowerCase()){case"delete":r.remove(),s.remove(),g(x);break;case"hide":r.addClass("footnote-print-only"),s.addClass("footnote-print-only"),g(x);break;case"ignore":r.addClass("footnote-print-only")}}},f=function(b,c){var d,e,f,g;b.each(function(){var b=a(this);f="#"+b.attr("href").split("#")[1],d=b.closest("sup"),e=b.find("sup"),d.length>0?(g=(d.attr("id")||"")+(b.attr("id")||""),c.push(d.attr({"data-footnote-backlink-ref":g,"data-footnote-ref":f}))):e.length>0?(g=(e.attr("id")||"")+(b.attr("id")||""),c.push(b.attr({"data-footnote-backlink-ref":g,"data-footnote-ref":f}))):(g=b.attr("id")||"",c.push(b.attr({"data-footnote-backlink-ref":g,"data-footnote-ref":f})))})},g=function(a){var b;a.is(":empty")||0===a.children(":not(.footnote-print-only)").length?(b=a.parent(),"delete"===d.actionOriginalFN.toLowerCase()?a.remove():a.addClass("footnote-print-only"),g(b)):a.children(":not(.footnote-print-only)").length==a.children("hr:not(.footnote-print-only)").length&&(b=a.parent(),"delete"===d.actionOriginalFN.toLowerCase()?a.remove():(a.children("hr").addClass("footnote-print-only"),a.addClass("footnote-print-only")),g(b))},h=function(a,b){b.indexOf(" ")>=0&&(b=b.trim().replace(/ +/g,"|").replace(/(.*)/g,"($1)"));var c=new RegExp("(\\s|&nbsp;)*<\\s*a[^#<]*#"+b+"[^>]*>(.*?)<\\s*/\\s*a>","g");return a.replace(c,"").replace("[]","")},i=function(a,b,c){var d,e,f=new RegExp("\\{\\{"+b+":([^\\}]*)\\}\\}","g");for(d=f.exec(a);d;)d[1]&&(e=c.attr(d[1])||"",a=a.replace("{{"+b+":"+d[1]+"}}",e)),d=f.exec(a);return a},j=function(b){if(d.activateOnHover){var c=a(b.target).closest(".footnote-button"),e='[data-footnote-identifier="'+c.attr("data-footnote-identifier")+'"]';if(c.hasClass("active"))return;if(c.addClass("hover-instantiated"),!d.allowMultipleFN){var f=".footnote-content:not("+e+")";p(f)}m(".footnote-button"+e).addClass("hover-instantiated")}},k=function(b){var c=a(b.target),d=c.closest(".footnote-button");$nearFootnote=c.closest(".footnote-content"),d.length>0?(b.preventDefault(),l(d)):$nearFootnote.length<1&&a(".footnote-content").length>0&&p()},l=function(a){a.blur();var b='data-footnote-identifier="'+a.attr("data-footnote-identifier")+'"';a.hasClass("changing")||(a.hasClass("active")?d.allowMultipleFN?p(".footnote-content["+b+"]"):p():(a.addClass("changing"),setTimeout(function(){a.removeClass("changing")},d.popoverCreateDelay),m(".footnote-button["+b+"]"),a.addClass("click-instantiated"),d.allowMultipleFN||p(".footnote-content:not(["+b+"])")))},m=function(b){b=b||".footnote-button";var c;c="string"!=typeof b&&d.allowMultipleFN?b:"string"!=typeof b?b.first():d.allowMultipleFN?a(b).closest(".footnote-button"):a(b+":first").closest(".footnote-button");var e=a();return c.each(function(){var b,c=a(this);try{b=d.contentMarkup.replace(/\{\{FOOTNOTENUM\}\}/g,c.attr("data-footnote-number")).replace(/\{\{FOOTNOTEID\}\}/g,c.attr("data-footnote-identifier")).replace(/\{\{FOOTNOTECONTENT\}\}/g,c.attr("data-footnote-content").replace(/&gtsym;/,"&gt;").replace(/&ltsym;/,"&lt;")),b=i(b,"BUTTON",c)}finally{$content=a(b);try{d.activateCallback($content)}catch(f){}d.appendPopoversTo?$content.appendTo(d.appendPopoversTo+":first"):($nearestBlock=c.closest("p, div, pre, li, ul, section, article, main, aside"),$siblingFootnote=$nearestBlock.siblings(".footnote-content:last"),$siblingFootnote.length>0?$content.insertAfter($siblingFootnote):$content.insertAfter($nearestBlock)),$content.attr("data-bigfoot-max-height",$content.height()),q(),c.addClass("active"),$content.find(".footnote-content-wrapper").bindScrollHandler(),e=e.add($content)}}),setTimeout(function(){e.addClass("active")},d.popoverCreateDelay),e};a.fn.bindScrollHandler=function(){d.preventPageScroll&&a(this).on("DOMMouseScroll mousewheel",function(b){var c=a(this),d=c.scrollTop(),e=c[0].scrollHeight,f=parseInt(c.css("height")),g=c.closest(".footnote-content");if(c.scrollTop()>0&&c.scrollTop()<10&&g.addClass("scrollable"),g.hasClass("scrollable")){var h="DOMMouseScroll"==b.type?-40*b.originalEvent.detail:b.originalEvent.wheelDelta,i=h>0,j=function(){return b.stopPropagation(),b.preventDefault(),b.returnValue=!1,!1};return!i&&-h>e-f-d?(c.scrollTop(e),g.addClass("fully-scrolled"),j()):i&&h>d?(c.scrollTop(0),g.removeClass("fully-scrolled"),j()):(g.removeClass("fully-scrolled"),void 0)}})};var n=function(b){d.deleteOnUnhover&&d.activateOnHover&&setTimeout(function(){a(b.target).closest(".footnote-content, .footnote-button");a(".footnote-button:hover, .footnote-content:hover").length<1&&p()},d.hoverDelay)},o=function(a){27==a.keyCode&&p()},p=function(b,c){b=b||".footnote-content",c=c||d.popoverDeleteDelay;var e,f,g,h=a();return a(b).each(function(){g=a(this),e=g.attr("data-footnote-identifier"),f=a('.footnote-button[data-footnote-identifier="'+e+'"]'),f.hasClass("changing")||(h=h.add(f),f.removeClass("active hover-instantiated click-instantiated").addClass("changing"),g.removeClass("active").addClass("disapearing"),setTimeout(function(){g.remove(),f.removeClass("changing")},c))}),h},q=function(){d.positionContent&&a(".footnote-content").each(function(){var b=a(this),c='data-footnote-identifier="'+b.attr("data-footnote-identifier")+'"',d=(b.find(".footnote-content-wrapper"),a(".footnote-button["+c+"]")),e=s(d),f=parseFloat(b.css("width")),g=parseFloat(b.css("margin-top")),h=+b.attr("data-bigfoot-max-height"),i=2*g+h,j=1e4;e.bottomRoom<i&&e.topRoom>e.bottomRoom?(b.css({top:"auto",bottom:e.bottomRoom+"px"}).addClass("top").removeClass("bottom"),j=e.topRoom-g-15,b.css({"transform-origin":100*e.leftRelative+"% 100%"})):(b.css({bottom:"auto",top:e.topRoom+"px"}).addClass("bottom").removeClass("top"),j=e.bottomRoom-g-15,b.css({"transform-origin":100*e.leftRelative+"% 0%"})),b.find(".footnote-content-wrapper").css({"max-height":Math.min(j,h)+"px"}),b.css({left:e.leftRoom-e.leftRelative*f+"px"}),r(b,e.leftRelative),parseInt(b.css("height"))<b.find(".footnote-content-wrapper")[0].scrollHeight&&b.addClass("scrollable")})},r=function(a,b){b=b||.5;var c=a.find(".tooltip");c.length>0&&c.css({left:100*b+"%"})},s=function(b){var c=parseFloat(b.outerWidth()),d=parseFloat(b.outerHeight()),e=t(),f=b.offset().top-a(window).scrollTop()+d/2,g=b.offset().left+c/2;return{topRoom:f,bottomRoom:e.height-f,leftRoom:g,rightRoom:e.width-g,leftRelative:g/e.width,topRelative:f/e.height}},t=function(){var a=document.createElement("div");a.style.cssText="position: fixed;top: 0;left: 0;bottom: 0;right: 0;",document.documentElement.insertBefore(a,document.documentElement.firstChild);var b={width:a.offsetWidth,height:a.offsetHeight};return document.documentElement.removeChild(a),b},u=function(a,b,e,f,g){b=b||d.popoverDeleteDelay,(null===e||e!==!1)&&(e=!0);var h,i,j;if("string"==typeof a){j="iphone"===a.toLowerCase()?"<320px":"ipad"===a.toLowerCase()?"<768px":a,i=">"===j.charAt(0)?"min":"<"===j.charAt(0)?"max":null;var k=i?"("+i+"-width: "+j.substring(1)+")":j;h=window.matchMedia(k)}else h=a;if(h.media&&"invalid"===h.media)return{added:!1,mq:h,listener:null};var l="min"===i,m="max"===i;f=f||v(e,b,l,function(a){a.addClass("fixed-bottom")}),g=g||v(e,b,m,function(){});var n=function(a){a.matches?f(e,c):g(e,c)};return h.addListener(n),n(h),d.breakpoints[a]={added:!0,mq:h,listener:n},d.breakpoints[a]},v=function(a,b,c,d){return function(a,e){var f;a&&(f=e.close(),e.updateSetting("activateCallback",d)),setTimeout(function(){e.updateSetting("positionContent",c),a&&e.activate(f)},b)}},w=function(a,b){var c;if("string"==typeof a)mqFound=void 0!==d.breakpoints[a];else for(c in d.breakpoints)if(d.breakpoints.hasOwnProperty(c)&&d.breakpoints[c].mq===a){mqFound=!0;break}if(mqFound){var e=d.breakpoints[c||a];b?b({matches:!1}):e.listener({matches:!1}),e.mq.removeListener(e.listener),delete d.breakpoints[c||a]}return mqFound},x=function(a,b){var c;if("string"==typeof a)c=d[a],d[a]=b;else{c={};for(var e in a)a.hasOwnProperty(e)&&(c[e]=d[e],d[e]=a[e])}return c},y=function(a){return d[a]};return a(document).ready(function(){e(),a(document).on("mouseenter",".footnote-button",j),a(document).on("touchend click",k),a(document).on("mouseout",".hover-instantiated",n),a(document).on("keyup",o),a(window).on("scroll resize",q)}),c={close:function(a,b){return p(a,b)},activate:function(a){return m(a)},reposition:function(){return q()},addBreakpoint:function(a,b,c,d,e){return u(a,b,c,d,e)},removeBreakpoint:function(a,b){return w(a,b)},getSetting:function(a){return y(a)},updateSetting:function(a,b){return x(a,b)}}}}(jQuery);
+$.bigfoot();
+
+document.addEventListener("DOMContentLoaded", function() {
+  var lazyloadImages;    
+
+console.log ('LAZY LOADER gittin bizzy');
+
+  if ("IntersectionObserver" in window) {
+    lazyloadImages = document.querySelectorAll(".lazyimg");
+    var imageObserver = new IntersectionObserver(function(entries, observer) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          var image = entry.target;
+          image.src = image.dataset.src;
+          // image.classList.remove("lazyimg"); // I don't want to remove the class; it's useful!
+          imageObserver.unobserve(image);
+        }
+      });
+    });
+
+    lazyloadImages.forEach(function(image) {
+      imageObserver.observe(image);
+    });
+  } 
+  
+else 
+    
+  {  
+    var lazyloadThrottleTimeout;
+    lazyloadImages = document.querySelectorAll(".lazyimg");
+    
+    function lazyload () { 
+      if(lazyloadThrottleTimeout) {
+        clearTimeout(lazyloadThrottleTimeout);
+      }    
+
+      lazyloadThrottleTimeout = setTimeout(function() {
+        var scrollTop = window.pageYOffset;
+        lazyloadImages.forEach(function(img) {
+            if(img.offsetTop < (window.innerHeight + scrollTop)) {
+              img.src = img.dataset.src;
+			  // image.classList.remove("lazyimg"); // I don't want to remove the class; it's useful!
+            }
+        });
+        if(lazyloadImages.length == 0) { 
+          document.removeEventListener("scroll", lazyload);
+          window.removeEventListener("resize", lazyload);
+          window.removeEventListener("orientationChange", lazyload);
+        }
+      }, 20);
+    }
+
+    document.addEventListener("scroll", lazyload);
+    window.addEventListener("resize", lazyload);
+    window.addEventListener("orientationChange", lazyload);
+  }
+})
+</script>
+
+
+</body></html>
