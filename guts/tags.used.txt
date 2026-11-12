@@ -1,4 +1,4 @@
-_size_s
+_size_m
 _size_xl
 _size_xl
 _size_l

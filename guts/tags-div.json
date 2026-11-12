@@ -1756,12 +1756,12 @@
         },
         "size M": {
             "key": "sizem",
-            "tally#": 8,
+            "tally#": 9,
             "true": "size M"
         },
         "size S": {
             "key": "sizes",
-            "tally#": 5,
+            "tally#": 4,
             "true": "size S"
         },
         "size XL": {
