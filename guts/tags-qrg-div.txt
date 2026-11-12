@@ -218,7 +218,7 @@ Silver City	0
 singing	0						
 size L	21						
 size M	8						
-size S	4						
+size S	5						
 size XL	35						
 skeleton	0						
 sleep	0						
