@@ -1,3 +1,8 @@
+PainScience.com/legacies-ch-3.html
+https://www.painscience.com/legacies-ch-3.html
+[Family Legacies: Chapter 3](https://www.painscience.com/legacies-ch-3.html)
+<a href="https://www.painscience.com/legacies-ch-3.html">Family Legacies: Chapter 3</a>
+
 PainScience.com/family-legacies-home-page.html
 https://www.painscience.com/family-legacies-home-page.html
 [FAMILY LEGACIES](https://www.painscience.com/family-legacies-home-page.html)
