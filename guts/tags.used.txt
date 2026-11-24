@@ -27,6 +27,7 @@ Overturf
  Herrick
  Brand
  _size_l
+_size_l
 _size_xl
 _size_xl
 _size_xl

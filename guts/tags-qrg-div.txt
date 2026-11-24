@@ -216,7 +216,7 @@ shins	0
 shoulder	0						
 Silver City	0						
 singing	0						
-size L	21						
+size L	22						
 size M	9						
 size S	4						
 size XL	37						
